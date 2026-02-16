@@ -165,34 +165,33 @@ pull_updates() {
 
     if [ -d ".git" ]; then
         if [ -n "$(git status --porcelain 2>/dev/null || true)" ]; then
-            if [ "$USE_STASH" -ne 1 ]; then
-                print_error "Local changes detected in $OVERSEER_DIR; refusing to update to avoid merge conflicts."
-                print_warning "This installation should stay clean. Fix by either:"
-                echo "  - Discard local changes: git reset --hard origin/main && git clean -fd"
-                echo "  - Or run update with explicit stash: bash scripts/update.sh --stash"
-                exit 1
+            # Update must still succeed: back up local changes then reset/clean.
+            local ts
+            ts=$(date +%Y%m%d-%H%M%S)
+            local backup_dir="${BACKUP_DIR}/local-changes-${ts}"
+            mkdir -p "$backup_dir"
+
+            print_warning "Local changes detected. Backing them up and resetting so update can continue."
+            print_substep "Backup: ${backup_dir}"
+
+            git diff > "${backup_dir}/diff.patch" 2>/dev/null || true
+            git diff --cached > "${backup_dir}/diff-staged.patch" 2>/dev/null || true
+            git ls-files -o --exclude-standard > "${backup_dir}/untracked.txt" 2>/dev/null || true
+            if [ -s "${backup_dir}/untracked.txt" ]; then
+                tar -czf "${backup_dir}/untracked.tar.gz" -T "${backup_dir}/untracked.txt" 2>/dev/null || true
             fi
 
-            if ! git stash push -u -m "overseer-update-stash-$(date +%s)" >/dev/null 2>&1; then
-                print_error "Failed to stash local changes; aborting."
-                exit 1
+            if [ "$USE_STASH" -eq 1 ]; then
+                print_warning "--stash is deprecated. This updater uses backup+reset to guarantee success."
             fi
-            HAD_STASH=1
-        else
-            HAD_STASH=0
+
+            git fetch origin main --quiet 2>/dev/null || true
+            git reset --hard origin/main >/dev/null 2>&1 || git reset --hard >/dev/null 2>&1 || true
+            git clean -fd >/dev/null 2>&1 || true
         fi
 
         # Pull latest (fast-forward only)
         git pull --ff-only origin main
-
-        if [ "${HAD_STASH:-0}" -eq 1 ]; then
-            # Apply (don't pop) so stash remains available even if conflicts occur.
-            if ! git stash apply >/dev/null 2>&1; then
-                print_warning "Stashed local changes did not apply cleanly."
-                print_warning "Your stash was kept. Resolve manually: git status && git stash list && git stash apply"
-                exit 1
-            fi
-        fi
 
         print_success "Repository updated"
     else

@@ -364,22 +364,36 @@ cmd_update() {
     # 2. Pull latest code (this also updates THIS script)
     echo -e "${BLUE}==>${NC} Pulling latest code..."
 
-    local had_stash="false"
-    if [ -n "$(git status --porcelain)" ]; then
-        if [ "$use_stash" != "true" ]; then
-            echo -e "${RED}[ERROR]${NC} Local changes detected in the Overseer install directory."
-            echo -e "${YELLOW}[INFO]${NC} This server install should stay clean; update is aborted to prevent conflicts."
-            echo -e "${YELLOW}[INFO]${NC} Options:"
-            echo -e "  - Discard local changes: ${BOLD}git reset --hard origin/main && git clean -fd${NC}"
-            echo -e "  - Keep local changes: commit them to a branch, or run: ${BOLD}./overseer update --stash${NC}"
-            return 1
+    # If the install dir is dirty, update MUST still succeed.
+    # We avoid stash/pop conflicts by backing up local diffs and untracked files,
+    # then hard-resetting to the remote branch before pulling.
+    if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+        local ts
+        ts=$(date +%Y%m%d-%H%M%S)
+        local backup_dir="${SCRIPT_DIR}/backups/local-changes-${ts}"
+        mkdir -p "$backup_dir"
+
+        echo -e "${YELLOW}[WARN]${NC} Local changes detected. Backing them up and resetting to ${UPDATE_REMOTE}/${UPDATE_BRANCH} so update can continue."
+        echo -e "    ${CYAN}>${NC} Backup: ${backup_dir}"
+
+        # Save diffs (tracked changes)
+        git diff > "${backup_dir}/diff.patch" 2>/dev/null || true
+        git diff --cached > "${backup_dir}/diff-staged.patch" 2>/dev/null || true
+
+        # Save a list of untracked files and a tarball of them.
+        git ls-files -o --exclude-standard > "${backup_dir}/untracked.txt" 2>/dev/null || true
+        if [ -s "${backup_dir}/untracked.txt" ]; then
+            tar -czf "${backup_dir}/untracked.tar.gz" -T "${backup_dir}/untracked.txt" 2>/dev/null || true
         fi
 
-        if ! git stash push -u -m "overseer-auto-stash-$(date +%s)" >/dev/null 2>&1; then
-            echo -e "${RED}[ERROR]${NC} Failed to stash local changes. Aborting update."
-            return 1
+        # Abort if user explicitly asked for stash behavior (legacy flag), but keep it functional.
+        if [ "$use_stash" = "true" ]; then
+            echo -e "${YELLOW}[INFO]${NC} --stash is deprecated. This updater now uses backup+reset to guarantee success."
         fi
-        had_stash="true"
+
+        git fetch "$UPDATE_REMOTE" "$UPDATE_BRANCH" --quiet || true
+        git reset --hard "${UPDATE_REMOTE}/${UPDATE_BRANCH}" >/dev/null 2>&1 || git reset --hard >/dev/null 2>&1 || true
+        git clean -fd >/dev/null 2>&1 || true
     fi
 
     local old_sha="$UPDATE_LOCAL_SHA"
@@ -388,22 +402,7 @@ cmd_update() {
         if has_unmerged_conflicts; then
             print_unmerged_conflicts
         fi
-        if [ "$had_stash" = "true" ]; then
-            echo -e "${YELLOW}[INFO]${NC} Your auto-stash was kept. Reapply manually when ready with: git stash list"
-        fi
         return 1
-    fi
-
-    if [ "$had_stash" = "true" ]; then
-        # Apply (don't pop) so the stash is preserved even if conflicts occur.
-        if ! git stash apply >/dev/null 2>&1; then
-            echo -e "${YELLOW}[WARN]${NC} Stashed local changes did not apply cleanly after update."
-            echo -e "${YELLOW}[INFO]${NC} Your stash was kept. Resolve manually:"
-            echo -e "  - Inspect: ${BOLD}git status && git stash list${NC}"
-            echo -e "  - Try again: ${BOLD}git stash apply${NC}"
-            echo -e "  - Or drop: ${BOLD}git stash drop${NC} (DANGEROUS: discards stash)"
-            return 1
-        fi
     fi
 
     local new_sha
@@ -535,8 +534,9 @@ cmd_help() {
     echo "  update    Update to latest version (only applies when new commits exist)"
     echo "  update --check  Check if updates are available"
     echo "  update --force  Attempt update even if branch diverged"
-    echo "  update --stash  (Explicit) Stash local changes before pulling, then re-apply (may still conflict)"
-    echo "  update --force-stash  Combine --force + --stash"
+    echo "  update          Update to latest version (auto-backs-up any local changes to backups/ and then updates cleanly)"
+    echo "  update --stash  Deprecated alias (kept for compatibility)"
+    echo "  update --force-stash  Deprecated alias (kept for compatibility)"
     echo "  install-cli     Install global 'overseer' command"
     echo "  uninstall-cli   Remove global 'overseer' command"
     echo "  help      Show this help"
