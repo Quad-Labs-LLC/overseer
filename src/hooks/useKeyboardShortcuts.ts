@@ -39,19 +39,19 @@ export function useKeyboardShortcuts() {
         if (prefixTimer) clearTimeout(prefixTimer);
 
         const gRoutes: Record<string, string> = {
-          d: "/dashboard",
-          c: "/chat",
-          p: "/providers",
-          s: "/settings",
-          u: "/users",
-          a: "/audit",
-          k: "/skills",
-          m: "/memory",
-          i: "/interfaces",
-          t: "/tasks",
-          y: "/system",
-          n: "/analytics",
-          r: "/cron",
+          d: "/admin/dashboard",
+          c: "/",
+          p: "/admin/providers",
+          s: "/admin/settings",
+          u: "/admin/users",
+          a: "/admin/audit",
+          k: "/admin/skills",
+          m: "/admin/memory",
+          i: "/admin/interfaces",
+          t: "/admin/tasks",
+          y: "/admin/system",
+          n: "/admin/analytics",
+          r: "/admin/cron",
         };
 
         if (gRoutes[key]) {
@@ -71,7 +71,7 @@ export function useKeyboardShortcuts() {
 
       // Single-key shortcuts
       if (key === "n" && !e.metaKey && !e.ctrlKey) {
-        router.push("/chat");
+        router.push("/");
         return;
       }
 

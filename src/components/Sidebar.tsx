@@ -31,13 +31,13 @@ const navigationSections: NavSection[] = [
     title: "",
     items: [
       {
-        name: "Chat",
-        href: "/chat",
+        name: "Chat UI",
+        href: "/",
         badge: "AI",
         requires: ["agent:execute"],
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
           </svg>
         ),
       },
@@ -48,7 +48,7 @@ const navigationSections: NavSection[] = [
     items: [
       {
         name: "Dashboard",
-        href: "/dashboard",
+        href: "/admin/dashboard",
         requires: ["agent:view"],
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,7 +58,7 @@ const navigationSections: NavSection[] = [
       },
       {
         name: "Analytics",
-        href: "/analytics",
+        href: "/admin/analytics",
         requires: ["agent:view"],
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,7 +70,7 @@ const navigationSections: NavSection[] = [
       },
       {
         name: "Conversations",
-        href: "/conversations",
+        href: "/admin/conversations",
         requires: ["conversations:view"],
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,7 +81,7 @@ const navigationSections: NavSection[] = [
       },
       {
         name: "Logs",
-        href: "/audit",
+        href: "/admin/audit",
         requires: ["audit:view"],
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +96,7 @@ const navigationSections: NavSection[] = [
     items: [
       {
         name: "Sessions",
-        href: "/sessions",
+        href: "/admin/sessions",
         requires: ["agent:view"],
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,7 +106,7 @@ const navigationSections: NavSection[] = [
       },
       {
         name: "Tasks",
-        href: "/tasks",
+        href: "/admin/tasks",
         requires: ["agent:view"],
         icon: (
           <svg
@@ -126,7 +126,7 @@ const navigationSections: NavSection[] = [
       },
       {
         name: "Files",
-        href: "/files",
+        href: "/admin/files",
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
@@ -135,7 +135,7 @@ const navigationSections: NavSection[] = [
       },
       {
         name: "Cron Jobs",
-        href: "/cron",
+        href: "/admin/cron",
         requires: ["agent:configure"],
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,7 +145,7 @@ const navigationSections: NavSection[] = [
       },
       {
         name: "Sub-agents",
-        href: "/subagents",
+        href: "/admin/subagents",
         requires: ["subagent:view"],
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,7 +155,7 @@ const navigationSections: NavSection[] = [
       },
       {
         name: "MCP Servers",
-        href: "/mcp",
+        href: "/admin/mcp",
         requires: ["mcp:view"],
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,7 +165,7 @@ const navigationSections: NavSection[] = [
       },
       {
         name: "Skills",
-        href: "/skills",
+        href: "/admin/skills",
         requires: ["skills:view"],
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,7 +180,7 @@ const navigationSections: NavSection[] = [
     items: [
       {
         name: "Providers",
-        href: "/providers",
+        href: "/admin/providers",
         requires: ["providers:view"],
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,7 +190,7 @@ const navigationSections: NavSection[] = [
       },
       {
         name: "Interfaces",
-        href: "/interfaces",
+        href: "/admin/interfaces",
         requires: ["interfaces:view"],
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -200,7 +200,7 @@ const navigationSections: NavSection[] = [
       },
       {
         name: "Soul",
-        href: "/soul",
+        href: "/admin/soul",
         requires: ["agent:configure"],
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,7 +210,7 @@ const navigationSections: NavSection[] = [
       },
       {
         name: "Tools",
-        href: "/tools",
+        href: "/admin/tools",
         requires: ["agent:configure"],
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -226,7 +226,7 @@ const navigationSections: NavSection[] = [
     items: [
       {
         name: "Users",
-        href: "/users",
+        href: "/admin/users",
         requires: ["users:view"],
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,7 +236,7 @@ const navigationSections: NavSection[] = [
       },
       {
         name: "Settings",
-        href: "/settings",
+        href: "/admin/settings",
         requires: ["system:settings:read"],
         icon: (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
