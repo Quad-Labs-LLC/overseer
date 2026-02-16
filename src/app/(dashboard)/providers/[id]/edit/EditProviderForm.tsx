@@ -55,8 +55,6 @@ export function EditProviderForm({ provider }: EditProviderFormProps) {
     provider_name:
       initialConfig.models_dev_provider_id || initialConfig.providerId || provider.name,
     model: provider.model,
-    max_tokens: provider.max_tokens,
-    use_model_default_tokens: provider.max_tokens == null,
     temperature: provider.temperature,
     is_active: Boolean(provider.is_active),
     is_default: Boolean(provider.is_default),
@@ -72,7 +70,12 @@ export function EditProviderForm({ provider }: EditProviderFormProps) {
       setCatalogError("");
 
       try {
-        const res = await fetch("/api/providers/catalog", { cache: "no-store" });
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 6000);
+        const res = await fetch("/api/providers/catalog", {
+          cache: "no-store",
+          signal: controller.signal,
+        }).finally(() => clearTimeout(timeout));
         if (!res.ok) {
           throw new Error(`Catalog request failed (${res.status})`);
         }
@@ -128,9 +131,6 @@ export function EditProviderForm({ provider }: EditProviderFormProps) {
       model: firstModel?.id ?? prev.model,
       base_url: nextProvider?.apiBaseUrl ?? prev.base_url,
       temperature: firstModel?.allowsTemperature === false ? 0 : prev.temperature,
-      max_tokens: prev.use_model_default_tokens
-        ? null
-        : firstModel?.maxOutput ?? prev.max_tokens,
     }));
   };
 
@@ -141,9 +141,6 @@ export function EditProviderForm({ provider }: EditProviderFormProps) {
       ...prev,
       model: modelId,
       temperature: model?.allowsTemperature === false ? 0 : prev.temperature,
-      max_tokens: prev.use_model_default_tokens
-        ? null
-        : model?.maxOutput ?? prev.max_tokens,
     }));
   };
 
@@ -179,7 +176,6 @@ export function EditProviderForm({ provider }: EditProviderFormProps) {
           api_key: formData.api_key || undefined,
           base_url: formData.base_url || undefined,
           model: formData.model,
-          max_tokens: formData.use_model_default_tokens ? null : formData.max_tokens,
           temperature: formData.temperature,
           is_active: formData.is_active,
           is_default: formData.is_default,
@@ -279,40 +275,7 @@ export function EditProviderForm({ provider }: EditProviderFormProps) {
         />
       </label>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="text-sm text-white">
-          <label className="inline-flex items-center gap-2 mb-2 text-xs text-text-secondary">
-            <input
-              type="checkbox"
-              checked={formData.use_model_default_tokens}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  use_model_default_tokens: e.target.checked,
-                  max_tokens: e.target.checked
-                    ? null
-                    : selectedModelInfo?.maxOutput ?? prev.max_tokens ?? 4096,
-                }))
-              }
-            />
-            Use model default max tokens
-          </label>
-          <input
-            type="number"
-            value={formData.max_tokens ?? ""}
-            onChange={(e) => {
-              const parsed = Number.parseInt(e.target.value, 10);
-              setFormData((prev) => ({
-                ...prev,
-                max_tokens: Number.isFinite(parsed) ? parsed : null,
-              }));
-            }}
-            disabled={formData.use_model_default_tokens}
-            placeholder="model default"
-            className="mt-1 w-full rounded border border-border bg-surface-overlay px-3 py-2 text-white disabled:opacity-50"
-          />
-        </div>
-
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <label className="text-sm text-white">
           Temperature
           <input

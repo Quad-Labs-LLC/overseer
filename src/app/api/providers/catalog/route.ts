@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
 import { getDynamicProviderCatalog } from "@/agent/dynamic-provider-catalog";
+import { getAllProvidersInfo } from "@/agent/providers";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+type CatalogProvider = {
+  id: string;
+  npm?: string;
+  [key: string]: unknown;
+};
 
 function inferRuntimeAdapter(providerId: string, npm?: string): string {
   if (npm === "@ai-sdk/openai") return "openai";
@@ -43,9 +50,35 @@ export async function GET() {
   // by the dashboard and onboarding flows, so keep it resilient to auth/session
   // issues and transient upstream failures.
   try {
-    const providers = await getDynamicProviderCatalog();
+    const staticFallback = getAllProvidersInfo().map((p) => ({
+      id: p.id,
+      displayName: p.displayName,
+      requiresKey: p.requiresKey,
+      description: p.description,
+      npm: p.npm,
+      supportsThinking: p.supportsThinking,
+      supportsMultimodal: p.supportsMultimodal,
+      models: p.models,
+      source: "static" as const,
+    }));
+
+    // Hard cap server latency. If models.dev hangs (it happens in some hosted
+    // environments), return the static registry immediately.
+    const timeoutMs = Number.parseInt(
+      process.env.OVERSEER_PROVIDER_CATALOG_TIMEOUT_MS || "2500",
+      10,
+    );
+
+    const providers =
+      await Promise.race([
+        getDynamicProviderCatalog(),
+        new Promise<typeof staticFallback>((resolve) =>
+          setTimeout(() => resolve(staticFallback as any), timeoutMs),
+        ) as any,
+      ]);
+
     return NextResponse.json({
-      providers: providers.map((provider) => ({
+      providers: (providers as CatalogProvider[]).map((provider) => ({
         ...provider,
         runtimeAdapter: inferRuntimeAdapter(provider.id, provider.npm),
       })),
@@ -54,7 +87,18 @@ export async function GET() {
     const msg = err instanceof Error ? err.message : String(err);
     return NextResponse.json(
       {
-        providers: [],
+        providers: getAllProvidersInfo().map((p) => ({
+          id: p.id,
+          displayName: p.displayName,
+          requiresKey: p.requiresKey,
+          description: p.description,
+          npm: p.npm,
+          supportsThinking: p.supportsThinking,
+          supportsMultimodal: p.supportsMultimodal,
+          models: p.models,
+          source: "static" as const,
+          runtimeAdapter: inferRuntimeAdapter(p.id, p.npm),
+        })),
         error: `Failed to load provider catalog: ${msg}`,
       },
       { status: 500 },

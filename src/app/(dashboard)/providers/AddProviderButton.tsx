@@ -43,11 +43,9 @@ export function AddProviderButton({ variant = "default" }: AddProviderButtonProp
     api_key: "",
     base_url: "",
     model: "",
-    max_tokens: null as number | null,
     temperature: 0.7,
     is_default: false,
     priority: 0,
-    use_model_default_tokens: true,
     thinking_level: "medium" as "low" | "medium" | "high",
   });
 
@@ -64,7 +62,12 @@ export function AddProviderButton({ variant = "default" }: AddProviderButtonProp
       setCatalogLoading(true);
       setCatalogLoadError("");
       try {
-        const res = await fetch("/api/providers/catalog", { cache: "no-store" });
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 6000);
+        const res = await fetch("/api/providers/catalog", {
+          cache: "no-store",
+          signal: controller.signal,
+        }).finally(() => clearTimeout(timeout));
         if (!res.ok) {
           throw new Error(`Catalog request failed (${res.status})`);
         }
@@ -82,9 +85,6 @@ export function AddProviderButton({ variant = "default" }: AddProviderButtonProp
               display_name: first.displayName,
               model: firstModel?.id || "",
               base_url: first.apiBaseUrl || "",
-              max_tokens: prev.use_model_default_tokens
-                ? null
-                : (firstModel?.maxOutput ?? prev.max_tokens),
               temperature: firstModel?.allowsTemperature === false ? 0 : prev.temperature,
             }));
           }
@@ -134,10 +134,6 @@ export function AddProviderButton({ variant = "default" }: AddProviderButtonProp
       display_name: info.displayName,
       model: firstModel?.id || "",
       base_url: info.apiBaseUrl || "",
-      // Auto-set sensible defaults based on model capabilities
-      max_tokens: prev.use_model_default_tokens
-        ? null
-        : (firstModel?.maxOutput ?? prev.max_tokens),
       temperature: firstModel?.allowsTemperature === false ? 0 : 0.7,
     }));
   };
@@ -149,10 +145,6 @@ export function AddProviderButton({ variant = "default" }: AddProviderButtonProp
     setFormData((prev) => ({
       ...prev,
       model: modelId,
-      // Auto-set max_tokens and temperature from model capabilities
-      max_tokens: prev.use_model_default_tokens
-        ? null
-        : (model?.maxOutput ?? prev.max_tokens),
       temperature: model?.allowsTemperature === false ? 0 : prev.temperature,
     }));
   };
@@ -179,7 +171,14 @@ export function AddProviderButton({ variant = "default" }: AddProviderButtonProp
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
+          name: formData.name,
+          display_name: formData.display_name,
+          api_key: formData.api_key,
+          base_url: formData.base_url,
+          model: formData.model,
+          temperature: formData.temperature,
+          is_default: formData.is_default,
+          priority: formData.priority,
           config: providerConfig,
         }),
       });
@@ -382,49 +381,7 @@ export function AddProviderButton({ variant = "default" }: AddProviderButtonProp
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                    Max Tokens (optional)
-                    {selectedModelInfo && (
-                      <span className="ml-1 text-[10px] text-[var(--color-text-muted)] font-normal">
-                        (max {formatTokenCount(selectedModelInfo.maxOutput)})
-                      </span>
-                    )}
-                  </label>
-                  <label className="inline-flex items-center gap-2 mb-2 text-xs text-[var(--color-text-secondary)]">
-                    <input
-                      type="checkbox"
-                      checked={formData.use_model_default_tokens}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          use_model_default_tokens: e.target.checked,
-                          max_tokens: e.target.checked
-                            ? null
-                            : (selectedModelInfo?.maxOutput ?? prev.max_tokens ?? 4096),
-                        }))
-                      }
-                      className="rounded"
-                    />
-                    Use model default limit
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.max_tokens ?? ""}
-                    disabled={formData.use_model_default_tokens}
-                    onChange={(e) => {
-                      const parsed = Number.parseInt(e.target.value, 10);
-                      setFormData((prev) => ({
-                        ...prev,
-                        max_tokens: Number.isFinite(parsed) ? parsed : null,
-                      }));
-                    }}
-                    className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                    placeholder="Leave empty to use model default"
-                  />
-                </div>
-                <div>
+              <div>
                   <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                     Temperature
                     {selectedModelInfo && !selectedModelInfo.allowsTemperature && (
@@ -441,7 +398,6 @@ export function AddProviderButton({ variant = "default" }: AddProviderButtonProp
                     onChange={(e) => setFormData((prev) => ({ ...prev, temperature: parseFloat(e.target.value) }))}
                     className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
                   />
-                </div>
               </div>
 
               <div className="flex items-center gap-2">

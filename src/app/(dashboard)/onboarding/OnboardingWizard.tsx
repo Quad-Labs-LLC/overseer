@@ -73,7 +73,6 @@ export function OnboardingWizard() {
     api_key: "",
     base_url: "",
     model: "gpt-4o",
-    max_tokens: 4096,
     temperature: 0.7,
     is_default: true,
     priority: 0,
@@ -130,7 +129,12 @@ export function OnboardingWizard() {
       setProviderCatalogLoading(true);
       setProviderCatalogError("");
       try {
-        const res = await fetch("/api/providers/catalog", { cache: "no-store" });
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 6000);
+        const res = await fetch("/api/providers/catalog", {
+          cache: "no-store",
+          signal: controller.signal,
+        }).finally(() => clearTimeout(timeout));
         if (!res.ok) throw new Error(`Catalog request failed (${res.status})`);
         const data = await res.json();
         const providers = (data.providers || []) as CatalogProvider[];
@@ -473,28 +477,17 @@ export function OnboardingWizard() {
                 />
               </div>
             )}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Max Tokens</label>
-                <input
-                  type="number"
-                  value={providerForm.max_tokens}
-                  onChange={(e) => setProviderForm((prev) => ({ ...prev, max_tokens: parseInt(e.target.value) }))}
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Temperature</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="2"
-                  value={providerForm.temperature}
-                  onChange={(e) => setProviderForm((prev) => ({ ...prev, temperature: parseFloat(e.target.value) }))}
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Temperature</label>
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                max="2"
+                value={providerForm.temperature}
+                onChange={(e) => setProviderForm((prev) => ({ ...prev, temperature: parseFloat(e.target.value) }))}
+                className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+              />
             </div>
           </div>
         )}
