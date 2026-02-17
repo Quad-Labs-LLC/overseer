@@ -15,6 +15,14 @@ export {
   type InitResult,
 } from "./init";
 
+// Identity management
+export {
+  loadUserIdentity,
+  saveUserIdentity,
+  hasUserIdentity,
+  resetUserIdentity,
+} from "./identity";
+
 // Soul management
 export {
   loadSoul,

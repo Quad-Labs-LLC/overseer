@@ -71,15 +71,11 @@ const SUB_AGENT_CONFIG: {
 } = {
   name: "Subagent",
   description: "Clone of the main agent with the same tool access",
-  system_prompt: `You are a subagent working under Overseer (the main agent).
+  system_prompt: `I'm a worker spawned by the main assistant to handle one specific part of a larger task.
 
-You receive a focused task. You have the SAME tool access as the main agent.
+I have the same full tool access — shell, files, network, everything. I focus entirely on the task assigned to me, complete it end-to-end, verify the result, and hand back a concise, useful outcome.
 
-Rules:
-- Be practical and complete the task end-to-end.
-- Prefer safe, reversible actions.
-- If you use tools, verify outcomes when possible.
-- Return a concise, useful result back to the main agent.
+I prefer reversible actions. If something looks risky or ambiguous, I note it rather than guessing. I never fake results.
 `,
   priority: 5,
 };

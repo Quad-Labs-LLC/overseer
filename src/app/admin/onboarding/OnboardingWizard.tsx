@@ -1,68 +1,110 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PROVIDER_INFO, type ProviderName } from "@/agent/provider-info";
 import type { InterfaceType } from "@/types/database";
 import type { ModelInfo } from "@/agent/provider-info";
+import type { QuizAnswers } from "@/app/api/profile/generate/route";
+import { cn } from "@/lib/utils";
+import { CheckIcon, ChevronRightIcon, LoaderIcon, SparklesIcon } from "lucide-react";
 
-type StepId =
-  | "welcome"
-  | "provider"
-  | "interface"
-  | "personalize"
-  | "soul"
-  | "done";
+// ── Types ─────────────────────────────────────────────────────────────────────
 
-const steps: Array<{ id: StepId; title: string; description: string }> = [
-  {
-    id: "welcome",
-    title: "Welcome to Overseer",
-    description: "Set up your self-hosted AI agent in a few steps.",
-  },
-  {
-    id: "provider",
-    title: "Add your AI provider",
-    description: "Connect your first model so the agent can think.",
-  },
-  {
-    id: "interface",
-    title: "Connect a chat interface",
-    description: "Optional: connect Telegram or Discord.",
-  },
-  {
-    id: "personalize",
-    title: "Personalize your assistant",
-    description: "Answer a few questions so the agent feels human and personal.",
-  },
-  {
-    id: "soul",
-    title: "Customize the soul",
-    description: "Optional: define the agent's personality.",
-  },
-  {
-    id: "done",
-    title: "All set",
-    description: "Finish and head to your dashboard.",
-  },
+type StepId = "welcome" | "provider" | "interface" | "quiz" | "generating" | "done";
+
+type QuizPage = 0 | 1 | 2 | 3;
+
+const QUIZ_PAGES: Array<{ title: string; subtitle: string }> = [
+  { title: "About you", subtitle: "Help me understand who I'm working with" },
+  { title: "Your goals", subtitle: "What will we accomplish together?" },
+  { title: "How I should respond", subtitle: "Calibrate my communication style" },
+  { title: "My personality", subtitle: "Define who I am for you" },
 ];
 
+const STEPS: Array<{ id: StepId; label: string }> = [
+  { id: "welcome", label: "Welcome" },
+  { id: "provider", label: "Provider" },
+  { id: "interface", label: "Interface" },
+  { id: "quiz", label: "Personalize" },
+  { id: "generating", label: "Generating" },
+  { id: "done", label: "Done" },
+];
+
+// ── Helper: Option card ────────────────────────────────────────────────────────
+
+function OptionCard({
+  selected,
+  onClick,
+  icon,
+  label,
+  description,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  icon?: string;
+  label: string;
+  description?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "relative flex flex-col gap-1 rounded-xl border p-4 text-left transition-all",
+        "hover:border-primary/60 hover:bg-primary/5",
+        selected
+          ? "border-primary bg-primary/10 ring-1 ring-primary"
+          : "border-border bg-card",
+      )}
+    >
+      {selected && (
+        <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-primary">
+          <CheckIcon className="h-3 w-3 text-primary-foreground" />
+        </span>
+      )}
+      {icon && <span className="text-xl">{icon}</span>}
+      <span className="text-sm font-medium text-foreground">{label}</span>
+      {description && <span className="text-xs text-muted-foreground">{description}</span>}
+    </button>
+  );
+}
+
+// ── CatalogProvider type (hoisted so it can be reused) ───────────────────────
+interface CatalogProvider {
+  id: string;
+  displayName: string;
+  requiresKey: boolean;
+  description: string;
+  npm: string;
+  apiBaseUrl?: string;
+  models: ModelInfo[];
+  runtimeAdapter: string;
+}
+
+// ── Field helpers ─────────────────────────────────────────────────────────────
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="block text-sm font-medium text-foreground">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+const INPUT_CLS =
+  "w-full rounded-lg border border-border bg-card px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow";
+
+const SELECT_CLS =
+  "w-full rounded-lg border border-border bg-card px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50";
+
+// ── Main component ────────────────────────────────────────────────────────────
 export function OnboardingWizard() {
   const router = useRouter();
   const [stepIndex, setStepIndex] = useState(0);
-  const step = steps[stepIndex];
+  const step = STEPS[stepIndex];
 
-  interface CatalogProvider {
-    id: string;
-    displayName: string;
-    requiresKey: boolean;
-    description: string;
-    npm: string;
-    apiBaseUrl?: string;
-    models: ModelInfo[];
-    runtimeAdapter: string;
-  }
-
+  // ── Provider state ──────────────────────────────────────────────────────────
   const [providerCatalog, setProviderCatalog] = useState<CatalogProvider[]>([]);
   const [providerCatalogLoading, setProviderCatalogLoading] = useState(false);
   const [providerCatalogError, setProviderCatalogError] = useState("");
@@ -89,29 +131,23 @@ export function OnboardingWizard() {
   const [interfaceError, setInterfaceError] = useState("");
   const [interfaceSaving, setInterfaceSaving] = useState(false);
 
-  const [personalizeForm, setPersonalizeForm] = useState({
-    userPreferredName: "",
-    userPronouns: "",
-    agentName: "Overseer",
-    toneDefault: "friendly" as "direct" | "friendly" | "formal" | "playful",
-    verbosityDefault: "balanced" as "short" | "balanced" | "detailed",
-    whenUncertain: "ask" as "ask" | "assume_and_note",
-    confirmations: "catastrophic_only" as "always" | "risky_only" | "catastrophic_only",
-    decisionStyle: "recommend_one" as "recommend_one" | "offer_three" | "ask_first",
-    technicalDepth: "ask_which" as "explain" | "just_do" | "ask_which",
-    proactivity: "suggest_next" as "suggest_next" | "only_answer",
-    primaryGoals: "mixed" as "devops" | "coding" | "business_ops" | "learning" | "mixed",
-    stressHandling: "straight_to_fix" as "calm_empathetic" | "straight_to_fix",
-    timezone: "",
+  // ── Quiz state ──────────────────────────────────────────────────────────────
+  const [quizPage, setQuizPage] = useState<QuizPage>(0);
+  const [quiz, setQuiz] = useState<QuizAnswers>({
+    name: "", role: "", experience: "intermediate", primaryGoal: "mixed",
+    workStyle: "deep_focus", agentName: "Overseer", tone: "casual",
+    verbosity: "balanced", decisionStyle: "recommend_one",
+    proactivity: "suggest_when_relevant", technicalDepth: "explain_on_request",
+    uncertainty: "state_assumption", confirmations: "risky_only",
+    humor: "light", empathy: "balanced", creativity: "balanced", learningStyle: "mixed",
   });
-  const [personalizeError, setPersonalizeError] = useState("");
-  const [personalizeSaving, setPersonalizeSaving] = useState(false);
 
-  const [soulContent, setSoulContent] = useState("");
-  const [soulSaving, setSoulSaving] = useState(false);
-  const [soulError, setSoulError] = useState("");
+  // ── Generating state ─────────────────────────────────────────────────────────
+  const [genStatus, setGenStatus] = useState("");
+  const [genError, setGenError] = useState("");
+  const [genDone, setGenDone] = useState(false);
 
-  const stepProgress = useMemo(() => ((stepIndex + 1) / steps.length) * 100, [stepIndex]);
+  const stepProgress = useMemo(() => ((stepIndex + 1) / STEPS.length) * 100, [stepIndex]);
 
   const selectedCatalogProvider = useMemo(
     () => providerCatalog.find((p) => p.id === providerForm.name),
@@ -263,603 +299,410 @@ export function OnboardingWizard() {
     }
   };
 
-  const saveSoul = async () => {
-    if (!soulContent.trim()) {
-      return true;
-    }
-    setSoulSaving(true);
-    setSoulError("");
+  const generateProfile = useCallback(async () => {
+    setGenStatus("Analyzing your answers…"); setGenError(""); setGenDone(false);
     try {
-      const res = await fetch("/api/soul", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: soulContent }),
+      const pvRes = await fetch("/api/chat");
+      const pvData = await pvRes.json();
+      const pv = pvData.providers?.find((p: { isDefault: boolean }) => p.isDefault) ?? pvData.providers?.[0];
+      setGenStatus("Writing your Identity & Soul with AI…");
+      const res = await fetch("/api/profile/generate", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers: quiz, providerId: pv?.id }),
       });
-      if (!res.ok) {
-        const data = await res.json();
-        setSoulError(data.error || "Failed to save soul");
-        return false;
-      }
+      if (!res.ok) { const d = await res.json().catch(() => ({})); setGenError(d.error || "Generation failed"); return false; }
+      setGenStatus("Done! Your AI is fully personalized ✨");
+      setGenDone(true);
       return true;
-    } catch {
-      setSoulError("Failed to save soul");
-      return false;
-    } finally {
-      setSoulSaving(false);
-    }
-  };
-
-  const savePersonalize = async () => {
-    setPersonalizeSaving(true);
-    setPersonalizeError("");
-    try {
-      const res = await fetch("/api/profile/bootstrap", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers: personalizeForm, refine: true }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setPersonalizeError(data.error || "Failed to save personalization");
-        return false;
-      }
-      return true;
-    } catch {
-      setPersonalizeError("Failed to save personalization");
-      return false;
-    } finally {
-      setPersonalizeSaving(false);
-    }
-  };
+    } catch (e) { setGenError(e instanceof Error ? e.message : "Generation failed"); return false; }
+  }, [quiz]);
 
   const handleNext = async () => {
-    if (step.id === "provider") {
-      const saved = await saveProvider();
-      if (!saved) return;
-    }
-    if (step.id === "interface") {
-      const saved = await saveInterface();
-      if (!saved) return;
-    }
-    if (step.id === "personalize") {
-      const saved = await savePersonalize();
-      if (!saved) return;
-    }
-    if (step.id === "soul") {
-      const saved = await saveSoul();
-      if (!saved) return;
-    }
-    if (step.id === "done") {
-      router.push("/dashboard");
+    if (step.id === "provider") { if (!(await saveProvider())) return; }
+    if (step.id === "interface") { if (!(await saveInterface())) return; }
+    if (step.id === "quiz") {
+      if (quizPage < 3) { setQuizPage((p) => (p + 1) as QuizPage); return; }
+      setStepIndex((p) => p + 1);
+      setTimeout(() => { void generateProfile(); }, 80);
       return;
     }
-    setStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
+    if (step.id === "generating" && !genDone) return;
+    if (step.id === "done") { router.push("/"); return; }
+    setStepIndex((p) => Math.min(p + 1, STEPS.length - 1));
   };
 
   const handleBack = () => {
-    setStepIndex((prev) => Math.max(prev - 1, 0));
+    if (step.id === "quiz" && quizPage > 0) { setQuizPage((p) => (p - 1) as QuizPage); return; }
+    if (step.id === "generating") return;
+    setStepIndex((p) => Math.max(p - 1, 0));
   };
 
+  const q = (key: keyof QuizAnswers, value: string) => setQuiz((p) => ({ ...p, [key]: value }));
+
+
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-2xl mx-auto py-8 px-4">
+      {/* Progress */}
       <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-semibold text-white font-[var(--font-mono)]">{step.title}</h1>
-            <p className="text-[var(--color-text-secondary)] mt-2">{step.description}</p>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
+              <SparklesIcon className="h-3.5 w-3.5 text-primary-foreground" />
+            </div>
+            <span className="text-sm font-semibold">Overseer Setup</span>
           </div>
-          <div className="text-xs text-[var(--color-text-muted)]">
-            Step {stepIndex + 1} of {steps.length}
-          </div>
+          <span className="text-xs text-muted-foreground">Step {stepIndex + 1} / {STEPS.length}</span>
         </div>
-        <div className="mt-4 h-2 rounded-full bg-[var(--color-surface-raised)] overflow-hidden">
-          <div className="h-full bg-[var(--color-accent)]" style={{ width: `${stepProgress}%` }} />
+        <div className="flex gap-1">
+          {STEPS.map((s, i) => (
+            <div key={s.id} className={cn("h-1 flex-1 rounded-full transition-all",
+              i < stepIndex ? "bg-primary" : i === stepIndex ? "bg-primary/60" : "bg-border")} />
+          ))}
         </div>
       </div>
 
-      <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-8">
+      {/* Card */}
+      <div className="rounded-2xl border border-border bg-card p-8 shadow-sm space-y-6">
+
+        {/* WELCOME */}
         {step.id === "welcome" && (
-          <div className="space-y-6 text-[var(--color-text-primary)]">
-            <p>
-              Overseer is your self-hosted AI agent. It can manage your VPS, automate workflows,
-              and connect to chat platforms.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-                <p className="text-white font-medium">Shell access</p>
-                <p className="text-sm text-[var(--color-text-muted)] mt-1">Full command execution on your server.</p>
-              </div>
-              <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-                <p className="text-white font-medium">Safe by design</p>
-                <p className="text-sm text-[var(--color-text-muted)] mt-1">Built-in guardrails for sensitive ops.</p>
-              </div>
-              <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-                <p className="text-white font-medium">Multi-channel</p>
-                <p className="text-sm text-[var(--color-text-muted)] mt-1">Telegram and more when you're ready.</p>
-              </div>
+          <div className="space-y-6 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+              <SparklesIcon className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Welcome to Overseer</h1>
+              <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
+                Your self-hosted AI agent. Connect a model, take a quick quiz, and AI writes your personal Identity &amp; Soul profile.
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-3 text-left">
+              {[
+                { icon: "🧠", title: "Smart memory", desc: "Remembers you across sessions" },
+                { icon: "🎭", title: "AI-written Soul", desc: "Personality crafted just for you" },
+                { icon: "🔒", title: "Private", desc: "Runs on your own server" },
+              ].map((item) => (
+                <div key={item.title} className="rounded-xl border border-border bg-background p-3 space-y-1.5">
+                  <div className="text-2xl">{item.icon}</div>
+                  <div className="text-xs font-semibold text-foreground">{item.title}</div>
+                  <div className="text-[11px] text-muted-foreground">{item.desc}</div>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
+        {/* PROVIDER */}
         {step.id === "provider" && (
-          <div className="space-y-6">
-            {providerError && (
-              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
-                {providerError}
-              </div>
-            )}
-            {providerCatalogError && (
-              <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-300 text-sm">
-                Provider catalog unavailable. Falling back to built-in providers.
-              </div>
-            )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Provider</label>
-                <select
-                  value={providerForm.name}
-                  onChange={(e) => handleProviderChange(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                  disabled={providerCatalogLoading}
-                >
+          <div className="space-y-5">
+            <div>
+              <h2 className="text-lg font-semibold">Connect your AI model</h2>
+              <p className="text-sm text-muted-foreground mt-1">Pick a provider and paste your API key.</p>
+            </div>
+            {providerError && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-sm text-destructive">{providerError}</div>}
+            {providerCatalogError && <div className="rounded-lg bg-yellow-500/10 border border-yellow-500/20 px-3 py-2 text-sm text-yellow-600 dark:text-yellow-400">Using built-in provider list.</div>}
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="Provider">
+                <select value={providerForm.name} onChange={(e) => handleProviderChange(e.target.value)} className={SELECT_CLS} disabled={providerCatalogLoading}>
                   {providerCatalog.length > 0
-                    ? providerCatalog.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.displayName}
-                        </option>
-                      ))
-                    : Object.entries(PROVIDER_INFO).map(([key, info]) => (
-                        <option key={key} value={key}>
-                          {info.displayName}
-                        </option>
-                      ))}
+                    ? providerCatalog.map((p) => <option key={p.id} value={p.id}>{p.displayName}</option>)
+                    : Object.entries(PROVIDER_INFO).map(([k, v]) => <option key={k} value={k}>{v.displayName}</option>)
+                  }
                 </select>
-                {providerCatalogLoading && (
-                  <p className="text-xs text-[var(--color-text-muted)] mt-1">Loading provider catalog…</p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Model</label>
-                {(
-                  (selectedCatalogProvider?.models?.length ?? 0) > 0 ||
-                  (fallbackProviderInfo?.models?.length ?? 0) > 0
-                ) ? (
-                  <select
-                    value={providerForm.model}
-                    onChange={(e) => setProviderForm((prev) => ({ ...prev, model: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                  >
-                    {(selectedCatalogProvider?.models ||
-                      fallbackProviderInfo?.models ||
-                      []).map((model) => (
-                      <option key={model.id} value={model.id}>
-                        {model.name} {model.reasoning ? "(reasoning)" : ""}
-                      </option>
+                {providerCatalogLoading && <p className="text-xs text-muted-foreground mt-1">Loading…</p>}
+              </Field>
+              <Field label="Model">
+                {(selectedCatalogProvider?.models?.length ?? fallbackProviderInfo?.models?.length ?? 0) > 0 ? (
+                  <select value={providerForm.model} onChange={(e) => setProviderForm((p) => ({ ...p, model: e.target.value }))} className={SELECT_CLS}>
+                    {(selectedCatalogProvider?.models || fallbackProviderInfo?.models || []).map((m) => (
+                      <option key={m.id} value={m.id}>{m.name}</option>
                     ))}
                   </select>
                 ) : (
-                  <input
-                    type="text"
-                    value={providerForm.model}
-                    onChange={(e) => setProviderForm((prev) => ({ ...prev, model: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                    placeholder="Model id (e.g. gpt-4o)"
-                    required
-                  />
+                  <input type="text" value={providerForm.model} onChange={(e) => setProviderForm((p) => ({ ...p, model: e.target.value }))} className={INPUT_CLS} placeholder="gpt-4o" />
                 )}
-              </div>
+              </Field>
             </div>
             {(selectedCatalogProvider?.requiresKey ?? fallbackProviderInfo?.requiresKey ?? true) && (
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">API Key</label>
-                <input
-                  type="password"
-                  value={providerForm.api_key}
-                  onChange={(e) => setProviderForm((prev) => ({ ...prev, api_key: e.target.value }))}
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                  placeholder="sk-..."
-                  required
-                />
-              </div>
+              <Field label="API Key">
+                <input type="password" value={providerForm.api_key} onChange={(e) => setProviderForm((p) => ({ ...p, api_key: e.target.value }))} className={INPUT_CLS} placeholder="sk-…" />
+              </Field>
             )}
-            {((selectedCatalogProvider &&
-              (selectedCatalogProvider.id === "ollama" ||
-                selectedCatalogProvider.runtimeAdapter === "openai-compatible")) ||
-              (!selectedCatalogProvider && providerForm.name === "ollama")) && (
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Base URL</label>
-                <input
-                  type="text"
-                  value={providerForm.base_url}
-                  onChange={(e) => setProviderForm((prev) => ({ ...prev, base_url: e.target.value }))}
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                  placeholder="http://localhost:11434/v1"
-                />
-              </div>
+            {(providerForm.name === "ollama" || selectedCatalogProvider?.runtimeAdapter === "openai-compatible") && (
+              <Field label="Base URL">
+                <input type="text" value={providerForm.base_url} onChange={(e) => setProviderForm((p) => ({ ...p, base_url: e.target.value }))} className={INPUT_CLS} placeholder="http://localhost:11434/v1" />
+              </Field>
             )}
-            <div>
-              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Temperature</label>
-              <input
-                type="number"
-                step="0.1"
-                min="0"
-                max="2"
-                value={providerForm.temperature}
-                onChange={(e) => setProviderForm((prev) => ({ ...prev, temperature: parseFloat(e.target.value) }))}
-                className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-              />
-            </div>
+            <Field label="Temperature">
+              <input type="number" step="0.1" min="0" max="2" value={providerForm.temperature} onChange={(e) => setProviderForm((p) => ({ ...p, temperature: parseFloat(e.target.value) }))} className={INPUT_CLS} />
+            </Field>
           </div>
         )}
 
+        {/* INTERFACE */}
         {step.id === "interface" && (
-          <div className="space-y-6">
-            {interfaceError && (
-              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
-                {interfaceError}
-              </div>
-            )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Platform</label>
-                <select
-                  value={interfaceForm.type}
-                  onChange={(e) => setInterfaceForm((prev) => ({ ...prev, type: e.target.value as InterfaceType }))}
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                >
+          <div className="space-y-5">
+            <div>
+              <h2 className="text-lg font-semibold">Connect a chat interface</h2>
+              <p className="text-sm text-muted-foreground mt-1">Optional — leave the token empty to skip.</p>
+            </div>
+            {interfaceError && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-sm text-destructive">{interfaceError}</div>}
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="Platform">
+                <select value={interfaceForm.type} onChange={(e) => setInterfaceForm((p) => ({ ...p, type: e.target.value as InterfaceType }))} className={SELECT_CLS}>
                   <option value="telegram">Telegram</option>
                   <option value="discord">Discord</option>
                 </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Name</label>
-                <input
-                  type="text"
-                  value={interfaceForm.name}
-                  onChange={(e) => setInterfaceForm((prev) => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                  placeholder="My Bot"
-                />
-              </div>
+              </Field>
+              <Field label="Bot name">
+                <input type="text" value={interfaceForm.name} onChange={(e) => setInterfaceForm((p) => ({ ...p, name: e.target.value }))} className={INPUT_CLS} placeholder="My Bot" />
+              </Field>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Bot Token</label>
-              <input
-                type="password"
-                value={interfaceForm.bot_token}
-                onChange={(e) => setInterfaceForm((prev) => ({ ...prev, bot_token: e.target.value }))}
-                className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
-              />
-              <p className="text-xs text-[var(--color-text-muted)] mt-1">Leave empty to skip for now.</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Allowed Users (Optional)</label>
-              <input
-                type="text"
-                value={interfaceForm.allowed_users}
-                onChange={(e) => setInterfaceForm((prev) => ({ ...prev, allowed_users: e.target.value }))}
-                className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                placeholder="123456789, 987654321"
-              />
-            </div>
+            <Field label="Bot Token (leave empty to skip)">
+              <input type="password" value={interfaceForm.bot_token} onChange={(e) => setInterfaceForm((p) => ({ ...p, bot_token: e.target.value }))} className={INPUT_CLS} placeholder="Paste token or leave blank" />
+            </Field>
+            <Field label="Allowed Users (comma-separated IDs)">
+              <input type="text" value={interfaceForm.allowed_users} onChange={(e) => setInterfaceForm((p) => ({ ...p, allowed_users: e.target.value }))} className={INPUT_CLS} placeholder="123456789" />
+            </Field>
           </div>
         )}
 
-        {step.id === "personalize" && (
+        {/* QUIZ */}
+        {step.id === "quiz" && (
           <div className="space-y-6">
-            {personalizeError && (
-              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
-                {personalizeError}
+            <div>
+              <div className="flex gap-1 mb-3">
+                {QUIZ_PAGES.map((_, i) => (
+                  <div key={i} className={cn("h-1.5 flex-1 rounded-full", i <= quizPage ? "bg-primary" : "bg-border")} />
+                ))}
+              </div>
+              <h2 className="text-lg font-semibold">{QUIZ_PAGES[quizPage].title}</h2>
+              <p className="text-sm text-muted-foreground">{QUIZ_PAGES[quizPage].subtitle}</p>
+            </div>
+
+            {quizPage === 0 && (
+              <div className="space-y-4">
+                <Field label="What's your name?">
+                  <input type="text" value={quiz.name} onChange={(e) => q("name", e.target.value)} className={INPUT_CLS} placeholder="e.g. Alex" />
+                </Field>
+                <Field label="Pronouns (optional)">
+                  <input type="text" value={quiz.pronouns ?? ""} onChange={(e) => q("pronouns", e.target.value)} className={INPUT_CLS} placeholder="e.g. he/him" />
+                </Field>
+                <Field label="What do you do?">
+                  <input type="text" value={quiz.role} onChange={(e) => q("role", e.target.value)} className={INPUT_CLS} placeholder="e.g. Backend engineer, Startup founder" />
+                </Field>
+                <Field label="Technical experience">
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { v: "beginner", i: "🌱", l: "Beginner", d: "Still learning" },
+                      { v: "intermediate", i: "⚡", l: "Intermediate", d: "Comfortable" },
+                      { v: "advanced", i: "🚀", l: "Advanced", d: "Deep knowledge" },
+                      { v: "expert", i: "🎯", l: "Expert", d: "I could teach this" },
+                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.experience === o.v} onClick={() => q("experience", o.v)} icon={o.i} label={o.l} description={o.d} />)}
+                  </div>
+                </Field>
+                <Field label="Timezone (optional)">
+                  <input type="text" value={quiz.timezone ?? ""} onChange={(e) => q("timezone", e.target.value)} className={INPUT_CLS} placeholder="e.g. Europe/Berlin" />
+                </Field>
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                  Your preferred name (optional)
-                </label>
-                <input
-                  type="text"
-                  value={personalizeForm.userPreferredName}
-                  onChange={(e) =>
-                    setPersonalizeForm((prev) => ({ ...prev, userPreferredName: e.target.value }))
-                  }
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                  placeholder="e.g. Erzen"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                  Pronouns (optional)
-                </label>
-                <input
-                  type="text"
-                  value={personalizeForm.userPronouns}
-                  onChange={(e) =>
-                    setPersonalizeForm((prev) => ({ ...prev, userPronouns: e.target.value }))
-                  }
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                  placeholder="e.g. he/him"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                  Agent name
-                </label>
-                <input
-                  type="text"
-                  value={personalizeForm.agentName}
-                  onChange={(e) =>
-                    setPersonalizeForm((prev) => ({ ...prev, agentName: e.target.value }))
-                  }
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                  placeholder="Overseer"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                  Tone
-                </label>
-                <select
-                  value={personalizeForm.toneDefault}
-                  onChange={(e) =>
-                    setPersonalizeForm((prev) => ({
-                      ...prev,
-                      toneDefault: e.target.value as typeof prev.toneDefault,
-                    }))
-                  }
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                >
-                  <option value="direct">Direct</option>
-                  <option value="friendly">Friendly</option>
-                  <option value="formal">Formal</option>
-                  <option value="playful">Playful</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                  Verbosity
-                </label>
-                <select
-                  value={personalizeForm.verbosityDefault}
-                  onChange={(e) =>
-                    setPersonalizeForm((prev) => ({
-                      ...prev,
-                      verbosityDefault: e.target.value as typeof prev.verbosityDefault,
-                    }))
-                  }
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                >
-                  <option value="short">Short</option>
-                  <option value="balanced">Balanced</option>
-                  <option value="detailed">Detailed</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                  When uncertain
-                </label>
-                <select
-                  value={personalizeForm.whenUncertain}
-                  onChange={(e) =>
-                    setPersonalizeForm((prev) => ({
-                      ...prev,
-                      whenUncertain: e.target.value as typeof prev.whenUncertain,
-                    }))
-                  }
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                >
-                  <option value="ask">Ask clarifying questions</option>
-                  <option value="assume_and_note">Assume and clearly note it</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                  Confirmations
-                </label>
-                <select
-                  value={personalizeForm.confirmations}
-                  onChange={(e) =>
-                    setPersonalizeForm((prev) => ({
-                      ...prev,
-                      confirmations: e.target.value as typeof prev.confirmations,
-                    }))
-                  }
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                >
-                  <option value="always">Always confirm destructive actions</option>
-                  <option value="risky_only">Confirm risky actions only</option>
-                  <option value="catastrophic_only">Only confirm catastrophic actions</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                  Decision style
-                </label>
-                <select
-                  value={personalizeForm.decisionStyle}
-                  onChange={(e) =>
-                    setPersonalizeForm((prev) => ({
-                      ...prev,
-                      decisionStyle: e.target.value as typeof prev.decisionStyle,
-                    }))
-                  }
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                >
-                  <option value="recommend_one">Recommend one option</option>
-                  <option value="offer_three">Offer up to 3 options</option>
-                  <option value="ask_first">Ask before deciding</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                  Technical depth
-                </label>
-                <select
-                  value={personalizeForm.technicalDepth}
-                  onChange={(e) =>
-                    setPersonalizeForm((prev) => ({
-                      ...prev,
-                      technicalDepth: e.target.value as typeof prev.technicalDepth,
-                    }))
-                  }
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                >
-                  <option value="ask_which">Ask which you prefer</option>
-                  <option value="just_do">Just do it (minimal explanation)</option>
-                  <option value="explain">Explain while doing</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                  Proactivity
-                </label>
-                <select
-                  value={personalizeForm.proactivity}
-                  onChange={(e) =>
-                    setPersonalizeForm((prev) => ({
-                      ...prev,
-                      proactivity: e.target.value as typeof prev.proactivity,
-                    }))
-                  }
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                >
-                  <option value="suggest_next">Suggest next steps</option>
-                  <option value="only_answer">Only answer what I ask</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                  Primary goals
-                </label>
-                <select
-                  value={personalizeForm.primaryGoals}
-                  onChange={(e) =>
-                    setPersonalizeForm((prev) => ({
-                      ...prev,
-                      primaryGoals: e.target.value as typeof prev.primaryGoals,
-                    }))
-                  }
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                >
-                  <option value="mixed">Mixed</option>
-                  <option value="devops">DevOps / VPS admin</option>
-                  <option value="coding">Coding</option>
-                  <option value="business_ops">Business ops</option>
-                  <option value="learning">Learning</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                  Stress handling
-                </label>
-                <select
-                  value={personalizeForm.stressHandling}
-                  onChange={(e) =>
-                    setPersonalizeForm((prev) => ({
-                      ...prev,
-                      stressHandling: e.target.value as typeof prev.stressHandling,
-                    }))
-                  }
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                >
-                  <option value="straight_to_fix">Straight to fix</option>
-                  <option value="calm_empathetic">Calm + empathetic</option>
-                </select>
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                  Timezone (optional)
-                </label>
-                <input
-                  type="text"
-                  value={personalizeForm.timezone}
-                  onChange={(e) =>
-                    setPersonalizeForm((prev) => ({ ...prev, timezone: e.target.value }))
-                  }
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-                  placeholder="e.g. America/New_York"
-                />
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-              <p className="text-sm text-[var(--color-text-secondary)]">
-                These answers are saved into your long-term memory and also generate a per-user
-                SOUL supplement.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {step.id === "soul" && (
-          <div className="space-y-4">
-            {soulError && (
-              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
-                {soulError}
+            {quizPage === 1 && (
+              <div className="space-y-4">
+                <Field label="What will you mainly use me for?">
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { v: "devops", i: "🖥️", l: "DevOps & Infra", d: "VPS, deployments" },
+                      { v: "coding", i: "💻", l: "Coding", d: "Building software" },
+                      { v: "business", i: "📊", l: "Business", d: "Ops, productivity" },
+                      { v: "learning", i: "📚", l: "Learning", d: "Research & study" },
+                      { v: "research", i: "🔬", l: "Research", d: "Deep analysis" },
+                      { v: "mixed", i: "🌀", l: "Mixed", d: "A bit of everything" },
+                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.primaryGoal === o.v} onClick={() => q("primaryGoal", o.v)} icon={o.i} label={o.l} description={o.d} />)}
+                  </div>
+                </Field>
+                <Field label="How do you typically work?">
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { v: "deep_focus", i: "🧘", l: "Deep focus", d: "One thing at a time" },
+                      { v: "multitasker", i: "🔀", l: "Multitasker", d: "Many things at once" },
+                      { v: "collaborative", i: "🤝", l: "Collaborative", d: "With a team" },
+                      { v: "structured", i: "📋", l: "Structured", d: "Plans & checklists" },
+                      { v: "spontaneous", i: "⚡", l: "Spontaneous", d: "Fast & iterative" },
+                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.workStyle === o.v} onClick={() => q("workStyle", o.v)} icon={o.i} label={o.l} description={o.d} />)}
+                  </div>
+                </Field>
+                <Field label="How do you learn best?">
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { v: "examples", i: "💡", l: "By example", d: "Show me how" },
+                      { v: "concepts", i: "🧠", l: "Concepts first", d: "Explain the why" },
+                      { v: "hands_on", i: "🔧", l: "Hands-on", d: "Let me try" },
+                      { v: "mixed", i: "🎨", l: "Mixed", d: "Whatever fits" },
+                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.learningStyle === o.v} onClick={() => q("learningStyle", o.v)} icon={o.i} label={o.l} description={o.d} />)}
+                  </div>
+                </Field>
               </div>
             )}
-            <p className="text-sm text-[var(--color-text-secondary)]">
-              Optional: paste a custom SOUL.md snippet to override the default personality.
-            </p>
-            <textarea
-              value={soulContent}
-              onChange={(e) => setSoulContent(e.target.value)}
-              className="w-full h-64 p-4 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg text-[var(--color-text-primary)] font-mono text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-              placeholder="# Overseer Soul\n\n## Identity\n..."
-              spellCheck={false}
-            />
+
+            {quizPage === 2 && (
+              <div className="space-y-4">
+                <Field label="How should I speak to you?">
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { v: "casual", i: "😊", l: "Casual & friendly", d: "Like a smart friend" },
+                      { v: "professional", i: "💼", l: "Professional", d: "Polished, no fluff" },
+                      { v: "direct", i: "⚡", l: "Direct", d: "Straight to the point" },
+                      { v: "warm", i: "🌟", l: "Warm", d: "Supportive energy" },
+                      { v: "witty", i: "🎭", l: "Witty", d: "Smart + fun" },
+                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.tone === o.v} onClick={() => q("tone", o.v)} icon={o.i} label={o.l} description={o.d} />)}
+                  </div>
+                </Field>
+                <Field label="How much detail do you want?">
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { v: "concise", i: "✂️", l: "Short & sharp", d: "Just the essentials" },
+                      { v: "balanced", i: "⚖️", l: "Balanced", d: "Context + answer" },
+                      { v: "detailed", i: "📖", l: "Detailed", d: "Full explanations" },
+                      { v: "adaptive", i: "🔄", l: "Adaptive", d: "Match the situation" },
+                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.verbosity === o.v} onClick={() => q("verbosity", o.v)} icon={o.i} label={o.l} description={o.d} />)}
+                  </div>
+                </Field>
+                <Field label="When presenting options, I should:">
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { v: "recommend_one", i: "🎯", l: "Recommend one", d: "Best option only" },
+                      { v: "offer_options", i: "📋", l: "Offer 2-3", d: "Let me choose" },
+                      { v: "explain_then_act", i: "💬", l: "Explain then act", d: "Tell me your reasoning" },
+                      { v: "just_do_it", i: "🚀", l: "Just do it", d: "Don't ask, just go" },
+                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.decisionStyle === o.v} onClick={() => q("decisionStyle", o.v)} icon={o.i} label={o.l} description={o.d} />)}
+                  </div>
+                </Field>
+              </div>
+            )}
+
+            {quizPage === 3 && (
+              <div className="space-y-4">
+                <Field label="My agent name">
+                  <input type="text" value={quiz.agentName} onChange={(e) => q("agentName", e.target.value)} className={INPUT_CLS} placeholder="Overseer" />
+                </Field>
+                <Field label="How proactive should I be?">
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { v: "highly_proactive", i: "🔥", l: "Very proactive", d: "Always suggest next steps" },
+                      { v: "suggest_when_relevant", i: "💡", l: "When relevant", d: "Suggest when it helps" },
+                      { v: "only_when_asked", i: "🤫", l: "Only when asked", d: "Just answer" },
+                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.proactivity === o.v} onClick={() => q("proactivity", o.v)} icon={o.i} label={o.l} description={o.d} />)}
+                  </div>
+                </Field>
+                <Field label="Before risky actions I should:">
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { v: "always", i: "🛡️", l: "Always ask", d: "Confirm everything" },
+                      { v: "risky_only", i: "⚠️", l: "Risky only", d: "Ask for risky actions" },
+                      { v: "catastrophic_only", i: "💥", l: "Catastrophic only", d: "Only truly irreversible" },
+                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.confirmations === o.v} onClick={() => q("confirmations", o.v)} icon={o.i} label={o.l} description={o.d} />)}
+                  </div>
+                </Field>
+                <Field label="Humor level">
+                  <div className="grid grid-cols-3 gap-2">
+                    {([
+                      { v: "none", i: "🎩", l: "None", d: "Strictly professional" },
+                      { v: "light", i: "😄", l: "Light", d: "Occasional wit" },
+                      { v: "playful", i: "🎉", l: "Playful", d: "Fun & friendly" },
+                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.humor === o.v} onClick={() => q("humor", o.v)} icon={o.i} label={o.l} description={o.d} />)}
+                  </div>
+                </Field>
+              </div>
+            )}
           </div>
         )}
 
+        {/* GENERATING */}
+        {step.id === "generating" && (
+          <div className="space-y-6 text-center py-4">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+              {genDone
+                ? <CheckIcon className="h-8 w-8 text-primary" />
+                : <LoaderIcon className="h-8 w-8 text-primary animate-spin" />
+              }
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold">{genDone ? "Personalization complete!" : "Generating your AI profile…"}</h2>
+              <p className="text-sm text-muted-foreground mt-2">{genStatus}</p>
+            </div>
+            {genError && (
+              <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive text-left">
+                <p className="font-medium">Generation failed</p>
+                <p className="mt-1 opacity-80">{genError}</p>
+                <button onClick={() => void generateProfile()} className="mt-2 text-xs underline opacity-80 hover:opacity-100">Try again</button>
+              </div>
+            )}
+            {genDone && (
+              <div className="grid grid-cols-2 gap-3 text-left text-sm">
+                <div className="rounded-xl border border-border bg-background p-4 space-y-1">
+                  <p className="font-semibold text-foreground">✅ IDENTITY.md</p>
+                  <p className="text-muted-foreground text-xs">Who you are — injected into every chat</p>
+                </div>
+                <div className="rounded-xl border border-border bg-background p-4 space-y-1">
+                  <p className="font-semibold text-foreground">✅ SOUL.md</p>
+                  <p className="text-muted-foreground text-xs">AI personality — tailored just for you</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* DONE */}
         {step.id === "done" && (
-          <div className="space-y-4 text-[var(--color-text-primary)]">
-            <p>You're ready to go. Visit the dashboard to see live stats and tools.</p>
-            <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-              <p className="text-white font-medium">Next suggestions</p>
-              <ul className="text-sm text-[var(--color-text-muted)] mt-2 space-y-1">
-                <li>• Add a second provider for fallback.</li>
-                <li>• Connect Telegram to chat with your agent.</li>
-                <li>• Review the soul to set tone and safety rules.</li>
-              </ul>
+          <div className="space-y-6 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+              <CheckIcon className="h-8 w-8 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">You're all set!</h2>
+              <p className="text-sm text-muted-foreground mt-2">Overseer is configured and ready. Start chatting!</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-left text-sm">
+              {[
+                { icon: "💬", title: "Chat now", desc: "Head to the main chat interface" },
+                { icon: "⚙️", title: "Settings", desc: "Add more providers or interfaces" },
+              ].map((item) => (
+                <div key={item.title} className="rounded-xl border border-border bg-background p-4 space-y-1">
+                  <p className="font-semibold text-foreground">{item.icon} {item.title}</p>
+                  <p className="text-muted-foreground text-xs">{item.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         )}
       </div>
 
+      {/* Navigation */}
       <div className="flex items-center justify-between mt-6">
         <button
           onClick={handleBack}
-          disabled={stepIndex === 0}
-          className="px-4 py-2 text-[var(--color-text-secondary)] hover:text-white disabled:opacity-50"
+          disabled={stepIndex === 0 || step.id === "generating"}
+          className="flex items-center gap-1.5 px-4 py-2 text-sm text-muted-foreground hover:text-foreground disabled:opacity-40 transition-colors"
         >
           Back
         </button>
         <button
           onClick={handleNext}
-          disabled={
-            providerSaving || interfaceSaving || personalizeSaving || soulSaving
-          }
-          className="px-5 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] text-black font-medium rounded-lg transition-colors disabled:opacity-60"
+          disabled={providerSaving || interfaceSaving || (step.id === "generating" && !genDone)}
+          className="flex items-center gap-1.5 px-5 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium rounded-lg transition-colors disabled:opacity-60"
         >
-          {step.id === "done"
-            ? "Go to Dashboard"
-            : providerSaving || interfaceSaving || personalizeSaving || soulSaving
-              ? "Saving..."
-              : "Continue"}
+          {providerSaving || interfaceSaving ? (
+            <><LoaderIcon className="h-3.5 w-3.5 animate-spin" /> Saving…</>
+          ) : step.id === "done" ? (
+            "Go to Chat"
+          ) : step.id === "quiz" && quizPage < 3 ? (
+            <>Next <ChevronRightIcon className="h-3.5 w-3.5" /></>
+          ) : step.id === "generating" ? (
+            genDone ? <>Continue <ChevronRightIcon className="h-3.5 w-3.5" /></> : "Generating…"
+          ) : (
+            <>Continue <ChevronRightIcon className="h-3.5 w-3.5" /></>
+          )}
         </button>
       </div>
     </div>

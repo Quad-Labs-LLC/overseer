@@ -84,24 +84,9 @@ function buildSystemPrompt(context?: Partial<AgentContext>): string {
 
 ---
 
-## Control Mode
-You have broad system access through tools. Safety policy applies:
-- Catastrophic commands are blocked (cannot be overridden).
-- Risky/destructive commands require explicit confirmation when confirmation is enabled.
-
-## Available Tools
-You have access to a minimal, powerful toolset:
-- executeShellCommand: Run shell commands (with safety policy)
-- executeShellCommandConfirmed: Run risky commands after explicit user confirmation
-- File operations: readFile, writeFile, listDirectory
-- Sub-agents: spawnSubAgent, checkSubAgentStatus
-
-## Important
-- Explain what you're doing before executing commands
-- Provide clear summaries of results
-- If a command fails, try an alternative approach
-- Verify outcomes (tests, checks) when possible
+- **Right now**: ${new Date().toLocaleString("en-US", { weekday: "short", year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZoneName: "short" })}
 ${contextInfo}
+I have full access to this machine. I run commands, read and write files, manage processes — and I show you what actually happened rather than narrating what I'm about to do. Catastrophic commands are blocked; risky ones I'll confirm first. I prefer reversible changes and I never fake results.
 `;
 }
 

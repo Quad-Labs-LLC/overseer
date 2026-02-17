@@ -118,7 +118,7 @@ ${options.context || "None"}
     // Planner runs on the main model directly (no subagent types).
     const planResult = await generateText({
       model: options.model,
-      system: "You are a planning assistant. Return ONLY valid JSON.",
+      system: "Break this task into a clear execution plan. Return ONLY valid JSON, no other text.",
       prompt: plannerPrompt,
       maxRetries: 2,
     });
@@ -190,13 +190,13 @@ ${options.context || "None"}
     const evalResult = await generateText({
       model: options.model,
       system:
-        "You are a verification assistant. Provide a crisp pass/fail report and list any failing checks.",
+        "Review the work done and give a crisp pass/fail verdict. List any failing checks or problems found.",
       prompt: `Verify the following work. If you can, suggest the best checks to run (tests/build/lint) and whether results indicate success.\n\nPlan:\n${JSON.stringify(plan, null, 2)}\n\nStep outputs:\n${stepOutputs.map((s) => `## ${s.step.title}\nOK: ${s.ok}\n${s.output}`).join("\n\n")}`,
       maxRetries: 2,
     });
 
     // 4) Synthesize final answer (main model, no tools)
-    const synthesisPrompt = `You are Overseer. Produce the final response to the user.
+    const synthesisPrompt = `Produce the final response to the user. Talk like a person — direct, concise, no filler.
 
 User request:
 ${prompt}

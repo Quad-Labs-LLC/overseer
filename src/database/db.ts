@@ -794,9 +794,19 @@ function initializeSchema() {
     { name: "category", definition: "TEXT NOT NULL DEFAULT 'custom'" },
     { name: "importance", definition: "INTEGER NOT NULL DEFAULT 5" },
     { name: "source", definition: "TEXT" },
+    { name: "tier", definition: "TEXT NOT NULL DEFAULT 'long_term'" },
+    { name: "expires_at", definition: "TEXT" },
+    { name: "conversation_id", definition: "TEXT" },
+    { name: "embedding_hint", definition: "TEXT" },
     { name: "created_at", definition: "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP" },
     { name: "updated_at", definition: "TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP" },
   ]);
+  createIndexIfPossible(
+    "CREATE INDEX IF NOT EXISTS idx_memory_tier ON memory(owner_user_id, tier, importance DESC);",
+  );
+  createIndexIfPossible(
+    "CREATE INDEX IF NOT EXISTS idx_memory_expires ON memory(expires_at) WHERE expires_at IS NOT NULL;",
+  );
 
   migrateTableColumns("interfaces", [
     { name: "owner_user_id", definition: "INTEGER NOT NULL DEFAULT 1" },
