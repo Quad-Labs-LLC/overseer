@@ -56,11 +56,13 @@
       "group": "Core Concepts",
       "pages": [
         "concepts/architecture",
+        "concepts/architecture-deep-dive",
         "concepts/agent",
         "concepts/providers",
         "concepts/tools",
         "concepts/skills",
-        "concepts/soul"
+        "concepts/soul",
+        "concepts/session-management"
       ]
     },
     {
@@ -74,11 +76,14 @@
     {
       "group": "Guides",
       "pages": [
+        "guides/user-guide",
         "guides/deployment",
         "guides/security",
         "guides/mcp-servers",
         "guides/sub-agents",
-        "guides/custom-skills"
+        "guides/custom-skills",
+        "guides/development",
+        "guides/faq"
       ]
     },
     {
@@ -91,7 +96,8 @@
         "api-reference/conversations",
         "api-reference/tools",
         "api-reference/skills",
-        "api-reference/health"
+        "api-reference/health",
+        "api-reference/api"
       ]
     }
   ],

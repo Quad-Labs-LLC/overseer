@@ -66,6 +66,35 @@ sudo systemctl enable --now overseer-discord
 docker compose up -d
 ```
 
+## Deploying the Documentation (docs-site)
+
+The Overseer documentation (`docs-site/`) is built using [Mintlify](https://mintlify.com) and can be easily deployed to Vercel or hosted on Mintlify's platform.
+
+### Local Testing
+
+To test the documentation locally before deploying, run the Mintlify CLI:
+
+```bash
+cd docs-site
+npx mintlify dev
+```
+
+The documentation will be available at `http://localhost:3000`.
+
+### Vercel Deployment
+
+To deploy the documentation site to Vercel:
+
+1. Push your code to a GitHub repository.
+2. Go to the [Vercel Dashboard](https://vercel.com/dashboard) and click **Add New...** -> **Project**.
+3. Import your Overseer repository.
+4. **Important Config:**
+   - **Framework Preset**: Other
+   - **Root Directory**: `docs-site`
+   - **Build Command**: `npm run build` (or leave default if Mintlify handles it, but typically Mintlify docs are deployed via Mintlify's own GitHub app. If deploying a custom static export, ensure Mintlify export commands are used).
+   
+*Note: The easiest way to host Mintlify docs is often through the Mintlify dashboard by linking your GitHub repository directly to Mintlify.*
+
 ## Environment Checklist
 
 <Check>Strong admin password (16+ characters)</Check>

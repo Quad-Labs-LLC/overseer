@@ -438,7 +438,7 @@ cmd_update() {
         esac
 
         case "$file" in
-            docs/*|*.md|LICENSE)
+            docs-site/*|*.md|LICENSE)
                 ;;
             *)
                 needs_build="true"
@@ -512,7 +512,7 @@ cmd_update() {
         sleep 2
         cmd_start
     else
-        echo -e "${BLUE}==>${NC} Runtime unchanged (docs/meta-only update). Skipping build and restart."
+        echo -e "${BLUE}==>${NC} Runtime unchanged (docs-site/meta-only update). Skipping build and restart."
     fi
 
     echo ""

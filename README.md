@@ -196,14 +196,14 @@ Never: Execute destructive commands without confirmation
 | Document | Description |
 |----------|-------------|
 | **[Quick Start Guide](#-quick-start)** | Get started in 5 minutes |
-| **[User Guide](docs/USER_GUIDE.md)** | Complete usage guide |
-| **[Deployment Guide](docs/DEPLOYMENT.md)** | Production deployment |
-| **[Developer Guide](docs/DEVELOPMENT.md)** | Build and extend Overseer |
-| **[API Documentation](docs/API.md)** | REST API reference |
-| **[Architecture](docs/ARCHITECTURE.md)** | System design & internals |
-| **[Security Guide](docs/SECURITY.md)** | Security best practices |
-| **[FAQ](docs/FAQ.md)** | Common questions |
-| **[Changelog](docs/CHANGELOG.md)** | Version history |
+| **[User Guide](https://docs.overseer.sh/guides/user-guide)** | Complete usage guide |
+| **[Deployment Guide](https://docs.overseer.sh/guides/deployment)** | Production deployment |
+| **[Developer Guide](https://docs.overseer.sh/guides/development)** | Build and extend Overseer |
+| **[API Documentation](https://docs.overseer.sh/api-reference/overview)** | REST API reference |
+| **[Architecture](https://docs.overseer.sh/concepts/architecture)** | System design & internals |
+| **[Security Guide](https://docs.overseer.sh/guides/security)** | Security best practices |
+| **[FAQ](https://docs.overseer.sh/guides/faq)** | Common questions |
+| **[Changelog](https://docs.overseer.sh/changelog)** | Version history |
 | **[Contributing](CONTRIBUTING.md)** | How to contribute |
 
 ---
@@ -220,7 +220,7 @@ Never: Execute destructive commands without confirmation
 
 #### Option 1: One-Line Install (Recommended)
 
-> Windows note: `install.sh`/`update.sh` are supported via **WSL2** (Ubuntu/Debian/etc). Git-Bash/MSYS/Cygwin are not supported for these scripts. For native Windows Server deployment, see `docs/DEPLOYMENT.md` (Windows Server section).
+> Windows note: `install.sh`/`update.sh` are supported via **WSL2** (Ubuntu/Debian/etc). Git-Bash/MSYS/Cygwin are not supported for these scripts. For native Windows Server deployment, see [Deployment Guide](https://docs.overseer.sh/guides/deployment) (Windows Server section).
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ErzenXz/overseer/main/scripts/install.sh | bash
@@ -408,7 +408,7 @@ graph TB
     AGENT --> LOGS
 ```
 
-**Learn more**: [Architecture Documentation](docs/ARCHITECTURE.md)
+**Learn more**: [Architecture Documentation](https://docs.overseer.sh/concepts/architecture-deep-dive)
 
 ---
 
@@ -442,7 +442,7 @@ overseer/
 │   ├── deploy-assistant/
 │   ├── database-helper/
 │   └── ...
-├── docs/                   # Documentation
+├── docs-site/              # Documentation
 ├── scripts/                # Installation & setup scripts
 └── systemd/                # Production service files
 ```
@@ -467,7 +467,7 @@ export const myCustomTool = tool({
 });
 ```
 
-**Learn more**: [Developer Guide](docs/DEVELOPMENT.md)
+**Learn more**: [Developer Guide](https://docs.overseer.sh/guides/development)
 
 ---
 
@@ -507,7 +507,7 @@ Overseer is built on the shoulders of giants:
 
 ## 🔗 Links
 
-- **Documentation**: [docs/](docs/)
+- **Documentation**: [docs-site/](docs-site/)
 - **Issues**: [GitHub Issues](https://github.com/ErzenXz/overseer/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/ErzenXz/overseer/discussions)
 - **Twitter**: [@overseer](https://twitter.com/overseer)

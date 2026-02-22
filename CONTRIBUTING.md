@@ -48,7 +48,7 @@ Instances of abusive behavior may be reported to the project team. All complaint
 ### 🐛 Reporting Bugs
 
 **Before submitting a bug report:**
-- Check the [FAQ](docs/FAQ.md)
+- Check the [FAQ](https://docs.overseer.sh/guides/faq)
 - Search [existing issues](https://github.com/ErzenXz/overseer/issues)
 - Try the latest version
 
@@ -137,7 +137,7 @@ See [Development Setup](#development-setup) and [Making Changes](#making-changes
 Share your custom skills with the community!
 
 **Steps:**
-1. Create skill following [Skill Development Guide](docs/DEVELOPMENT.md#creating-skills)
+1. Create skill following [Skill Development Guide](https://docs.overseer.sh/guides/development#creating-skills)
 2. Test thoroughly
 3. Add documentation
 4. Submit to [Skills Marketplace](https://github.com/ErzenXz/overseer-skills) (coming soon)
@@ -218,7 +218,7 @@ git checkout -b fix/issue-123
 **Branch naming conventions:**
 - `feature/` - New features
 - `fix/` - Bug fixes
-- `docs/` - Documentation changes
+- `docs-site/` - Documentation changes
 - `refactor/` - Code refactoring
 - `test/` - Adding tests
 - `chore/` - Maintenance tasks

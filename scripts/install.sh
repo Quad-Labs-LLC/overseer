@@ -1571,7 +1571,7 @@ main() {
     fi
 
     if [ "$PRODUCTION_MODE" -eq 1 ]; then
-        # Compatibility flag used by docs/DEPLOYMENT.md. Keep behavior safe and explicit.
+        # Compatibility flag used by docs-site/guides/deployment.mdx. Keep behavior safe and explicit.
         print_info "Production mode enabled (--production)."
     fi
 

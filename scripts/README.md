@@ -558,10 +558,9 @@ sudo ufw status
 
 ## 📚 Documentation
 
-- **[Deployment Guide](../docs/DEPLOYMENT.md)** - Comprehensive deployment documentation
-- **[README](../README.md)** - Main project README
+- **[Deployment Guide](https://docs.overseer.sh/guides/deployment)** - Comprehensive deployment documentation
+- **[API Documentation](https://docs.overseer.sh/api-reference/overview)** - API reference
 - **[Agent Setup](../AGENT_SETUP.md)** - Agent configuration guide
-- **[API Documentation](../docs/API.md)** - API reference
 
 ---
 
@@ -714,7 +713,7 @@ MIT License - See [LICENSE](../LICENSE) file for details
 
 - **Issues**: [GitHub Issues](https://github.com/ErzenXz/Overseer/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/ErzenXz/Overseer/discussions)
-- **Documentation**: [Full Docs](../docs/)
+- **Documentation**: [Full Docs](https://docs.overseer.sh/)
 
 ---
 
