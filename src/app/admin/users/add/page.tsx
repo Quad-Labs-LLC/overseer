@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { usersModel } from "@/database";
 import { getCurrentUser } from "@/lib/auth";
 import { Permission, requirePermission } from "@/lib/permissions";
+import { ArrowLeftIcon, UserPlusIcon, KeyIcon, ShieldIcon, AlertCircleIcon, CheckCircle2Icon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -49,7 +51,7 @@ async function createUserAction(formData: FormData) {
     role as "admin" | "developer" | "operator" | "viewer"
   );
 
-  revalidatePath("/users");
+  revalidatePath("/admin/users");
   redirect("/admin/users/add?success=User%20created%20successfully");
 }
 
@@ -66,93 +68,115 @@ export default async function AddUserPage({
   });
 
   const params = await searchParams;
-  const error = typeof params.error === "string" ? params.error : null;
-  const success = typeof params.success === "string" ? params.success : null;
+  const error = params.error as string | undefined;
+  const success = params.success as string | undefined;
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-xl text-white font-(--font-mono)">Add User</h1>
-          <p className="text-text-secondary mt-1 text-pretty">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-2xl mx-auto">
+      <div className="flex flex-col gap-4">
+        <Link 
+          href="/admin/users" 
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-fit group"
+        >
+          <div className="w-6 h-6 rounded-md bg-muted/50 border border-border/50 flex items-center justify-center group-hover:bg-background group-hover:border-border transition-colors">
+            <ArrowLeftIcon className="w-3.5 h-3.5" />
+          </div>
+          Back to Users
+        </Link>
+        
+        <div className="flex flex-col gap-1.5">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Add User</h1>
+          <p className="text-sm text-muted-foreground">
             Create a new dashboard account with role-based access.
           </p>
         </div>
-        <Link
-          href="/users"
-          className="px-3 py-2 text-sm rounded border border-border text-text-secondary hover:text-white hover:bg-surface-overlay transition-colors"
-        >
-          Back to users
-        </Link>
       </div>
 
-      <div className="max-w-2xl bg-surface-raised border border-border rounded-lg p-6">
-        <form action={createUserAction} className="space-y-5">
-          <div>
-            <label htmlFor="username" className="block text-sm font-medium text-white mb-2">
-              Username
-            </label>
-            <input
-              id="username"
-              name="username"
-              required
-              minLength={3}
-              placeholder="e.g. erzen.admin"
-              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-white placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
-            />
-          </div>
+      <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-border/50 bg-muted/20">
+          <h2 className="text-sm font-semibold tracking-tight text-foreground">Account Details</h2>
+        </div>
+        
+        <div className="p-5">
+          <form action={createUserAction} className="space-y-6">
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label htmlFor="username" className="text-sm font-medium text-foreground tracking-tight flex items-center gap-2">
+                  <UserPlusIcon className="w-4 h-4 text-muted-foreground" />
+                  Username
+                </label>
+                <input
+                  id="username"
+                  name="username"
+                  required
+                  minLength={3}
+                  placeholder="e.g. erzen.admin"
+                  className="w-full h-9 px-3 bg-background border border-input rounded-md text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring transition-colors placeholder:text-muted-foreground"
+                />
+              </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
-              Temporary password
-            </label>
-            <input
-              id="password"
-              name="password"
-              required
-              minLength={8}
-              type="password"
-              placeholder="At least 8 characters"
-              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-white placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
-            />
-          </div>
+              <div className="space-y-1.5">
+                <label htmlFor="password" className="text-sm font-medium text-foreground tracking-tight flex items-center gap-2">
+                  <KeyIcon className="w-4 h-4 text-muted-foreground" />
+                  Temporary password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  required
+                  minLength={8}
+                  type="password"
+                  placeholder="At least 8 characters"
+                  className="w-full h-9 px-3 bg-background border border-input rounded-md text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring transition-colors placeholder:text-muted-foreground"
+                />
+              </div>
 
-          <div>
-            <label htmlFor="role" className="block text-sm font-medium text-white mb-2">
-              Role
-            </label>
-            <select
-              id="role"
-              name="role"
-              defaultValue="viewer"
-              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-accent"
-            >
-              <option value="admin">Admin</option>
-              <option value="developer">Developer</option>
-              <option value="operator">Operator</option>
-              <option value="viewer">Viewer</option>
-            </select>
-          </div>
+              <div className="space-y-1.5">
+                <label htmlFor="role" className="text-sm font-medium text-foreground tracking-tight flex items-center gap-2">
+                  <ShieldIcon className="w-4 h-4 text-muted-foreground" />
+                  Role
+                </label>
+                <select
+                  id="role"
+                  name="role"
+                  defaultValue="viewer"
+                  className="w-full h-9 px-3 bg-background border border-input rounded-md text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring transition-colors"
+                >
+                  <option value="admin">Admin</option>
+                  <option value="developer">Developer</option>
+                  <option value="operator">Operator</option>
+                  <option value="viewer">Viewer</option>
+                </select>
+              </div>
+            </div>
 
-          {error ? (
-            <p className="text-sm text-red-400 text-pretty">{error}</p>
-          ) : null}
-          {success ? (
-            <p className="text-sm text-green-400 text-pretty">{success}</p>
-          ) : null}
+            {error && (
+              <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                <AlertCircleIcon className="w-4 h-4" />
+                {error}
+              </div>
+            )}
+            
+            {success && (
+              <div className="p-3 bg-success/10 border border-success/20 text-success text-sm rounded-lg flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                <CheckCircle2Icon className="w-4 h-4" />
+                {success}
+              </div>
+            )}
 
-          <div className="flex items-center gap-3">
-            <button
-              type="submit"
-              className="px-4 py-2 rounded bg-accent hover:bg-accent-light text-black text-sm font-medium transition-colors"
-            >
-              Create user
-            </button>
-            <p className="text-xs text-text-muted text-pretty">
-              User can change password after first sign-in.
-            </p>
-          </div>
-        </form>
+            <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-border/50">
+              <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
+                User can change password after first sign-in.
+              </p>
+              <button
+                type="submit"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm h-9 px-4 w-full sm:w-auto"
+              >
+                Create user
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

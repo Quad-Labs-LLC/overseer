@@ -298,7 +298,12 @@ export default function ChatPage() {
                           <Fragment key={`${message.id}-${i}`}>
                             <Message from={message.role}>
                               <MessageContent>
-                                <MessageResponse>{part.text}</MessageResponse>
+                                <MessageResponse
+                                  caret="block"
+                                  isAnimating={message.role === "assistant" && isLast && isGenerating}
+                                >
+                                  {part.text}
+                                </MessageResponse>
                               </MessageContent>
                               {message.role === "assistant" && isLast && !isGenerating && (
                                 <MessageActions>

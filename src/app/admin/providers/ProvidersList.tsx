@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trpc } from "@/lib/trpc/client";
+import { cn } from "@/lib/utils";
 
 interface ProviderRuntimeConfig {
   providerId?: string;
@@ -28,7 +29,7 @@ interface ProvidersListProps {
 
 function ProviderCardSkeleton() {
   return (
-    <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-5">
+    <div className="rounded-xl border border-border bg-card shadow-sm p-5">
       <div className="flex items-start gap-4">
         <Skeleton className="w-12 h-12 rounded-lg shrink-0" />
         <div className="flex-1 space-y-2">
@@ -168,38 +169,46 @@ export function ProvidersList({ providers }: ProvidersListProps) {
         return (
           <div
             key={provider.id}
-            className={`stagger-item card-hover bg-[var(--color-surface-raised)] border rounded-lg overflow-hidden ${
-              provider.is_default ? "border-[var(--color-accent)]" : "border-[var(--color-border)]"
-            }`}
+            className={cn(
+              "group relative overflow-hidden rounded-xl border bg-card shadow-sm transition-all duration-200",
+              provider.is_active ? "border-border hover:border-primary/50 hover:shadow-md" : "border-border/50 bg-muted/10 opacity-75 grayscale-[0.5]"
+            )}
           >
+            {isDeletingThis && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            )}
+            
             {/* Main row */}
-            <div className="p-5">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-start gap-4 min-w-0 flex-1">
+            <div className="p-6">
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                <div className="flex items-start gap-5 min-w-0 flex-1">
                   {/* Avatar */}
                   <div
-                    className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                    className={cn(
+                      "w-14 h-14 rounded-xl flex items-center justify-center shrink-0 transition-colors shadow-sm",
                       provider.is_active
-                        ? "bg-[var(--color-accent)] text-black"
-                        : "bg-[var(--color-surface-overlay)] text-[var(--color-text-muted)]"
-                    }`}
+                        ? "bg-primary/10 text-primary ring-1 ring-primary/20"
+                        : "bg-muted text-muted-foreground ring-1 ring-border"
+                    )}
                   >
-                    <span className="text-lg font-bold">
+                    <span className="text-xl font-bold tracking-tight">
                       {provider.display_name.charAt(0)}
                     </span>
                   </div>
 
-                  <div className="min-w-0 flex-1">
+                  <div className="min-w-0 flex-1 space-y-2">
                     {/* Name + badges */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-semibold text-white">{provider.display_name}</h3>
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <h3 className="text-base font-semibold tracking-tight text-foreground">{provider.display_name}</h3>
                       {provider.is_default && (
-                        <span className="text-[10px] px-2 py-0.5 bg-[var(--color-accent-dim)] text-[var(--color-accent)] rounded font-medium">
+                        <span className="text-[10px] px-2 py-0.5 bg-primary/10 text-primary rounded-full font-semibold uppercase tracking-wider">
                           Default
                         </span>
                       )}
                       {!provider.is_active && (
-                        <span className="text-[10px] px-2 py-0.5 bg-[var(--color-surface-overlay)] text-[var(--color-text-secondary)] rounded">
+                        <span className="text-[10px] px-2 py-0.5 bg-muted text-muted-foreground border border-border rounded-full font-medium uppercase tracking-wider">
                           Disabled
                         </span>
                       )}
@@ -207,112 +216,149 @@ export function ProvidersList({ providers }: ProvidersListProps) {
                     </div>
 
                     {/* Model ID */}
-                    <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-                      Model: <span className="text-[var(--color-text-primary)] font-mono text-xs">{provider.model}</span>
+                    <p className="text-sm text-muted-foreground flex items-baseline gap-1.5">
+                      Model: <span className="text-foreground font-mono text-xs font-medium bg-muted/50 px-1.5 py-0.5 rounded border border-border/50">{provider.model}</span>
                       {modelInfo && modelInfo.name !== provider.model && (
-                        <span className="text-[var(--color-text-muted)] ml-1">({modelInfo.name})</span>
+                        <span className="text-[11px] text-muted-foreground/80">({modelInfo.name})</span>
                       )}
                     </p>
 
                     {/* Capabilities row */}
                     {modelInfo && (
-                      <div className="mt-2">
+                      <div className="pt-1">
                         <CapabilityBadges model={modelInfo} />
                       </div>
                     )}
 
                     {/* Stats row */}
-                    <div className="flex items-center gap-4 mt-2 text-xs text-[var(--color-text-muted)] flex-wrap">
+                    <div className="flex items-center gap-4 pt-1.5 text-xs text-muted-foreground flex-wrap">
                       {modelInfo ? (
                         <>
-                          <span>Context: <span className="text-[var(--color-text-secondary)]">{formatTokenCount(modelInfo.contextWindow)}</span></span>
-                          <span>Max Output: <span className="text-[var(--color-text-secondary)]">{formatTokenCount(modelInfo.maxOutput)}</span></span>
+                          <span className="flex items-center gap-1.5">
+                            Context <span className="font-medium text-foreground">{formatTokenCount(modelInfo.contextWindow)}</span>
+                          </span>
+                          <span className="w-1 h-1 rounded-full bg-border" />
+                          <span className="flex items-center gap-1.5">
+                            Max Out <span className="font-medium text-foreground">{formatTokenCount(modelInfo.maxOutput)}</span>
+                          </span>
                           {(modelInfo.supportsThinking || modelInfo.reasoning) && runtimeConfig.thinking_level && (
-                            <span>
-                              Thinking: <span className="text-amber-400 uppercase">{runtimeConfig.thinking_level}</span>
-                            </span>
+                            <>
+                              <span className="w-1 h-1 rounded-full bg-border" />
+                              <span className="flex items-center gap-1.5">
+                                Think <span className="font-medium text-primary uppercase">{runtimeConfig.thinking_level}</span>
+                              </span>
+                            </>
                           )}
                           {modelInfo.knowledgeCutoff && (
-                            <span>Cutoff: <span className="text-[var(--color-text-secondary)]">{modelInfo.knowledgeCutoff}</span></span>
+                            <>
+                              <span className="w-1 h-1 rounded-full bg-border" />
+                              <span className="flex items-center gap-1.5">
+                                Cutoff <span className="font-medium text-foreground">{modelInfo.knowledgeCutoff}</span>
+                              </span>
+                            </>
                           )}
                         </>
                       ) : (
                         <>
-                          <span>
-                            Max Tokens: {provider.max_tokens ?? "model default"}
+                          <span className="flex items-center gap-1.5">
+                            Max Tokens <span className="font-medium text-foreground">{provider.max_tokens ?? "Auto"}</span>
                           </span>
-                          <span>Temperature: {provider.temperature}</span>
+                          <span className="w-1 h-1 rounded-full bg-border" />
+                          <span className="flex items-center gap-1.5">
+                            Temp <span className="font-medium text-foreground">{provider.temperature}</span>
+                          </span>
                         </>
                       )}
-                      <span>Priority: {provider.priority}</span>
+                      <span className="w-1 h-1 rounded-full bg-border" />
+                      <span className="flex items-center gap-1.5">
+                        Priority <span className="font-medium text-foreground">{provider.priority}</span>
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleTest(provider.id)}
-                    disabled={isTestingThis}
-                    className="interactive"
-                  >
-                    {isTestingThis ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FlaskConical className="h-3.5 w-3.5" />}
-                    {isTestingThis ? "Testing..." : "Test"}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    asChild
-                    className="interactive"
-                  >
-                    <a href={`/providers/${provider.id}/edit`}>
-                      <Pencil className="h-3.5 w-3.5" />
-                      Edit
-                    </a>
-                  </Button>
-                  {!provider.is_default && (
+                <div className="flex flex-wrap md:flex-col items-center md:items-end gap-2 shrink-0">
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleTest(provider.id)}
+                      disabled={isTestingThis}
+                      className="h-8 px-3 text-xs font-medium shadow-sm"
+                    >
+                      {isTestingThis ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : <FlaskConical className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />}
+                      {isTestingThis ? "Testing" : "Test"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                      className="h-8 px-3 text-xs font-medium shadow-sm"
+                    >
+                      <a href={`/admin/providers/${provider.id}/edit`}>
+                        <Pencil className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
+                        Edit
+                      </a>
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center gap-1.5">
+                    {!provider.is_default && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDefaultMutation.mutate({ id: provider.id })}
+                        className="h-8 px-3 text-xs font-medium hover:text-primary hover:bg-primary/10"
+                      >
+                        <Star className="h-3.5 w-3.5 mr-1.5" />
+                        Default
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setDefaultMutation.mutate({ id: provider.id })}
-                      className="interactive"
+                      onClick={() => toggleActiveMutation.mutate({ id: provider.id, is_active: !provider.is_active })}
+                      className={cn(
+                        "h-8 px-3 text-xs font-medium",
+                        provider.is_active
+                          ? "hover:bg-warning/10 hover:text-warning"
+                          : "hover:bg-success/10 hover:text-success"
+                      )}
                     >
-                      <Star className="h-3.5 w-3.5" />
-                      Default
+                      <Power className="h-3.5 w-3.5 mr-1.5" />
+                      {provider.is_active ? "Disable" : "Enable"}
                     </Button>
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => toggleActiveMutation.mutate({ id: provider.id, is_active: !provider.is_active })}
-                    className={`interactive ${
-                      provider.is_active
-                        ? "text-yellow-400 hover:text-yellow-300"
-                        : "text-green-400 hover:text-green-300"
-                    }`}
-                  >
-                    <Power className="h-3.5 w-3.5" />
-                    {provider.is_active ? "Disable" : "Enable"}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(provider.id)}
-                    disabled={isDeletingThis}
-                    className="interactive text-red-400 hover:text-red-300"
-                  >
-                    {isDeletingThis ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-                    Delete
-                  </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(provider.id)}
+                      disabled={isDeletingThis}
+                      className="h-8 px-3 text-xs font-medium hover:bg-destructive/10 hover:text-destructive text-muted-foreground"
+                    >
+                      {isDeletingThis ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <Trash2 className="h-3.5 w-3.5 mr-1.5" />}
+                      Delete
+                    </Button>
+                  </div>
                 </div>
               </div>
+
+              {/* Test Result Feedback Inline */}
+              {testResult && testResult.id === provider.id && (
+                <div className={cn(
+                  "mt-4 px-4 py-3 rounded-lg text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-300",
+                  testResult.success ? "bg-success/10 text-success border border-success/20" : "bg-destructive/10 text-destructive border border-destructive/20"
+                )}>
+                  <div className={cn("w-2 h-2 rounded-full", testResult.success ? "bg-success" : "bg-destructive")} />
+                  <span className="font-medium">{testResult.success ? "Connection successful:" : "Connection failed:"}</span>
+                  <span className="opacity-90 font-mono text-xs">{testResult.message}</span>
+                </div>
+              )}
             </div>
 
             {/* Pricing footer (if model info available) */}
             {modelInfo && (modelInfo.costPerMillionInput !== undefined || modelInfo.costPerMillionOutput !== undefined) && (
-              <div className="border-t border-[var(--color-border)] px-5 py-3 bg-[var(--color-surface)] flex items-center gap-6">
+              <div className="border-t border-border/50 px-6 py-3 bg-muted/20 flex items-center justify-between gap-6">
                 <PricingDisplay model={modelInfo} compact />
               </div>
             )}

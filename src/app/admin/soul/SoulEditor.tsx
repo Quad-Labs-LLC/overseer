@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { SaveIcon, RefreshCcwIcon, AlertCircleIcon, CheckCircle2Icon } from "lucide-react";
 
 interface SoulEditorProps {
   initialContent: string;
@@ -63,42 +65,48 @@ export function SoulEditor({ initialContent, isCustom, defaultSoul }: SoulEditor
   };
 
   return (
-    <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg overflow-hidden">
-      <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
+    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden flex flex-col h-[calc(100vh-12rem)]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:px-6 border-b border-border/50 bg-muted/20 gap-4 shrink-0">
         <div className="flex items-center gap-3">
-          <h2 className="font-semibold text-white">SOUL.md</h2>
+          <h2 className="text-sm font-semibold tracking-tight text-foreground font-mono">SOUL.md</h2>
           {hasChanges && (
-            <span className="text-xs px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded">
+            <span className="text-[10px] font-medium px-2 py-0.5 bg-warning/10 text-warning border border-warning/20 rounded-full uppercase tracking-wider animate-in fade-in zoom-in-95 duration-200">
               Unsaved changes
             </span>
           )}
           {saved && (
-            <span className="text-xs px-2 py-0.5 bg-green-500/20 text-green-400 rounded">
-              Saved!
+            <span className="text-[10px] font-medium px-2 py-0.5 bg-success/10 text-success border border-success/20 rounded-full uppercase tracking-wider flex items-center gap-1 animate-in fade-in zoom-in-95 duration-200">
+              <CheckCircle2Icon className="w-3 h-3" /> Saved
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           {isCustom && (
             <button
               onClick={handleReset}
-              className="px-3 py-1.5 text-sm text-[var(--color-text-secondary)] hover:text-white bg-[var(--color-surface-overlay)] hover:bg-[var(--color-border)] rounded-lg transition-colors"
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3 shadow-sm"
             >
-              Clear Supplement
+              <RefreshCcwIcon className="w-3.5 h-3.5" />
+              Clear
             </button>
           )}
           <button
             onClick={handleSave}
             disabled={saving || !hasChanges}
-            className="px-4 py-1.5 text-sm bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] text-black font-medium rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm h-8 px-4"
           >
-            {saving ? "Saving..." : "Save Changes"}
+            {saving ? (
+              <><svg className="animate-spin -ml-1 mr-2 h-3.5 w-3.5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...</>
+            ) : (
+              <><SaveIcon className="w-3.5 h-3.5" /> Save Changes</>
+            )}
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="p-3 bg-red-500/10 border-b border-red-500/20 text-red-400 text-sm">
+        <div className="p-3 mx-4 mt-4 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
+          <AlertCircleIcon className="w-4 h-4" />
           {error}
         </div>
       )}
@@ -106,7 +114,7 @@ export function SoulEditor({ initialContent, isCustom, defaultSoul }: SoulEditor
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        className="w-full h-[600px] p-4 bg-transparent text-[var(--color-text-primary)] font-mono text-sm resize-none focus:outline-none"
+        className="flex-1 w-full p-6 bg-transparent text-foreground/90 font-mono text-[13px] leading-relaxed resize-none focus:outline-none custom-scrollbar"
         placeholder="# Overseer Soul Document
 
 ## Identity

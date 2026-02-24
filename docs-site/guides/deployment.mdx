@@ -68,32 +68,75 @@ docker compose up -d
 
 ## Deploying the Documentation (docs-site)
 
-The Overseer documentation (`docs-site/`) is built using [Mintlify](https://mintlify.com) and can be easily deployed to Vercel or hosted on Mintlify's platform.
+The **only** documentation source for Overseer is the **`docs-site/`** folder in this repository (Mintlify). There is no separate or duplicate docs site — use `docs-site/` for all official docs.
 
-### Local Testing
+You can host it **on Mintlify** (easiest), **on Vercel** (custom domain), or **both**.
 
-To test the documentation locally before deploying, run the Mintlify CLI:
+### Option A: Mintlify hosting (recommended, free)
+
+1. Go to [mintlify.com/start](https://mintlify.com/start) and sign in with GitHub.
+2. Connect the **Overseer** repository and choose the branch (e.g. `main`).
+3. Set the **docs path** to `docs-site` (the folder that contains `mint.json`).
+4. Install the Mintlify GitHub App when prompted so pushes auto-deploy.
+5. Your docs go live at `https://your-subdomain.mintlify.app`. You can add a custom domain in Mintlify settings.
+
+No build step or Vercel config needed; Mintlify builds and hosts the site.
+
+### Option B: Deploy docs on Vercel (custom domain at your-site.com/docs)
+
+Use this if you want the docs at **your own domain** (e.g. `https://overseer.sh/docs`) instead of `*.mintlify.app`.
+
+**Step 1: Deploy on Mintlify first**
+
+- Complete **Option A** above so your docs are live at `https://<your-subdomain>.mintlify.app`.
+
+**Step 2: Create a Vercel project that proxies to Mintlify**
+
+1. In the [Vercel Dashboard](https://vercel.com/dashboard), click **Add New...** → **Project**.
+2. Import the **same** Overseer repository.
+3. **Project settings:**
+   - **Framework Preset**: Other (or a minimal framework; the app only does rewrites).
+   - **Root Directory**: `/` (repository root).
+   - **Build Command**: leave default or use `echo 'No build'` (no need to build the docs; Mintlify hosts them).
+   - **Output Directory**: leave default.
+
+4. In the repo **root** (not inside `docs-site`), add a `vercel.json` that rewrites `/docs` to Mintlify:
+
+```json
+{
+  "rewrites": [
+    { "source": "/docs", "destination": "https://<your-subdomain>.mintlify.app/docs" },
+    { "source": "/docs/:path*", "destination": "https://<your-subdomain>.mintlify.app/docs/:path*" }
+  ]
+}
+```
+
+Replace `<your-subdomain>` with your Mintlify subdomain (e.g. from `https://dashboard.mintlify.com/your-org/your-subdomain`).
+
+5. Deploy. Once the domain is set (e.g. `overseer.sh`), your docs will be at `https://overseer.sh/docs`.
+
+<Info>
+  Rewrites keep the URL as `yoursite.com/docs` while serving content from Mintlify. For a **docs-only** Vercel project (no main app), you can use a minimal Next.js or static app that only contains this `vercel.json`.
+</Info>
+
+### Option C: Docs as a separate Vercel project (subdomain)
+
+If you prefer docs on a subdomain (e.g. `docs.overseer.sh`):
+
+1. Deploy on Mintlify (Option A) and get `https://<your-subdomain>.mintlify.app`.
+2. In Vercel, add a **second** project or the same project with an **additional domain**: `docs.overseer.sh`.
+3. In **Settings → Domains**, add `docs.overseer.sh` and in **Settings → Domains → Redirect** (or DNS), point it to `https://<your-subdomain>.mintlify.app`, or use Vercel rewrites from a single page app that redirects to Mintlify.
+
+### Local testing
+
+Run the docs locally before pushing:
 
 ```bash
 cd docs-site
 npx mintlify dev
 ```
 
-The documentation will be available at `http://localhost:3000`.
-
-### Vercel Deployment
-
-To deploy the documentation site to Vercel:
-
-1. Push your code to a GitHub repository.
-2. Go to the [Vercel Dashboard](https://vercel.com/dashboard) and click **Add New...** -> **Project**.
-3. Import your Overseer repository.
-4. **Important Config:**
-   - **Framework Preset**: Other
-   - **Root Directory**: `docs-site`
-   - **Build Command**: `npm run build` (or leave default if Mintlify handles it, but typically Mintlify docs are deployed via Mintlify's own GitHub app. If deploying a custom static export, ensure Mintlify export commands are used).
-   
-*Note: The easiest way to host Mintlify docs is often through the Mintlify dashboard by linking your GitHub repository directly to Mintlify.*
+Open [http://localhost:3000](http://localhost:3000) to preview. No separate build step is required for Mintlify.
 
 ## Environment Checklist
 

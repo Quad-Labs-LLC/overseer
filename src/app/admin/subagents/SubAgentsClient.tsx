@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { StatsCard } from "@/components/StatsCard";
 import { SubAgentsList } from "./SubAgentsList";
+import { cn } from "@/lib/utils";
 
 interface HealthData {
   timestamp: string;
@@ -132,27 +133,27 @@ export default function SubAgentsClient({ stats, allTypes }: SubAgentsClientProp
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-xl font-semibold text-white font-[var(--font-mono)]">Sub-Agents</h1>
-          <p className="text-[var(--color-text-secondary)] mt-1">Specialized agents for specific tasks</p>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col gap-1.5">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Sub-Agents</h1>
+          <p className="text-sm text-muted-foreground">Specialized agents for specific tasks</p>
         </div>
-        <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-md border border-border/50 cursor-pointer hover:bg-muted/50 transition-colors">
             <input
               type="checkbox"
               checked={autoRefresh}
               onChange={(event) => setAutoRefresh(event.target.checked)}
-              className="rounded border-[var(--color-border)] bg-[var(--color-surface-overlay)] text-[var(--color-accent)] focus:ring-[var(--color-accent)] focus:ring-offset-zinc-900"
+              className="rounded border-border bg-background text-primary focus:ring-primary focus:ring-offset-background"
             />
             Auto-refresh
           </label>
           <button
             onClick={() => fetchHealthData()}
-            className="flex items-center gap-2 px-4 py-2 bg-[var(--color-surface-overlay)] hover:bg-[var(--color-border)] text-[var(--color-text-primary)] text-sm font-medium rounded-lg transition-colors border border-[var(--color-border)]"
+            className="flex items-center gap-2 px-3 py-1.5 bg-background hover:bg-muted text-foreground text-sm font-medium rounded-md transition-colors border border-border shadow-sm"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -163,8 +164,8 @@ export default function SubAgentsClient({ stats, allTypes }: SubAgentsClientProp
             Refresh
           </button>
           <a
-            href="/subagents/spawn"
-            className="flex items-center gap-2 px-4 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] text-white text-sm font-medium rounded-lg transition-colors"
+            href="/admin/subagents/spawn"
+            className="flex items-center gap-2 px-4 py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold rounded-md transition-colors shadow-sm"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -175,41 +176,44 @@ export default function SubAgentsClient({ stats, allTypes }: SubAgentsClientProp
       </div>
 
       {healthData && (
-        <div className="bg-[var(--color-accent-dim)] border border-[var(--color-accent-border)] rounded-lg p-6 mb-8">
-          <div className="flex items-center justify-between">
+        <div className="rounded-xl border border-primary/20 bg-primary/5 shadow-sm p-6 relative overflow-hidden">
+          <div className="absolute right-0 top-0 w-32 h-32 bg-primary/10 rounded-bl-full -mr-8 -mt-8 pointer-events-none" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
             <div>
-              <h2 className="text-lg font-semibold text-white mb-2">System Health</h2>
+              <h2 className="text-sm font-semibold tracking-tight text-foreground uppercase tracking-wider mb-2">System Health</h2>
               <div className="flex items-center gap-4">
-                <div className={`text-4xl font-bold ${getHealthColor(healthData.overall.health)}`}>
+                <div className={`text-4xl font-bold tracking-tight ${getHealthColor(healthData.overall.health)}`}>
                   {healthData.overall.health}%
                 </div>
                 {getStatusBadge(healthData.overall.status)}
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-sm text-[var(--color-text-secondary)] mb-2">
-                Last updated: {new Date(healthData.timestamp).toLocaleTimeString()}
+            <div className="sm:text-right flex flex-col gap-1.5">
+              <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                Last updated: <span className="font-mono text-foreground">{new Date(healthData.timestamp).toLocaleTimeString()}</span>
               </div>
               {healthData.overall.degradedAgents > 0 && (
-                <div className="text-yellow-400 text-sm">
-                  ⚠ {healthData.overall.degradedAgents} degraded agent(s)
+                <div className="text-[11px] font-medium text-warning bg-warning/10 border border-warning/20 px-2 py-0.5 rounded inline-flex items-center gap-1.5 sm:self-end">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                  {healthData.overall.degradedAgents} degraded agent(s)
                 </div>
               )}
               {healthData.overall.openCircuits > 0 && (
-                <div className="text-red-400 text-sm">
-                  🔴 {healthData.overall.openCircuits} open circuit(s)
+                <div className="text-[11px] font-medium text-destructive bg-destructive/10 border border-destructive/20 px-2 py-0.5 rounded inline-flex items-center gap-1.5 sm:self-end">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  {healthData.overall.openCircuits} open circuit(s)
                 </div>
               )}
             </div>
           </div>
 
           {healthData.recommendations.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-[var(--color-accent-border)]">
-              <h3 className="text-sm font-medium text-white mb-2">Recommendations</h3>
-              <ul className="space-y-1">
+            <div className="mt-6 pt-5 border-t border-primary/10">
+              <h3 className="text-[11px] font-semibold tracking-wider uppercase text-foreground mb-3">Recommendations</h3>
+              <ul className="space-y-2">
                 {healthData.recommendations.slice(0, 3).map((rec, index) => (
-                  <li key={index} className="text-sm text-[var(--color-text-primary)] flex items-start gap-2">
-                    <span className="text-[var(--color-accent)]">•</span>
+                  <li key={index} className="text-sm text-muted-foreground flex items-start gap-2.5">
+                    <span className="text-primary mt-1 flex-shrink-0">•</span>
                     <span>{rec}</span>
                   </li>
                 ))}
@@ -219,7 +223,7 @@ export default function SubAgentsClient({ stats, allTypes }: SubAgentsClientProp
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title="Total Sub-Agents"
           value={stats.total}
@@ -268,60 +272,52 @@ export default function SubAgentsClient({ stats, allTypes }: SubAgentsClientProp
       </div>
 
       {healthData && healthData.circuitBreakers.states.length > 0 && (
-        <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-6 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white">Circuit Breakers</h2>
-            <div className="flex items-center gap-4 text-sm">
-              <span className="text-green-400">
-                ● {healthData.circuitBreakers.summary.closed} Closed
-              </span>
-              <span className="text-yellow-400">
-                ◐ {healthData.circuitBreakers.summary.halfOpen} Half-Open
-              </span>
-              <span className="text-red-400">
-                ● {healthData.circuitBreakers.summary.open} Open
-              </span>
-            </div>
-          </div>
+        <div className="rounded-xl border border-border bg-card shadow-sm p-6">
+          <h2 className="text-sm font-semibold tracking-tight text-foreground uppercase tracking-wider mb-5">Circuit Breakers</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {healthData.circuitBreakers.states.map((state) => {
               const stateColors = {
-                CLOSED: "border-green-500/30 bg-green-500/5",
-                HALF_OPEN: "border-yellow-500/30 bg-yellow-500/5",
-                OPEN: "border-red-500/30 bg-red-500/5",
+                CLOSED: "border-success/30 bg-success/5",
+                HALF_OPEN: "border-warning/30 bg-warning/5",
+                OPEN: "border-destructive/30 bg-destructive/5",
               };
 
               return (
                 <div
                   key={state.agentType}
-                  className={`p-4 rounded-lg border ${
-                    stateColors[state.state as keyof typeof stateColors]
-                  }`}
+                  className={cn(
+                    "p-5 rounded-xl border flex flex-col gap-3 transition-colors",
+                    stateColors[state.state as keyof typeof stateColors] || stateColors.CLOSED
+                  )}
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-white capitalize">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-foreground tracking-tight capitalize">
                       {state.agentType}
                     </span>
                     <span
-                      className={`text-xs px-2 py-1 rounded ${
+                      className={cn(
+                        "text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider border",
                         state.state === "OPEN"
-                          ? "bg-red-500/20 text-red-400"
+                          ? "bg-destructive/10 text-destructive border-destructive/20"
                           : state.state === "HALF_OPEN"
-                          ? "bg-yellow-500/20 text-yellow-400"
-                          : "bg-green-500/20 text-green-400"
-                      }`}
+                          ? "bg-warning/10 text-warning border-warning/20"
+                          : "bg-success/10 text-success border-success/20"
+                      )}
                     >
                       {state.state}
                     </span>
                   </div>
-                  <div className="text-sm text-[var(--color-text-secondary)] mb-3">
-                    Failure Rate: {(state.failureRate * 100).toFixed(1)}%
+                  <div className="text-xs font-medium text-muted-foreground bg-background/50 px-2.5 py-1.5 rounded border border-border/50 w-fit">
+                    Failure Rate: <span className="text-foreground font-mono">{(state.failureRate * 100).toFixed(1)}%</span>
                   </div>
                   {state.state === "OPEN" && (
                     <button
                       onClick={() => handleResetCircuit(state.agentType)}
-                      className="w-full px-3 py-1.5 text-xs font-medium bg-[var(--color-surface-overlay)] hover:bg-[var(--color-border)] text-[var(--color-text-primary)] rounded transition-colors"
+                      className="w-full mt-2 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3 shadow-sm"
                     >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
                       Reset Circuit
                     </button>
                   )}
@@ -333,40 +329,40 @@ export default function SubAgentsClient({ stats, allTypes }: SubAgentsClientProp
       )}
 
       {healthData && healthData.resourcePools.summary.totalActive + healthData.resourcePools.summary.totalQueued > 0 && (
-        <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-6 mb-8">
-          <h2 className="text-lg font-semibold text-white mb-4">Resource Pools</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-            <div className="text-center p-3 bg-[var(--color-surface-overlay)] rounded-lg">
-              <div className="text-2xl font-bold text-green-400">
+        <div className="rounded-xl border border-border bg-card shadow-sm p-6">
+          <h2 className="text-sm font-semibold tracking-tight text-foreground uppercase tracking-wider mb-5">Resource Pools</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="flex flex-col items-center justify-center p-4 bg-muted/30 rounded-lg border border-border/50">
+              <div className="text-3xl font-bold tracking-tight text-success tabular-nums">
                 {healthData.resourcePools.summary.totalActive}
               </div>
-              <div className="text-xs text-[var(--color-text-secondary)] mt-1">Active</div>
+              <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mt-1.5">Active</div>
             </div>
-            <div className="text-center p-3 bg-[var(--color-surface-overlay)] rounded-lg">
-              <div className="text-2xl font-bold text-yellow-400">
+            <div className="flex flex-col items-center justify-center p-4 bg-muted/30 rounded-lg border border-border/50">
+              <div className="text-3xl font-bold tracking-tight text-warning tabular-nums">
                 {healthData.resourcePools.summary.totalQueued}
               </div>
-              <div className="text-xs text-[var(--color-text-secondary)] mt-1">Queued</div>
+              <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mt-1.5">Queued</div>
             </div>
-            <div className="text-center p-3 bg-[var(--color-surface-overlay)] rounded-lg">
-              <div className="text-2xl font-bold text-blue-400">
+            <div className="flex flex-col items-center justify-center p-4 bg-muted/30 rounded-lg border border-border/50">
+              <div className="text-3xl font-bold tracking-tight text-primary tabular-nums">
                 {healthData.resourcePools.summary.totalCompleted}
               </div>
-              <div className="text-xs text-[var(--color-text-secondary)] mt-1">Completed</div>
+              <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mt-1.5">Completed</div>
             </div>
-            <div className="text-center p-3 bg-[var(--color-surface-overlay)] rounded-lg">
-              <div className="text-2xl font-bold text-red-400">
+            <div className="flex flex-col items-center justify-center p-4 bg-muted/30 rounded-lg border border-border/50">
+              <div className="text-3xl font-bold tracking-tight text-destructive tabular-nums">
                 {healthData.resourcePools.summary.totalFailed}
               </div>
-              <div className="text-xs text-[var(--color-text-secondary)] mt-1">Failed</div>
+              <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mt-1.5">Failed</div>
             </div>
           </div>
         </div>
       )}
 
       {Object.keys(stats.by_type).length > 0 && (
-        <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-6 mb-8">
-          <h2 className="text-lg font-semibold text-white mb-4">Usage by Agent Type</h2>
+        <div className="rounded-xl border border-border bg-card shadow-sm p-6">
+          <h2 className="text-sm font-semibold tracking-tight text-foreground uppercase tracking-wider mb-5">Usage by Agent Type</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {Object.entries(stats.by_type).map(([type, count]) => {
               const config = getSubAgentConfig(type);
@@ -374,19 +370,20 @@ export default function SubAgentsClient({ stats, allTypes }: SubAgentsClientProp
               const successRate = agentHealth?.successRate || 0;
 
               return (
-                <div key={type} className="text-center p-4 bg-[var(--color-surface-overlay)] rounded-lg border border-[var(--color-border)]">
-                  <div className="text-2xl font-bold text-white">{count}</div>
-                  <div className="text-sm text-[var(--color-text-secondary)] mt-1">{config?.name || type}</div>
+                <div key={type} className="flex flex-col items-center justify-center p-4 bg-muted/30 rounded-lg border border-border/50 hover:border-primary/30 transition-colors">
+                  <div className="text-2xl font-bold tracking-tight text-foreground tabular-nums">{count}</div>
+                  <div className="text-xs font-medium text-muted-foreground mt-1 text-center line-clamp-1">{config?.name || type}</div>
                   {agentHealth && (
-                    <div className="text-xs mt-2">
+                    <div className="mt-2.5 flex items-center justify-center">
                       <span
-                        className={`${
+                        className={cn(
+                          "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border",
                           successRate > 0.9
-                            ? "text-green-400"
+                            ? "bg-success/10 text-success border-success/20"
                             : successRate > 0.7
-                            ? "text-yellow-400"
-                            : "text-red-400"
-                        }`}
+                            ? "bg-warning/10 text-warning border-warning/20"
+                            : "bg-destructive/10 text-destructive border-destructive/20"
+                        )}
                       >
                         {(successRate * 100).toFixed(0)}% success
                       </span>
@@ -399,52 +396,55 @@ export default function SubAgentsClient({ stats, allTypes }: SubAgentsClientProp
         </div>
       )}
 
-      <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-6 mb-8">
-        <h2 className="text-lg font-semibold text-white mb-4">Available Sub-Agent Types</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {allTypes.map((type) => {
-            const config = getSubAgentConfig(type);
-            const typeIcons: Record<string, string> = {
-              generic: "M12 4v16m8-8H4",
-            };
+    <div className="rounded-xl border border-border bg-card shadow-sm p-6">
+      <h2 className="text-sm font-semibold tracking-tight text-foreground uppercase tracking-wider mb-5">Available Sub-Agent Types</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {allTypes.map((type) => {
+          const config = getSubAgentConfig(type);
+          const typeIcons: Record<string, string> = {
+            generic: "M12 4v16m8-8H4",
+          };
 
-            return (
-              <div key={type} className="p-4 bg-[var(--color-surface-overlay)] rounded-lg border border-[var(--color-border)]">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[var(--color-accent-dim)] flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-[var(--color-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d={typeIcons[type] || "M12 6v6m0 0v6m0-6h6m-6 0H6"}
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-white">{config?.name || type}</h3>
-                    <p className="text-xs text-[var(--color-text-secondary)] mt-1">{config?.description || ""}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-xs px-2 py-0.5 bg-[var(--color-surface-overlay)] text-[var(--color-text-primary)] rounded">{type}</span>
-                      {config?.tools && <span className="text-xs text-[var(--color-text-muted)]">{config.tools.length} tools</span>}
-                    </div>
+          return (
+            <div key={type} className="p-5 bg-muted/20 rounded-xl border border-border/50 hover:border-primary/30 transition-colors group">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors ring-1 ring-primary/20">
+                  <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d={typeIcons[type] || "M12 6v6m0 0v6m0-6h6m-6 0H6"}
+                    />
+                  </svg>
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-foreground tracking-tight truncate">{config?.name || type}</h3>
+                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{config?.description || "No description provided."}</p>
+                  <div className="flex items-center gap-2 mt-3 flex-wrap">
+                    <span className="text-[10px] px-2 py-0.5 bg-muted text-muted-foreground border border-border rounded font-mono uppercase tracking-widest">{type}</span>
+                    {config?.tools && <span className="text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded uppercase tracking-wider">{config.tools.length} tools</span>}
                   </div>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg">
-        <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Recent Sub-Agents</h2>
-          <a href="/subagents/all" className="text-sm text-[var(--color-accent)] hover:text-[var(--color-accent)]">
-            View All
-          </a>
-        </div>
-        <SubAgentsList />
+            </div>
+          );
+        })}
       </div>
     </div>
-  );
+
+    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+      <div className="px-6 py-4 border-b border-border/50 bg-muted/20 flex items-center justify-between">
+        <h2 className="text-sm font-semibold tracking-tight text-foreground flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-primary"></span>
+          Recent Sub-Agents
+        </h2>
+        <a href="/admin/subagents/all" className="text-xs font-semibold text-primary hover:underline uppercase tracking-wider">
+          View All
+        </a>
+      </div>
+      <SubAgentsList />
+    </div>
+  </div>
+);
 }

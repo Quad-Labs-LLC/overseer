@@ -1,24 +1,32 @@
 ---
 title: Introduction
-description: "Overseer — Self-Hosted AI Agent Platform"
+description: "Overseer — Self-Hosted AI Agent Platform. Production-ready docs for a large-scale open-source project."
 ---
 
 # Welcome to Overseer
 
-Overseer is a **production-ready, self-hosted AI agent platform** that turns your server into an intelligent assistant. Chat via Telegram, Discord, or Web — manage everything through a beautiful dashboard.
+**Overseer** is a **production-ready, self-hosted AI agent platform** that turns your server into an intelligent assistant. Chat via **Telegram**, **Discord**, or the **Web dashboard** — manage everything through a single, secure admin interface.
+
+Use this documentation to get started, deploy to production, integrate with the API, and extend Overseer with custom skills and MCP servers.
 
 <CardGroup cols={2}>
   <Card title="Quick Start" icon="rocket" href="/quickstart">
     Get Overseer running in under 5 minutes
   </Card>
+  <Card title="Installation" icon="terminal" href="/installation">
+    Step-by-step install for all platforms
+  </Card>
   <Card title="Architecture" icon="building" href="/concepts/architecture">
-    Understand how Overseer works under the hood
+    How Overseer works under the hood
   </Card>
   <Card title="API Reference" icon="code" href="/api-reference/overview">
-    REST API documentation for custom integrations
+    REST API for custom integrations
   </Card>
-  <Card title="Deploy" icon="server" href="/guides/deployment">
-    Production deployment guides for any environment
+  <Card title="Deployment" icon="server" href="/guides/deployment">
+    Production deployment and Vercel docs
+  </Card>
+  <Card title="User Guide" icon="book" href="/guides/user-guide">
+    Using the dashboard, bots, and SOUL.md
   </Card>
 </CardGroup>
 
@@ -26,40 +34,48 @@ Overseer is a **production-ready, self-hosted AI agent platform** that turns you
 
 <AccordionGroup>
   <Accordion title="True Agentic Behavior">
-    Powered by Vercel AI SDK's Tool Loop for complex, multi-step autonomous
+    Powered by the Vercel AI SDK tool loop for complex, multi-step autonomous
     reasoning. Not just a chatbot — a real agent that can plan and execute
     multi-step tasks.
   </Accordion>
   <Accordion title="20+ LLM Providers">
     OpenAI, Anthropic, Google Gemini, Groq, Ollama, Azure, AWS Bedrock, Mistral,
-    xAI Grok, and many more. Switch providers on the fly.
+    xAI Grok, and more. Switch providers per conversation or globally.
   </Accordion>
   <Accordion title="Multi-Platform Chat">
     Talk to your server via Telegram, Discord, or the built-in web interface.
-    Full streaming responses, rich formatting, and file uploads.
+    Full streaming, rich formatting, and file uploads.
   </Accordion>
-  <Accordion title="Enterprise Security">
+  <Accordion title="Enterprise-Grade Security">
     AES-256 encryption, bcrypt auth, command whitelisting, dangerous command
-    detection, complete audit logging. Your data never leaves your server.
+    detection, and full audit logging. Your data stays on your server.
   </Accordion>
-  <Accordion title="Extensible Skills System">
-    9+ pre-built skills for common tasks. Create custom skills or connect MCP
-    servers for unlimited capability expansion.
+  <Accordion title="Extensible Skills & MCP">
+    Pre-built skills for common tasks. Add custom skills or connect MCP
+    servers for unlimited capabilities.
   </Accordion>
 </AccordionGroup>
 
 ## Quick Install
 
+One-line install (recommended):
+
 ```bash
 curl -fsSL https://overseer.sh/install | bash
 ```
 
-Or clone manually:
+Or clone and run manually:
 
 ```bash
 git clone https://github.com/ErzenXz/overseer.git
 cd overseer
 pnpm install
-pnpm setup
+pnpm run db:init
+cp .env.example .env
+# Edit .env with your credentials, then:
 pnpm dev
 ```
+
+<Tip>
+  New here? Follow the [Quick Start](/quickstart) for a guided setup, then read the [User Guide](/guides/user-guide) for day-to-day use.
+</Tip>

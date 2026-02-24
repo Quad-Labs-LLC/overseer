@@ -51,20 +51,20 @@ function OptionCard({
       type="button"
       onClick={onClick}
       className={cn(
-        "relative flex flex-col gap-1 rounded-xl border p-4 text-left transition-all",
-        "hover:border-primary/60 hover:bg-primary/5",
+        "relative flex flex-col gap-1.5 rounded-xl border p-4 text-left transition-all duration-200",
+        "hover:border-primary/50 hover:shadow-sm",
         selected
-          ? "border-primary bg-primary/10 ring-1 ring-primary"
+          ? "border-primary bg-primary/5 ring-1 ring-primary shadow-sm"
           : "border-border bg-card",
       )}
     >
       {selected && (
-        <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-primary">
-          <CheckIcon className="h-3 w-3 text-primary-foreground" />
+        <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm animate-in zoom-in-50 duration-200">
+          <CheckIcon className="h-3 w-3" />
         </span>
       )}
-      {icon && <span className="text-xl">{icon}</span>}
-      <span className="text-sm font-medium text-foreground">{label}</span>
+      {icon && <span className="text-2xl mb-1">{icon}</span>}
+      <span className="text-sm font-semibold text-foreground tracking-tight">{label}</span>
       {description && <span className="text-xs text-muted-foreground">{description}</span>}
     </button>
   );
@@ -85,18 +85,18 @@ interface CatalogProvider {
 // ── Field helpers ─────────────────────────────────────────────────────────────
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-foreground">{label}</label>
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-foreground tracking-tight">{label}</label>
       {children}
     </div>
   );
 }
 
 const INPUT_CLS =
-  "w-full rounded-lg border border-border bg-card px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow";
+  "w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 shadow-sm";
 
 const SELECT_CLS =
-  "w-full rounded-lg border border-border bg-card px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50";
+  "w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 shadow-sm appearance-none";
 
 // ── Main component ────────────────────────────────────────────────────────────
 export function OnboardingWizard() {
@@ -341,51 +341,51 @@ export function OnboardingWizard() {
 
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
+    <div className="max-w-2xl mx-auto py-8 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Progress */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
-              <SparklesIcon className="h-3.5 w-3.5 text-primary-foreground" />
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary shadow-sm">
+              <SparklesIcon className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="text-sm font-semibold">Overseer Setup</span>
+            <span className="text-sm font-semibold tracking-tight">Overseer Setup</span>
           </div>
-          <span className="text-xs text-muted-foreground">Step {stepIndex + 1} / {STEPS.length}</span>
+          <span className="text-xs font-medium text-muted-foreground">Step {stepIndex + 1} of {STEPS.length}</span>
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-1.5">
           {STEPS.map((s, i) => (
-            <div key={s.id} className={cn("h-1 flex-1 rounded-full transition-all",
-              i < stepIndex ? "bg-primary" : i === stepIndex ? "bg-primary/60" : "bg-border")} />
+            <div key={s.id} className={cn("h-1.5 flex-1 rounded-full transition-all duration-300",
+              i < stepIndex ? "bg-primary" : i === stepIndex ? "bg-primary/50" : "bg-muted")} />
           ))}
         </div>
       </div>
 
       {/* Card */}
-      <div className="rounded-2xl border border-border bg-card p-8 shadow-sm space-y-6">
+      <div className="rounded-2xl border border-border bg-card p-8 sm:p-10 shadow-lg shadow-black/5 space-y-8">
 
         {/* WELCOME */}
         {step.id === "welcome" && (
-          <div className="space-y-6 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-              <SparklesIcon className="h-8 w-8 text-primary" />
+          <div className="space-y-8 text-center animate-in fade-in zoom-in-95 duration-500">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20 shadow-inner">
+              <SparklesIcon className="h-10 w-10 text-primary" />
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">Welcome to Overseer</h1>
-              <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
+            <div className="space-y-3">
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">Welcome to Overseer</h1>
+              <p className="text-base text-muted-foreground max-w-[28rem] mx-auto leading-relaxed">
                 Your self-hosted AI agent. Connect a model, take a quick quiz, and AI writes your personal Identity &amp; Soul profile.
               </p>
             </div>
-            <div className="grid grid-cols-3 gap-3 text-left">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left pt-4">
               {[
                 { icon: "🧠", title: "Smart memory", desc: "Remembers you across sessions" },
                 { icon: "🎭", title: "AI-written Soul", desc: "Personality crafted just for you" },
                 { icon: "🔒", title: "Private", desc: "Runs on your own server" },
-              ].map((item) => (
-                <div key={item.title} className="rounded-xl border border-border bg-background p-3 space-y-1.5">
-                  <div className="text-2xl">{item.icon}</div>
-                  <div className="text-xs font-semibold text-foreground">{item.title}</div>
-                  <div className="text-[11px] text-muted-foreground">{item.desc}</div>
+              ].map((item, i) => (
+                <div key={item.title} className="rounded-xl border border-border bg-background p-4 space-y-2 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 duration-200" style={{ animationDelay: `${i * 100}ms` }}>
+                  <div className="text-2xl mb-3">{item.icon}</div>
+                  <div className="text-sm font-semibold tracking-tight text-foreground">{item.title}</div>
+                  <div className="text-xs text-muted-foreground leading-relaxed">{item.desc}</div>
                 </div>
               ))}
             </div>
@@ -394,14 +394,14 @@ export function OnboardingWizard() {
 
         {/* PROVIDER */}
         {step.id === "provider" && (
-          <div className="space-y-5">
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
             <div>
-              <h2 className="text-lg font-semibold">Connect your AI model</h2>
+              <h2 className="text-xl font-bold tracking-tight text-foreground">Connect your AI model</h2>
               <p className="text-sm text-muted-foreground mt-1">Pick a provider and paste your API key.</p>
             </div>
-            {providerError && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-sm text-destructive">{providerError}</div>}
-            {providerCatalogError && <div className="rounded-lg bg-yellow-500/10 border border-yellow-500/20 px-3 py-2 text-sm text-yellow-600 dark:text-yellow-400">Using built-in provider list.</div>}
-            <div className="grid grid-cols-2 gap-4">
+            {providerError && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive flex items-center gap-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>{providerError}</div>}
+            {providerCatalogError && <div className="rounded-lg bg-warning/10 border border-warning/20 px-4 py-3 text-sm text-warning flex items-center gap-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Using built-in provider list.</div>}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Field label="Provider">
                 <select value={providerForm.name} onChange={(e) => handleProviderChange(e.target.value)} className={SELECT_CLS} disabled={providerCatalogLoading}>
                   {providerCatalog.length > 0
@@ -409,7 +409,7 @@ export function OnboardingWizard() {
                     : Object.entries(PROVIDER_INFO).map(([k, v]) => <option key={k} value={k}>{v.displayName}</option>)
                   }
                 </select>
-                {providerCatalogLoading && <p className="text-xs text-muted-foreground mt-1">Loading…</p>}
+                {providerCatalogLoading && <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1.5"><LoaderIcon className="w-3 h-3 animate-spin" /> Loading providers…</p>}
               </Field>
               <Field label="Model">
                 {(selectedCatalogProvider?.models?.length ?? fallbackProviderInfo?.models?.length ?? 0) > 0 ? (
@@ -441,13 +441,13 @@ export function OnboardingWizard() {
 
         {/* INTERFACE */}
         {step.id === "interface" && (
-          <div className="space-y-5">
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
             <div>
-              <h2 className="text-lg font-semibold">Connect a chat interface</h2>
+              <h2 className="text-xl font-bold tracking-tight text-foreground">Connect a chat interface</h2>
               <p className="text-sm text-muted-foreground mt-1">Optional — leave the token empty to skip.</p>
             </div>
-            {interfaceError && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-sm text-destructive">{interfaceError}</div>}
-            <div className="grid grid-cols-2 gap-4">
+            {interfaceError && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive flex items-center gap-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>{interfaceError}</div>}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Field label="Platform">
                 <select value={interfaceForm.type} onChange={(e) => setInterfaceForm((p) => ({ ...p, type: e.target.value as InterfaceType }))} className={SELECT_CLS}>
                   <option value="telegram">Telegram</option>
@@ -469,19 +469,19 @@ export function OnboardingWizard() {
 
         {/* QUIZ */}
         {step.id === "quiz" && (
-          <div className="space-y-6">
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
             <div>
-              <div className="flex gap-1 mb-3">
+              <div className="flex gap-1.5 mb-4">
                 {QUIZ_PAGES.map((_, i) => (
-                  <div key={i} className={cn("h-1.5 flex-1 rounded-full", i <= quizPage ? "bg-primary" : "bg-border")} />
+                  <div key={i} className={cn("h-1.5 flex-1 rounded-full transition-all duration-300", i <= quizPage ? "bg-primary" : "bg-muted")} />
                 ))}
               </div>
-              <h2 className="text-lg font-semibold">{QUIZ_PAGES[quizPage].title}</h2>
-              <p className="text-sm text-muted-foreground">{QUIZ_PAGES[quizPage].subtitle}</p>
+              <h2 className="text-xl font-bold tracking-tight text-foreground">{QUIZ_PAGES[quizPage].title}</h2>
+              <p className="text-sm text-muted-foreground mt-1">{QUIZ_PAGES[quizPage].subtitle}</p>
             </div>
 
             {quizPage === 0 && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <Field label="What's your name?">
                   <input type="text" value={quiz.name} onChange={(e) => q("name", e.target.value)} className={INPUT_CLS} placeholder="e.g. Alex" />
                 </Field>
@@ -492,7 +492,7 @@ export function OnboardingWizard() {
                   <input type="text" value={quiz.role} onChange={(e) => q("role", e.target.value)} className={INPUT_CLS} placeholder="e.g. Backend engineer, Startup founder" />
                 </Field>
                 <Field label="Technical experience">
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {([
                       { v: "beginner", i: "🌱", l: "Beginner", d: "Still learning" },
                       { v: "intermediate", i: "⚡", l: "Intermediate", d: "Comfortable" },
@@ -508,9 +508,9 @@ export function OnboardingWizard() {
             )}
 
             {quizPage === 1 && (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <Field label="What will you mainly use me for?">
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {([
                       { v: "devops", i: "🖥️", l: "DevOps & Infra", d: "VPS, deployments" },
                       { v: "coding", i: "💻", l: "Coding", d: "Building software" },
@@ -522,7 +522,7 @@ export function OnboardingWizard() {
                   </div>
                 </Field>
                 <Field label="How do you typically work?">
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {([
                       { v: "deep_focus", i: "🧘", l: "Deep focus", d: "One thing at a time" },
                       { v: "multitasker", i: "🔀", l: "Multitasker", d: "Many things at once" },
@@ -533,7 +533,7 @@ export function OnboardingWizard() {
                   </div>
                 </Field>
                 <Field label="How do you learn best?">
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {([
                       { v: "examples", i: "💡", l: "By example", d: "Show me how" },
                       { v: "concepts", i: "🧠", l: "Concepts first", d: "Explain the why" },
@@ -546,71 +546,77 @@ export function OnboardingWizard() {
             )}
 
             {quizPage === 2 && (
-              <div className="space-y-4">
-                <Field label="How should I speak to you?">
-                  <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-6">
+                <Field label="How long should my responses be?">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {([
-                      { v: "casual", i: "😊", l: "Casual & friendly", d: "Like a smart friend" },
-                      { v: "professional", i: "💼", l: "Professional", d: "Polished, no fluff" },
-                      { v: "direct", i: "⚡", l: "Direct", d: "Straight to the point" },
-                      { v: "warm", i: "🌟", l: "Warm", d: "Supportive energy" },
-                      { v: "witty", i: "🎭", l: "Witty", d: "Smart + fun" },
-                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.tone === o.v} onClick={() => q("tone", o.v)} icon={o.i} label={o.l} description={o.d} />)}
-                  </div>
-                </Field>
-                <Field label="How much detail do you want?">
-                  <div className="grid grid-cols-2 gap-2">
-                    {([
-                      { v: "concise", i: "✂️", l: "Short & sharp", d: "Just the essentials" },
-                      { v: "balanced", i: "⚖️", l: "Balanced", d: "Context + answer" },
-                      { v: "detailed", i: "📖", l: "Detailed", d: "Full explanations" },
-                      { v: "adaptive", i: "🔄", l: "Adaptive", d: "Match the situation" },
+                      { v: "concise", i: "�", l: "Concise", d: "No fluff, just answers" },
+                      { v: "balanced", i: "⚖️", l: "Balanced", d: "Context when needed" },
+                      { v: "detailed", i: "�", l: "Detailed", d: "Thorough explanations" },
                     ] as const).map((o) => <OptionCard key={o.v} selected={quiz.verbosity === o.v} onClick={() => q("verbosity", o.v)} icon={o.i} label={o.l} description={o.d} />)}
                   </div>
                 </Field>
-                <Field label="When presenting options, I should:">
-                  <div className="grid grid-cols-2 gap-2">
+                <Field label="How should I handle uncertainty?">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {([
-                      { v: "recommend_one", i: "🎯", l: "Recommend one", d: "Best option only" },
-                      { v: "offer_options", i: "📋", l: "Offer 2-3", d: "Let me choose" },
-                      { v: "explain_then_act", i: "💬", l: "Explain then act", d: "Tell me your reasoning" },
-                      { v: "just_do_it", i: "🚀", l: "Just do it", d: "Don't ask, just go" },
+                      { v: "ask_first", i: "❓", l: "Ask first", d: "Clarify before acting" },
+                      { v: "state_assumption", i: "🤔", l: "Assume & state", d: "Guess but tell me" },
+                      { v: "just_do_it", i: "⚡", l: "Just do it", d: "Make the best guess" },
+                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.uncertainty === o.v} onClick={() => q("uncertainty", o.v)} icon={o.i} label={o.l} description={o.d} />)}
+                  </div>
+                </Field>
+                <Field label="When making decisions:">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {([
+                      { v: "give_options", i: "🔀", l: "Give options", d: "Show me paths" },
+                      { v: "recommend_one", i: "⭐", l: "Recommend one", d: "Pick the best" },
+                      { v: "decide_for_me", i: "�", l: "Decide for me", d: "Just handle it" },
                     ] as const).map((o) => <OptionCard key={o.v} selected={quiz.decisionStyle === o.v} onClick={() => q("decisionStyle", o.v)} icon={o.i} label={o.l} description={o.d} />)}
+                  </div>
+                </Field>
+                <Field label="When should I ask for confirmation?">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {([
+                      { v: "always", i: "🛡️", l: "Always", d: "For any action" },
+                      { v: "risky_only", i: "⚠️", l: "Risky only", d: "For destructive actions" },
+                      { v: "never", i: "🏎️", l: "Never", d: "Full autonomy" },
+                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.confirmations === o.v} onClick={() => q("confirmations", o.v)} icon={o.i} label={o.l} description={o.d} />)}
                   </div>
                 </Field>
               </div>
             )}
 
             {quizPage === 3 && (
-              <div className="space-y-4">
-                <Field label="My agent name">
-                  <input type="text" value={quiz.agentName} onChange={(e) => q("agentName", e.target.value)} className={INPUT_CLS} placeholder="Overseer" />
+              <div className="space-y-6">
+                <Field label="What should we name me?">
+                  <input type="text" value={quiz.agentName} onChange={(e) => q("agentName", e.target.value)} className={INPUT_CLS} placeholder="e.g. Overseer" />
                 </Field>
-                <Field label="How proactive should I be?">
-                  <div className="grid grid-cols-2 gap-2">
+                <Field label="Tone of voice">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     {([
-                      { v: "highly_proactive", i: "🔥", l: "Very proactive", d: "Always suggest next steps" },
-                      { v: "suggest_when_relevant", i: "💡", l: "When relevant", d: "Suggest when it helps" },
-                      { v: "only_when_asked", i: "🤫", l: "Only when asked", d: "Just answer" },
-                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.proactivity === o.v} onClick={() => q("proactivity", o.v)} icon={o.i} label={o.l} description={o.d} />)}
-                  </div>
-                </Field>
-                <Field label="Before risky actions I should:">
-                  <div className="grid grid-cols-2 gap-2">
-                    {([
-                      { v: "always", i: "🛡️", l: "Always ask", d: "Confirm everything" },
-                      { v: "risky_only", i: "⚠️", l: "Risky only", d: "Ask for risky actions" },
-                      { v: "catastrophic_only", i: "💥", l: "Catastrophic only", d: "Only truly irreversible" },
-                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.confirmations === o.v} onClick={() => q("confirmations", o.v)} icon={o.i} label={o.l} description={o.d} />)}
+                      { v: "professional", i: "�", l: "Professional", d: "Formal & polite" },
+                      { v: "casual", i: "☕", l: "Casual", d: "Friendly & relaxed" },
+                      { v: "direct", i: "🎯", l: "Direct", d: "Straight to the point" },
+                      { v: "friendly", i: "👋", l: "Friendly", d: "Warm & encouraging" },
+                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.tone === o.v} onClick={() => q("tone", o.v)} icon={o.i} label={o.l} description={o.d} />)}
                   </div>
                 </Field>
                 <Field label="Humor level">
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {([
-                      { v: "none", i: "🎩", l: "None", d: "Strictly professional" },
-                      { v: "light", i: "😄", l: "Light", d: "Occasional wit" },
-                      { v: "playful", i: "🎉", l: "Playful", d: "Fun & friendly" },
+                      { v: "none", i: "�", l: "None", d: "Strictly business" },
+                      { v: "light", i: "🙂", l: "Light", d: "Occasional joke" },
+                      { v: "playful", i: "🥳", l: "Playful", d: "Fun & witty" },
                     ] as const).map((o) => <OptionCard key={o.v} selected={quiz.humor === o.v} onClick={() => q("humor", o.v)} icon={o.i} label={o.l} description={o.d} />)}
+                  </div>
+                </Field>
+                <Field label="Empathy & Support">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {([
+                      { v: "objective", i: "🤖", l: "Objective", d: "Facts only" },
+                      { v: "balanced", i: "🤝", l: "Balanced", d: "Helpful but professional" },
+                      { v: "nurturing", i: "❤️", l: "Nurturing", d: "Highly supportive" },
+                    ] as const).map((o) => <OptionCard key={o.v} selected={quiz.empathy === o.v} onClick={() => q("empathy", o.v)} icon={o.i} label={o.l} description={o.d} />)}
                   </div>
                 </Field>
               </div>
@@ -620,47 +626,55 @@ export function OnboardingWizard() {
 
         {/* GENERATING */}
         {step.id === "generating" && (
-          <div className="space-y-6 text-center py-4">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-              {genDone
-                ? <CheckIcon className="h-8 w-8 text-primary" />
-                : <LoaderIcon className="h-8 w-8 text-primary animate-spin" />
-              }
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold">{genDone ? "Personalization complete!" : "Generating your AI profile…"}</h2>
-              <p className="text-sm text-muted-foreground mt-2">{genStatus}</p>
-            </div>
-            {genError && (
-              <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive text-left">
-                <p className="font-medium">Generation failed</p>
-                <p className="mt-1 opacity-80">{genError}</p>
-                <button onClick={() => void generateProfile()} className="mt-2 text-xs underline opacity-80 hover:opacity-100">Try again</button>
-              </div>
-            )}
-            {genDone && (
-              <div className="grid grid-cols-2 gap-3 text-left text-sm">
-                <div className="rounded-xl border border-border bg-background p-4 space-y-1">
-                  <p className="font-semibold text-foreground">✅ IDENTITY.md</p>
-                  <p className="text-muted-foreground text-xs">Who you are — injected into every chat</p>
+          <div className="space-y-8 text-center py-8 animate-in fade-in zoom-in-95 duration-500">
+            {genError ? (
+              <>
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-destructive/10 ring-1 ring-destructive/20">
+                  <svg className="w-10 h-10 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                 </div>
-                <div className="rounded-xl border border-border bg-background p-4 space-y-1">
-                  <p className="font-semibold text-foreground">✅ SOUL.md</p>
-                  <p className="text-muted-foreground text-xs">AI personality — tailored just for you</p>
+                <div className="space-y-2">
+                  <h2 className="text-xl font-bold text-foreground">Generation Failed</h2>
+                  <p className="text-sm text-destructive max-w-md mx-auto">{genError}</p>
                 </div>
-              </div>
+                <button onClick={() => generateProfile()} className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors shadow-sm">
+                  Try Again
+                </button>
+              </>
+            ) : genDone ? (
+              <>
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-success/10 ring-1 ring-success/20">
+                  <CheckIcon className="w-10 h-10 text-success" />
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-xl font-bold text-foreground">All Set!</h2>
+                  <p className="text-sm text-muted-foreground max-w-md mx-auto">{genStatus}</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20">
+                  <LoaderIcon className="w-10 h-10 text-primary animate-spin" />
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-xl font-bold text-foreground">Personalizing...</h2>
+                  <p className="text-sm text-muted-foreground animate-pulse max-w-md mx-auto">{genStatus}</p>
+                </div>
+              </>
             )}
           </div>
         )}
 
         {/* DONE */}
         {step.id === "done" && (
-          <div className="space-y-6 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-              <CheckIcon className="h-8 w-8 text-primary" />
+          <div className="space-y-8 text-center py-8 animate-in fade-in zoom-in-95 duration-500">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-success/10 ring-1 ring-success/20 shadow-inner">
+              <SparklesIcon className="h-10 w-10 text-success" />
             </div>
-            <div>
-              <h2 className="text-2xl font-bold text-foreground">You're all set!</h2>
+            <div className="space-y-3">
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">You're ready to go</h1>
+              <p className="text-base text-muted-foreground max-w-md mx-auto leading-relaxed">
+                Overseer is set up. You can tweak your settings later in the Dashboard. Let's start chatting!
+              </p>
               <p className="text-sm text-muted-foreground mt-2">Overseer is configured and ready. Start chatting!</p>
             </div>
             <div className="grid grid-cols-2 gap-3 text-left text-sm">
@@ -679,29 +693,36 @@ export function OnboardingWizard() {
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between mt-6">
+      <div className="flex items-center justify-between mt-8 pt-6 border-t border-border/50">
         <button
           onClick={handleBack}
           disabled={stepIndex === 0 || step.id === "generating"}
-          className="flex items-center gap-1.5 px-4 py-2 text-sm text-muted-foreground hover:text-foreground disabled:opacity-40 transition-colors"
+          className={cn(
+            "flex items-center gap-1.5 px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
+            stepIndex === 0 || step.id === "generating" || step.id === "done"
+              ? "invisible opacity-0"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground border border-transparent hover:border-border shadow-sm"
+          )}
         >
           Back
         </button>
         <button
           onClick={handleNext}
           disabled={providerSaving || interfaceSaving || (step.id === "generating" && !genDone)}
-          className="flex items-center gap-1.5 px-5 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium rounded-lg transition-colors disabled:opacity-60"
+          className="flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold rounded-lg transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none"
         >
           {providerSaving || interfaceSaving ? (
-            <><LoaderIcon className="h-3.5 w-3.5 animate-spin" /> Saving…</>
+            <><LoaderIcon className="h-4 w-4 animate-spin" /> Saving…</>
           ) : step.id === "done" ? (
-            "Go to Chat"
+            "Go to Dashboard"
           ) : step.id === "quiz" && quizPage < 3 ? (
-            <>Next <ChevronRightIcon className="h-3.5 w-3.5" /></>
+            <>Next <ChevronRightIcon className="h-4 w-4" /></>
+          ) : step.id === "quiz" && quizPage === 3 ? (
+            "Generate Profile"
           ) : step.id === "generating" ? (
-            genDone ? <>Continue <ChevronRightIcon className="h-3.5 w-3.5" /></> : "Generating…"
+            genDone ? <>Continue <ChevronRightIcon className="h-4 w-4" /></> : "Generating…"
           ) : (
-            <>Continue <ChevronRightIcon className="h-3.5 w-3.5" /></>
+            <>Continue <ChevronRightIcon className="h-4 w-4" /></>
           )}
         </button>
       </div>

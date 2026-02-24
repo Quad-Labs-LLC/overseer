@@ -21,24 +21,24 @@ export default async function InterfacesPage() {
     : [];
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-xl font-semibold text-white font-[var(--font-mono)]">Chat Interfaces</h1>
-          <p className="text-[var(--color-text-secondary)] mt-1">Configure Telegram, Discord, and other chat connections</p>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col gap-1.5">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Chat Interfaces</h1>
+          <p className="text-sm text-muted-foreground">Configure Telegram, Discord, and other chat connections</p>
         </div>
         <AddInterfaceButton />
       </div>
 
       {interfaces.length === 0 ? (
-        <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--color-surface-overlay)] flex items-center justify-center">
-            <svg className="w-8 h-8 text-[var(--color-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="rounded-2xl border border-border bg-card p-12 text-center shadow-sm">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-muted/50 mb-6 ring-1 ring-border">
+            <svg className="w-10 h-10 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-white mb-2">No interfaces configured</h3>
-          <p className="text-[var(--color-text-secondary)] mb-6">Add a chat interface to start talking to your AI agent</p>
+          <h3 className="text-xl font-semibold tracking-tight text-foreground mb-2">No interfaces configured</h3>
+          <p className="text-sm text-muted-foreground mb-8 max-w-md mx-auto">Add a chat interface to start talking to your AI agent from your favorite messaging apps</p>
           <AddInterfaceButton variant="primary" />
         </div>
       ) : (
@@ -46,49 +46,63 @@ export default async function InterfacesPage() {
       )}
 
       {/* Setup Instructions */}
-      <div className="mt-8 space-y-6">
-        <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-6">
-          <h2 className="text-[10px] font-[var(--font-mono)] uppercase tracking-[0.1em] text-[var(--color-text-muted)] mb-4">Telegram Setup</h2>
-          <ol className="space-y-3 text-sm text-[var(--color-text-secondary)]">
-            <li className="flex gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--color-accent-dim)] text-[var(--color-accent)] flex items-center justify-center text-xs">1</span>
-              <span>Open Telegram and search for <strong className="text-[var(--color-text-primary)]">@BotFather</strong></span>
-            </li>
-            <li className="flex gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--color-accent-dim)] text-[var(--color-accent)] flex items-center justify-center text-xs">2</span>
-              <span>Send <code className="px-1.5 py-0.5 bg-[var(--color-surface-overlay)] rounded text-[var(--color-text-primary)]">/newbot</code> and follow the prompts</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--color-accent-dim)] text-[var(--color-accent)] flex items-center justify-center text-xs">3</span>
-              <span>Copy the bot token and paste it here</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--color-accent-dim)] text-[var(--color-accent)] flex items-center justify-center text-xs">4</span>
-              <span>Start the worker process (`npm run bot` for Telegram, `npm run discord` for Discord) and use the Test button above to verify credentials</span>
-            </li>
-          </ol>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+        <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-border/50 bg-muted/20">
+            <h2 className="text-sm font-semibold tracking-tight text-foreground flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#0088cc]"></span>
+              Telegram Setup
+            </h2>
+          </div>
+          <div className="p-6">
+            <ol className="space-y-4 text-sm text-muted-foreground">
+              <li className="flex gap-4">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold ring-1 ring-primary/20">1</span>
+                <span className="pt-0.5">Open Telegram and search for <strong className="text-foreground">@BotFather</strong></span>
+              </li>
+              <li className="flex gap-4">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold ring-1 ring-primary/20">2</span>
+                <span className="pt-0.5">Send <code className="px-1.5 py-0.5 bg-muted/50 border border-border rounded text-foreground font-mono text-[11px]">/newbot</code> and follow the prompts</span>
+              </li>
+              <li className="flex gap-4">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold ring-1 ring-primary/20">3</span>
+                <span className="pt-0.5">Copy the bot token and paste it here</span>
+              </li>
+              <li className="flex gap-4">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold ring-1 ring-primary/20">4</span>
+                <span className="pt-0.5 leading-relaxed">Start the worker process (<code className="px-1.5 py-0.5 bg-muted/50 border border-border rounded text-foreground font-mono text-[11px]">npm run bot</code>) and use the Test button above to verify</span>
+              </li>
+            </ol>
+          </div>
         </div>
 
-        <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-6">
-          <h2 className="text-[10px] font-[var(--font-mono)] uppercase tracking-[0.1em] text-[var(--color-text-muted)] mb-4">Discord Setup</h2>
-          <ol className="space-y-3 text-sm text-[var(--color-text-secondary)]">
-            <li className="flex gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--color-accent-dim)] text-[var(--color-accent)] flex items-center justify-center text-xs">1</span>
-              <span>Create an application in Discord Developer Portal and add a Bot user</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--color-accent-dim)] text-[var(--color-accent)] flex items-center justify-center text-xs">2</span>
-              <span>Copy Bot Token and Client ID into the interface form</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--color-accent-dim)] text-[var(--color-accent)] flex items-center justify-center text-xs">3</span>
-              <span>Invite the bot to your server with required scopes and permissions</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--color-accent-dim)] text-[var(--color-accent)] flex items-center justify-center text-xs">4</span>
-              <span>Run `npm run discord` and test connectivity from the Interfaces list</span>
-            </li>
-          </ol>
+        <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-border/50 bg-muted/20">
+            <h2 className="text-sm font-semibold tracking-tight text-foreground flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#5865F2]"></span>
+              Discord Setup
+            </h2>
+          </div>
+          <div className="p-6">
+            <ol className="space-y-4 text-sm text-muted-foreground">
+              <li className="flex gap-4">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold ring-1 ring-primary/20">1</span>
+                <span className="pt-0.5">Create an application in Discord Developer Portal and add a Bot user</span>
+              </li>
+              <li className="flex gap-4">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold ring-1 ring-primary/20">2</span>
+                <span className="pt-0.5">Copy Bot Token and Client ID into the interface form</span>
+              </li>
+              <li className="flex gap-4">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold ring-1 ring-primary/20">3</span>
+                <span className="pt-0.5 leading-relaxed">Invite the bot to your server with required scopes and permissions</span>
+              </li>
+              <li className="flex gap-4">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold ring-1 ring-primary/20">4</span>
+                <span className="pt-0.5 leading-relaxed">Run <code className="px-1.5 py-0.5 bg-muted/50 border border-border rounded text-foreground font-mono text-[11px]">npm run discord</code> and test connectivity</span>
+              </li>
+            </ol>
+          </div>
         </div>
       </div>
     </div>

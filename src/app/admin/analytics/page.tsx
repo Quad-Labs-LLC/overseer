@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useMemo } from "react";
+import { cn } from "@/lib/utils";
+import { trpc } from "@/lib/trpc/client";
 
 interface DailyData {
   day: string;
@@ -35,76 +37,58 @@ interface AnalyticsData {
 }
 
 export default function AnalyticsPage() {
-  const [data, setData] = useState<AnalyticsData | null>(null);
   const [timeRange, setTimeRange] = useState<"7" | "30" | "90">("30");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/analytics?days=${timeRange}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      // Defensive normalization: SQLite aggregates can arrive as strings depending on driver/serialization.
-      const normalized: AnalyticsData = {
-        ...json,
-        dailyData: Array.isArray(json.dailyData)
-          ? json.dailyData.map((d: any) => ({
-              day: String(d.day ?? ""),
-              cost: Number(d.cost ?? 0),
-              requests: Number(d.requests ?? 0),
-              tokens: Number(d.tokens ?? 0),
-            }))
-          : [],
-        modelData: Array.isArray(json.modelData)
-          ? json.modelData.map((m: any) => ({
-              model: String(m.model ?? ""),
-              cost: Number(m.cost ?? 0),
-              requests: Number(m.requests ?? 0),
-              tokens: Number(m.tokens ?? 0),
-            }))
-          : [],
-        topUsers: Array.isArray(json.topUsers)
-          ? json.topUsers.map((u: any) => ({
-              userId: String(u.userId ?? ""),
-              totalCost: Number(u.totalCost ?? 0),
-              monthlyCost: Number(u.monthlyCost ?? 0),
-              totalRequests: Number(u.totalRequests ?? 0),
-            }))
-          : [],
-        convStats: {
-          total: Number(json.convStats?.total ?? 0),
-          tokens: Number(json.convStats?.tokens ?? 0),
-          messages: Number(json.convStats?.messages ?? 0),
-        },
-        memoryStats: {
-          total: Number(json.memoryStats?.total ?? 0),
-          byCategory: (json.memoryStats?.byCategory ?? {}) as Record<string, number>,
-          avgImportance: Number(json.memoryStats?.avgImportance ?? 0),
-        },
-        subAgentStats: {
-          total: Number(json.subAgentStats?.total ?? 0),
-          by_type: (json.subAgentStats?.by_type ?? {}) as Record<string, number>,
-          completed: Number(json.subAgentStats?.completed ?? 0),
-          error: Number(json.subAgentStats?.error ?? 0),
-          working: Number(json.subAgentStats?.working ?? 0),
-        },
-        contextStats: json.contextStats ?? { totalSummaries: 0 },
-        systemHealth: json.systemHealth,
-      };
-      setData(normalized);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load analytics");
-    } finally {
-      setLoading(false);
-    }
-  }, [timeRange]);
+  const { data: rawData, isLoading: loading, error: queryError, refetch } = trpc.analytics.get.useQuery(
+    { days: Number(timeRange) },
+    { staleTime: 60 * 1000 }
+  );
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  const data = useMemo((): AnalyticsData | null => {
+    if (!rawData) return null;
+    return {
+      dailyData: rawData.dailyData.map((d) => ({
+        day: String(d.day ?? ""),
+        cost: Number(d.cost ?? 0),
+        requests: Number(d.requests ?? 0),
+        tokens: Number(d.tokens ?? 0),
+      })),
+      modelData: rawData.modelData.map((m) => ({
+        model: String(m.model ?? ""),
+        cost: Number(m.cost ?? 0),
+        requests: Number(m.requests ?? 0),
+        tokens: Number(m.tokens ?? 0),
+      })),
+      topUsers: rawData.topUsers.map((u: any) => ({
+        userId: String(u.userId ?? ""),
+        totalCost: Number(u.totalCost ?? 0),
+        monthlyCost: Number(u.monthlyCost ?? 0),
+        totalRequests: Number(u.totalRequests ?? 0),
+      })),
+      convStats: {
+        total: Number(rawData.convStats?.total ?? 0),
+        tokens: Number(rawData.convStats?.tokens ?? 0),
+        messages: Number(rawData.convStats?.messages ?? 0),
+      },
+      memoryStats: {
+        total: Number(rawData.memoryStats?.total ?? 0),
+        byCategory: (rawData.memoryStats?.byCategory ?? {}) as Record<string, number>,
+        avgImportance: Number(rawData.memoryStats?.avgImportance ?? 0),
+      },
+      subAgentStats: {
+        total: Number(rawData.subAgentStats?.total ?? 0),
+        by_type: (rawData.subAgentStats?.by_type ?? {}) as Record<string, number>,
+        completed: Number(rawData.subAgentStats?.completed ?? 0),
+        error: Number(rawData.subAgentStats?.error ?? 0),
+        working: Number(rawData.subAgentStats?.working ?? 0),
+      },
+      contextStats: rawData.contextStats ?? { totalSummaries: 0 },
+      systemHealth: rawData.systemHealth,
+    };
+  }, [rawData]);
+
+  const error = queryError?.message ?? null;
+  const loadData = () => refetch();
 
   const dailyData = data?.dailyData ?? [];
   const modelData = data?.modelData ?? [];
@@ -138,35 +122,35 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Analytics</h1>
-          <p className="text-[var(--color-text-secondary)] mt-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col gap-1.5">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Analytics</h1>
+          <p className="text-sm text-muted-foreground">
             Comprehensive insights into your AI agent usage and costs
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={loadData}
             disabled={loading}
-            className="p-2 rounded-lg bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-white transition-colors disabled:opacity-50"
+            className="flex items-center justify-center w-9 h-9 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-sm transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             title="Refresh"
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className={loading ? "animate-spin" : ""}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className={loading ? "animate-spin" : "text-muted-foreground"}>
               <path d="M13.65 2.35A7.95 7.95 0 008 0C3.58 0 .01 3.58.01 8S3.58 16 8 16c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 018 14 6 6 0 1114 8h-3l4 4 4-4h-3a8 8 0 00-2.35-5.65z" fill="currentColor" transform="scale(0.9) translate(1,1)" />
             </svg>
           </button>
-          <div className="flex gap-1 bg-[var(--color-surface)] rounded-lg p-1">
+          <div className="flex items-center gap-1 bg-muted/30 border border-border/50 rounded-lg p-1 shadow-sm">
             {(["7", "30", "90"] as const).map((d) => (
               <button
                 key={d}
                 onClick={() => setTimeRange(d)}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
                   timeRange === d
-                    ? "bg-[var(--color-accent)] text-white shadow-sm"
-                    : "text-[var(--color-text-secondary)] hover:text-white"
+                    ? "bg-background text-foreground shadow-sm ring-1 ring-border/50"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
                 {d}D
@@ -181,21 +165,27 @@ export default function AnalyticsPage() {
           {/* Skeleton loaders */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-xl p-5 animate-pulse">
-                <div className="h-4 bg-[var(--color-surface)] rounded w-20 mb-3" />
-                <div className="h-8 bg-[var(--color-surface)] rounded w-24" />
+              <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-sm animate-pulse">
+                <div className="h-4 bg-muted/50 rounded w-20 mb-4" />
+                <div className="h-8 bg-muted/50 rounded w-24" />
               </div>
             ))}
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-xl p-6 h-80 animate-pulse" />
-            <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-xl p-6 h-80 animate-pulse" />
+            <div className="lg:col-span-2 rounded-xl border border-border bg-card shadow-sm p-6 h-80 animate-pulse flex flex-col justify-between">
+              <div className="h-5 bg-muted/50 rounded w-32" />
+              <div className="h-full mt-6 bg-muted/30 rounded" />
+            </div>
+            <div className="rounded-xl border border-border bg-card shadow-sm p-6 h-80 animate-pulse flex flex-col justify-between">
+              <div className="h-5 bg-muted/50 rounded w-32" />
+              <div className="flex-1 mt-6 rounded-full bg-muted/30 mx-8 my-4" />
+            </div>
           </div>
         </div>
       ) : (
-        <>
+        <div className="space-y-6">
           {/* KPI Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <KpiCard
               title="Total Cost"
               value={`$${totals.cost.toFixed(2)}`}
@@ -226,22 +216,22 @@ export default function AnalyticsPage() {
           {/* Main Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Cost Trend Chart */}
-            <div className="lg:col-span-2 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-white">Cost Trend</h2>
-                <span className="text-xs text-[var(--color-text-secondary)] bg-[var(--color-surface)] px-2 py-1 rounded-md">
+            <div className="lg:col-span-2 rounded-xl border border-border bg-card shadow-sm p-6 flex flex-col hover:border-primary/50 transition-colors duration-200">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-base font-semibold tracking-tight text-foreground">Cost Trend</h2>
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest bg-muted/50 px-2 py-1 rounded border border-border/50">
                   {dailyData.length} days
                 </span>
               </div>
-              <div className="h-56">
-                <AreaChart data={dailyData} dataKey="cost" color="#22c55e" label="$" />
+              <div className="h-64 mt-auto">
+                <AreaChart data={dailyData} dataKey="cost" color="hsl(var(--primary))" label="$" />
               </div>
             </div>
 
             {/* Model Distribution */}
-            <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-xl p-6">
-              <h2 className="text-lg font-semibold text-white mb-4">Cost by Model</h2>
-              <div className="h-56 flex items-center justify-center">
+            <div className="rounded-xl border border-border bg-card shadow-sm p-6 flex flex-col hover:border-primary/50 transition-colors duration-200">
+              <h2 className="text-base font-semibold tracking-tight text-foreground mb-6">Cost by Model</h2>
+              <div className="flex-1 flex items-center justify-center min-h-[16rem]">
                 <DonutChart data={modelData.slice(0, 6)} />
               </div>
             </div>
@@ -249,17 +239,17 @@ export default function AnalyticsPage() {
 
           {/* Usage Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-xl p-6">
-              <h2 className="text-lg font-semibold text-white mb-4">Requests per Day</h2>
-              <div className="h-44">
-                <BarChart data={dailyData} dataKey="requests" color="#3b82f6" />
+            <div className="rounded-xl border border-border bg-card shadow-sm p-6 flex flex-col hover:border-primary/50 transition-colors duration-200">
+              <h2 className="text-base font-semibold tracking-tight text-foreground mb-6">Requests per Day</h2>
+              <div className="h-44 mt-auto">
+                <BarChart data={dailyData} dataKey="requests" color="hsl(var(--chart-1))" />
               </div>
             </div>
 
-            <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-xl p-6">
-              <h2 className="text-lg font-semibold text-white mb-4">Token Usage</h2>
-              <div className="h-44">
-                <AreaChart data={dailyData} dataKey="tokens" color="#a855f7" label="" />
+            <div className="rounded-xl border border-border bg-card shadow-sm p-6 flex flex-col hover:border-primary/50 transition-colors duration-200">
+              <h2 className="text-base font-semibold tracking-tight text-foreground mb-6">Token Usage</h2>
+              <div className="h-44 mt-auto">
+                <AreaChart data={dailyData} dataKey="tokens" color="hsl(var(--chart-2))" label="" />
               </div>
             </div>
           </div>
@@ -267,35 +257,35 @@ export default function AnalyticsPage() {
           {/* Detailed Tables Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Top Users */}
-            <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-xl p-6">
-              <h2 className="text-lg font-semibold text-white mb-4">Top Users by Cost</h2>
+            <div className="rounded-xl border border-border bg-card shadow-sm p-6 flex flex-col hover:border-primary/50 transition-colors duration-200">
+              <h2 className="text-base font-semibold tracking-tight text-foreground mb-6">Top Users by Cost</h2>
               {userData.length === 0 ? (
                 <EmptyState text="No user data yet" />
               ) : (
-                <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                <div className="space-y-2 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
                   {userData.slice(0, 10).map((user, i) => (
                     <div
                       key={user.userId}
-                      className="flex items-center gap-3 p-3 rounded-lg bg-[var(--color-surface)] group hover:bg-[var(--color-surface)]/80 transition-colors"
+                      className="flex items-center gap-3 p-3 rounded-lg bg-muted/20 border border-border/50 group hover:bg-muted/40 transition-colors"
                     >
-                      <span className="w-6 h-6 flex items-center justify-center rounded-full bg-[var(--color-accent)]/20 text-[var(--color-accent)] text-xs font-bold shrink-0">
+                      <span className="w-6 h-6 flex items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0 ring-1 ring-primary/20">
                         {i + 1}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-white font-medium truncate text-sm">{user.userId}</p>
-                        <p className="text-xs text-[var(--color-text-secondary)]">
+                        <p className="text-sm font-medium text-foreground truncate">{user.userId}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
                           {user.totalRequests.toLocaleString()} requests
                         </p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-white font-semibold text-sm">${user.totalCost.toFixed(4)}</p>
-                        <p className="text-xs text-[var(--color-text-secondary)]">
+                        <p className="text-sm font-semibold text-foreground">${user.totalCost.toFixed(4)}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
                           ${user.monthlyCost.toFixed(4)}/mo
                         </p>
                       </div>
-                      <div className="w-16 h-1.5 bg-[var(--color-surface-raised)] rounded-full overflow-hidden shrink-0">
+                      <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden shrink-0">
                         <div
-                          className="h-full bg-[var(--color-accent)] rounded-full transition-all"
+                          className="h-full bg-primary rounded-full transition-all"
                           style={{ width: `${(user.totalCost / Math.max(userData[0]?.totalCost || 1, 1)) * 100}%` }}
                         />
                       </div>
@@ -306,31 +296,33 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Model Details */}
-            <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-xl p-6">
-              <h2 className="text-lg font-semibold text-white mb-4">Model Breakdown</h2>
+            <div className="rounded-xl border border-border bg-card shadow-sm p-6 flex flex-col hover:border-primary/50 transition-colors duration-200">
+              <h2 className="text-base font-semibold tracking-tight text-foreground mb-6">Model Breakdown</h2>
               {modelData.length === 0 ? (
                 <EmptyState text="No model data yet" />
               ) : (
-                <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                <div className="space-y-2 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
                   {modelData.slice(0, 10).map((model, i) => {
                     const costPerMillion = (model.cost / Math.max(model.tokens, 1)) * 1_000_000;
                     return (
                       <div
                         key={model.model}
-                        className="flex items-center gap-3 p-3 rounded-lg bg-[var(--color-surface)]"
+                        className="flex items-center gap-3 p-3 rounded-lg bg-muted/20 border border-border/50 hover:bg-muted/40 transition-colors"
                       >
-                        <span className="w-6 h-6 flex items-center justify-center rounded-full bg-blue-500/20 text-blue-400 text-xs font-bold shrink-0">
+                        <span className="w-6 h-6 flex items-center justify-center rounded-full bg-chart-1/10 text-chart-1 text-xs font-bold shrink-0 ring-1 ring-chart-1/20">
                           {i + 1}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-white font-medium truncate text-sm">{model.model}</p>
-                          <p className="text-xs text-[var(--color-text-secondary)]">
-                            {model.requests.toLocaleString()} req &middot; {formatNumber(model.tokens)} tok
+                          <p className="text-sm font-medium text-foreground truncate">{model.model}</p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1.5">
+                            <span>{model.requests.toLocaleString()} req</span>
+                            <span className="w-1 h-1 rounded-full bg-border" />
+                            <span>{formatNumber(model.tokens)} tok</span>
                           </p>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-white font-semibold text-sm">${model.cost.toFixed(4)}</p>
-                          <p className="text-xs text-[var(--color-text-secondary)]">
+                          <p className="text-sm font-semibold text-foreground">${model.cost.toFixed(4)}</p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
                             ${costPerMillion.toFixed(2)}/1M
                           </p>
                         </div>
@@ -347,7 +339,7 @@ export default function AnalyticsPage() {
             <StatsCard
               title="Sub-Agents"
               icon={<AgentIcon />}
-              accentClass="bg-blue-500/20 text-blue-400"
+              accentClass="bg-chart-1/10 text-chart-1 ring-1 ring-chart-1/20"
               items={[
                 { label: "Total spawned", value: data?.subAgentStats?.total ?? 0 },
                 { label: "Completed", value: data?.subAgentStats?.completed ?? 0 },
@@ -404,20 +396,24 @@ function KpiCard({
   subValue?: string;
 }) {
   const accentColors: Record<string, string> = {
-    green: "text-green-400",
-    blue: "text-blue-400",
-    purple: "text-purple-400",
-    amber: "text-amber-400",
+    green: "text-success bg-success/10 ring-1 ring-success/20",
+    blue: "text-chart-1 bg-chart-1/10 ring-1 ring-chart-1/20",
+    purple: "text-chart-2 bg-chart-2/10 ring-1 ring-chart-2/20",
+    amber: "text-warning bg-warning/10 ring-1 ring-warning/20",
   };
 
   return (
-    <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-xl p-5 hover:border-[var(--color-border-hover)] transition-colors">
-      <div className="flex items-center justify-between mb-3">
-        <span className={`${accentColors[accent] ?? "text-white"}`}>{icon}</span>
+    <div className="rounded-xl border border-border bg-card p-6 shadow-sm hover:border-primary/50 transition-colors duration-200 flex flex-col">
+      <div className="flex items-center gap-3 mb-4">
+        <span className={cn("w-10 h-10 flex items-center justify-center rounded-lg shrink-0", accentColors[accent] ?? "text-foreground bg-muted")}>
+          {icon}
+        </span>
+        <h3 className="text-sm font-semibold tracking-tight text-foreground line-clamp-1">{title}</h3>
       </div>
-      <p className="text-[var(--color-text-secondary)] text-xs uppercase tracking-wider">{title}</p>
-      <p className="text-2xl font-bold text-white mt-1">{value}</p>
-      {subValue && <p className="text-xs text-[var(--color-text-secondary)] mt-1">{subValue}</p>}
+      <div className="mt-auto">
+        <p className="text-3xl font-bold tracking-tight text-foreground tabular-nums">{value}</p>
+        {subValue && <p className="text-[11px] font-medium text-muted-foreground mt-1.5 uppercase tracking-wider">{subValue}</p>}
+      </div>
     </div>
   );
 }
@@ -644,23 +640,23 @@ function StatsCard({
   accentClass: string;
   items: Array<{ label: string; value: string | number; status?: "good" | "warning" | "bad" }>;
 }) {
-  const statusColors = { good: "bg-green-500", warning: "bg-yellow-500", bad: "bg-red-500" };
+  const statusColors = { good: "bg-success", warning: "bg-warning", bad: "bg-destructive" };
 
   return (
-    <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-xl p-6">
-      <div className="flex items-center gap-3 mb-4">
-        <span className={`w-9 h-9 flex items-center justify-center rounded-lg ${accentClass}`}>
+    <div className="rounded-xl border border-border bg-card shadow-sm p-6 hover:border-primary/50 transition-colors duration-200">
+      <div className="flex items-center gap-3 mb-6">
+        <span className={cn("w-9 h-9 flex items-center justify-center rounded-lg", accentClass)}>
           {icon}
         </span>
-        <h3 className="text-base font-semibold text-white">{title}</h3>
+        <h3 className="text-base font-semibold tracking-tight text-foreground">{title}</h3>
       </div>
-      <div className="space-y-2.5">
+      <div className="space-y-3">
         {items.map((item, i) => (
-          <div key={i} className="flex items-center justify-between">
-            <span className="text-sm text-[var(--color-text-secondary)]">{item.label}</span>
+          <div key={i} className="flex items-center justify-between p-2 rounded-md bg-muted/20 border border-border/50">
+            <span className="text-xs font-medium text-foreground">{item.label}</span>
             <div className="flex items-center gap-2">
-              {item.status && <span className={`w-1.5 h-1.5 rounded-full ${statusColors[item.status]}`} />}
-              <span className="text-sm text-white font-medium">{item.value}</span>
+              {item.status && <span className={cn("w-1.5 h-1.5 rounded-full", statusColors[item.status])} />}
+              <span className="text-xs font-mono text-muted-foreground bg-background px-1.5 py-0.5 rounded border border-border/50">{item.value}</span>
             </div>
           </div>
         ))}
@@ -671,7 +667,8 @@ function StatsCard({
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div className="h-full flex items-center justify-center text-[var(--color-text-secondary)] text-sm">
+    <div className="h-full flex flex-col items-center justify-center text-muted-foreground text-sm gap-2">
+      <svg className="w-8 h-8 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
       {text}
     </div>
   );

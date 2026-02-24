@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface User {
   username: string;
@@ -271,56 +272,56 @@ export function Sidebar({ user, permissions }: SidebarProps) {
   };
 
   return (
-    <aside className="w-56 h-full bg-[var(--color-surface-raised)] border-r border-[var(--color-border)] flex flex-col shrink-0">
+    <aside className="w-64 h-full bg-sidebar border-r border-border flex flex-col shrink-0">
       {/* Logo */}
-      <div className="px-4 py-5 border-b border-[var(--color-border)]">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded bg-[var(--color-accent)] flex items-center justify-center">
-            <svg className="w-3.5 h-3.5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+      <div className="px-5 py-5 border-b border-border/50">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-sm">
+            <svg className="w-4 h-4 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
           </div>
           <div>
-            <h1 className="text-sm font-semibold font-[var(--font-mono)] text-white tracking-tight">OVERSEER</h1>
-            <p className="text-[10px] text-[var(--color-text-muted)] font-[var(--font-mono)] tracking-wider uppercase">v1.0.0</p>
+            <h1 className="text-[15px] font-semibold tracking-tight text-foreground">Overseer</h1>
+            <p className="text-[11px] font-mono text-muted-foreground mt-0.5">v1.0.0</p>
           </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 py-3 px-2 overflow-y-auto custom-scrollbar">
+      <nav className="flex-1 py-4 px-3 overflow-y-auto custom-scrollbar">
         {sections.map((section, sectionIndex) => (
-          <div key={section.title || `section-${sectionIndex}`} className={sectionIndex > 0 ? "mt-5" : ""}>
+          <div key={section.title || `section-${sectionIndex}`} className={sectionIndex > 0 ? "mt-6" : ""}>
             {section.title && (
-              <h3 className="px-2 mb-1.5 text-[10px] font-medium font-[var(--font-mono)] text-[var(--color-text-muted)] uppercase tracking-[0.1em]">
+              <h3 className="px-3 mb-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                 {section.title}
               </h3>
             )}
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               {section.items.map((item) => {
                 const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                 return (
                   <div key={item.name}>
                     <Link
                       href={item.href}
-                      className={`flex items-center gap-2.5 px-2 py-1.5 rounded text-[13px] font-medium transition-colors ${
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2 rounded-md text-[13px] font-medium transition-all duration-200",
                         isActive
-                          ? "bg-[var(--color-accent-dim)] text-[var(--color-accent-light)]"
-                          : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-overlay)]"
-                      }`}
+                          ? "bg-primary/10 text-primary"
+                          : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent"
+                      )}
                     >
-                      <span className={isActive ? "text-[var(--color-accent)]" : ""}>{item.icon}</span>
+                      <span className={cn("transition-colors", isActive ? "text-primary" : "text-sidebar-foreground/50")}>
+                        {item.icon}
+                      </span>
                       {item.name}
                       {item.badge && (
-                        <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded font-[var(--font-mono)] bg-[var(--color-accent-dim)] text-[var(--color-accent)] font-semibold tracking-wider">
+                        <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold">
                           {item.badge}
                         </span>
                       )}
                     </Link>
-                    {item.badge && (
-                      <div className="my-2 mx-2 border-b border-[var(--color-border)]" />
-                    )}
                   </div>
                 );
               })}
@@ -330,23 +331,23 @@ export function Sidebar({ user, permissions }: SidebarProps) {
       </nav>
 
       {/* User section */}
-      <div className="p-3 border-t border-[var(--color-border)]">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-6 h-6 rounded bg-[var(--color-surface-overlay)] flex items-center justify-center border border-[var(--color-border)]">
-            <span className="text-[10px] font-semibold font-[var(--font-mono)] text-[var(--color-text-secondary)]">
+      <div className="p-4 border-t border-border/50 bg-sidebar-accent/30 m-3 rounded-xl">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center border border-border shadow-sm">
+            <span className="text-[13px] font-semibold text-foreground">
               {user.username.charAt(0).toUpperCase()}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-[var(--color-text-primary)] truncate">{user.username}</p>
-            <p className="text-[10px] text-[var(--color-text-muted)] capitalize font-[var(--font-mono)]">{user.role}</p>
+            <p className="text-[13px] font-medium text-foreground truncate">{user.username}</p>
+            <p className="text-[11px] text-muted-foreground capitalize">{user.role}</p>
           </div>
         </div>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs text-[var(--color-text-muted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/5 rounded transition-colors"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-[13px] font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
         >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
           Sign out
