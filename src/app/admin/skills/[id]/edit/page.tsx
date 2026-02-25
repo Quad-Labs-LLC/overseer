@@ -62,12 +62,12 @@ export default async function EditSkillPage({ params }: EditSkillPageProps) {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-xl text-white font-(--font-mono)">Configure Skill</h1>
+          <h1 className="text-xl text-foreground font-mono">Configure Skill</h1>
           <p className="text-text-secondary mt-1">Adjust runtime behavior for `{skill.name}`.</p>
         </div>
         <Link
           href="/skills"
-          className="px-3 py-2 text-sm rounded border border-border text-text-secondary hover:text-white hover:bg-surface-overlay transition-colors"
+          className="px-3 py-2 text-sm rounded border border-border text-text-secondary hover:text-foreground hover:bg-surface-overlay transition-colors"
         >
           Back
         </Link>
@@ -78,7 +78,7 @@ export default async function EditSkillPage({ params }: EditSkillPageProps) {
           <input type="hidden" name="id" value={skill.id} />
 
           <div>
-            <label className="block text-sm text-white mb-2">Skill metadata</label>
+            <label className="block text-sm text-foreground mb-2">Skill metadata</label>
             <div className="rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-text-secondary">
               <p><span className="text-text-muted">Skill ID:</span> {skill.skill_id}</p>
               <p><span className="text-text-muted">Source:</span> {skill.source}</p>
@@ -87,23 +87,23 @@ export default async function EditSkillPage({ params }: EditSkillPageProps) {
           </div>
 
           <div>
-            <label className="block text-sm text-white mb-2">System Prompt</label>
+            <label className="block text-sm text-foreground mb-2">System Prompt</label>
             <textarea
               name="system_prompt"
               defaultValue={skill.system_prompt || ""}
               rows={8}
-              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               placeholder="Optional system prompt override for this skill"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-white mb-2">Config (JSON)</label>
+            <label className="block text-sm text-foreground mb-2">Config (JSON)</label>
             <textarea
               name="config"
               defaultValue={skill.config || ""}
               rows={10}
-              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm font-mono text-white focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               placeholder='{"key":"value"}'
             />
             <p className="text-xs text-text-muted mt-1">
@@ -124,7 +124,7 @@ export default async function EditSkillPage({ params }: EditSkillPageProps) {
           <div>
             <button
               type="submit"
-              className="px-4 py-2 rounded bg-accent hover:bg-accent-light text-black text-sm font-medium transition-colors"
+              className="px-4 py-2 rounded bg-primary hover:bg-primary-light text-primary-foreground text-sm font-medium transition-colors"
             >
               Save Changes
             </button>

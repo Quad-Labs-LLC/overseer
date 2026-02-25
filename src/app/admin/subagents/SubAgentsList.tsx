@@ -43,7 +43,7 @@ const typeColors: Record<string, string> = {
   docker: "bg-cyan-500/10 text-cyan-400",
   db: "bg-yellow-500/10 text-yellow-400",
   security: "bg-pink-500/10 text-pink-400",
-  network: "bg-[var(--color-accent-dim)] text-[var(--color-accent)]",
+  network: "bg-[primary/10] text-primary",
 };
 
 export function SubAgentsList() {
@@ -87,7 +87,7 @@ export function SubAgentsList() {
 
   if (loading) {
     return (
-      <div className="p-8 text-center text-[var(--color-text-muted)]">
+      <div className="p-8 text-center text-muted-foreground">
         Loading sub-agents...
       </div>
     );
@@ -96,13 +96,13 @@ export function SubAgentsList() {
   if (subAgents.length === 0) {
     return (
       <div className="p-12 text-center">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--color-surface-overlay)] flex items-center justify-center">
-          <svg className="w-8 h-8 text-[var(--color-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+          <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-white mb-2">No sub-agents yet</h3>
-        <p className="text-[var(--color-text-secondary)]">Sub-agents are spawned automatically during complex tasks</p>
+        <h3 className="text-lg font-medium text-foreground mb-2">No sub-agents yet</h3>
+        <p className="text-muted-foreground">Sub-agents are spawned automatically during complex tasks</p>
       </div>
     );
   }
@@ -110,15 +110,15 @@ export function SubAgentsList() {
   return (
     <div>
       {/* Filter Tabs */}
-      <div className="flex gap-2 p-4 border-b border-[var(--color-border)]">
+      <div className="flex gap-2 p-4 border-b border-border">
         {["all", "active", "working", "completed", "error"].map((status) => (
           <button
             key={status}
             onClick={() => setFilter(status)}
             className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
               filter === status
-                ? "bg-[var(--color-accent-dim)] text-[var(--color-accent)]"
-                : "text-[var(--color-text-secondary)] hover:text-white hover:bg-[var(--color-surface-overlay)]"
+                ? "bg-[primary/10] text-primary"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
             }`}
           >
             {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -130,7 +130,7 @@ export function SubAgentsList() {
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="text-left text-sm text-[var(--color-text-secondary)] border-b border-[var(--color-border)]">
+            <tr className="text-left text-sm text-muted-foreground border-b border-border">
               <th className="px-6 py-4 font-medium">Agent</th>
               <th className="px-6 py-4 font-medium">Type</th>
               <th className="px-6 py-4 font-medium">Status</th>
@@ -141,15 +141,15 @@ export function SubAgentsList() {
               <th className="px-6 py-4 font-medium">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--color-border)]">
+          <tbody className="divide-y divide-border">
             {filteredSubAgents.map((agent) => (
-              <tr key={agent.id} className="hover:bg-[var(--color-surface-overlay)] transition-colors">
+              <tr key={agent.id} className="hover:bg-muted transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div className={`w-2 h-2 rounded-full ${statusColors[agent.status]} ${agent.status === "working" ? "animate-pulse" : ""}`} />
                     <div>
-                      <p className="font-medium text-white">{agent.name}</p>
-                      <code className="text-xs text-[var(--color-text-muted)] font-mono">
+                      <p className="font-medium text-foreground">{agent.name}</p>
+                      <code className="text-xs text-muted-foreground font-mono">
                         {agent.sub_agent_id.slice(0, 8)}...
                       </code>
                     </div>
@@ -166,32 +166,32 @@ export function SubAgentsList() {
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <span className="text-sm text-[var(--color-text-secondary)] truncate max-w-[200px] block" title={agent.assigned_task || ""}>
+                  <span className="text-sm text-muted-foreground truncate max-w-[200px] block" title={agent.assigned_task || ""}>
                     {agent.assigned_task?.slice(0, 50) || "-"}
                     {agent.assigned_task && agent.assigned_task.length > 50 ? "..." : ""}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm text-[var(--color-text-secondary)]">
+                <td className="px-6 py-4 text-sm text-muted-foreground">
                   {formatDuration(agent.started_at, agent.completed_at)}
                 </td>
-                <td className="px-6 py-4 text-sm text-[var(--color-text-secondary)]">
+                <td className="px-6 py-4 text-sm text-muted-foreground">
                   {agent.step_count}
                 </td>
-                <td className="px-6 py-4 text-sm text-[var(--color-text-secondary)]">
+                <td className="px-6 py-4 text-sm text-muted-foreground">
                   {agent.tokens_used.toLocaleString()}
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex gap-2">
                     <a
                       href={`/subagents/${agent.id}`}
-                      className="px-3 py-1.5 text-xs text-[var(--color-text-secondary)] hover:text-white bg-[var(--color-surface-overlay)] hover:bg-[var(--color-border)] rounded-lg transition-colors"
+                      className="px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground bg-muted hover:bg-border rounded-lg transition-colors"
                     >
                       Details
                     </a>
                     {agent.task_result && (
                       <button
                         onClick={() => alert(agent.task_result)}
-                        className="px-3 py-1.5 text-xs text-[var(--color-accent)] hover:text-[var(--color-accent)] bg-[var(--color-accent-dim)] hover:bg-[var(--color-accent-dim)] rounded-lg transition-colors"
+                        className="px-3 py-1.5 text-xs text-primary hover:text-primary bg-[primary/10] hover:bg-[primary/10] rounded-lg transition-colors"
                       >
                         View Result
                       </button>
@@ -205,7 +205,7 @@ export function SubAgentsList() {
       </div>
 
       {filteredSubAgents.length === 0 && (
-        <div className="p-8 text-center text-[var(--color-text-muted)]">
+        <div className="p-8 text-center text-muted-foreground">
           No sub-agents match the current filter
         </div>
       )}

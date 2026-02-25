@@ -124,7 +124,7 @@ function parseInlineMarkdown(text: string): React.ReactNode[] {
     const codeMatch = remaining.match(/^`([^`]+)`/);
     if (codeMatch) {
       elements.push(
-        <code key={key++} className="px-1.5 py-0.5 bg-[var(--color-surface-overlay)] rounded text-sm font-mono text-[var(--color-accent)]">
+        <code key={key++} className="px-1.5 py-0.5 bg-muted rounded text-sm font-mono text-primary">
           {codeMatch[1]}
         </code>
       );
@@ -157,7 +157,7 @@ function parseInlineMarkdown(text: string): React.ReactNode[] {
           href={linkMatch[2]}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[var(--color-accent)] hover:underline"
+          className="text-primary hover:underline"
         >
           {linkMatch[1]}
         </a>
@@ -191,20 +191,20 @@ function CodeBlock({ language, code }: { language: string; code: string }) {
   };
 
   return (
-    <div className="relative group my-3 rounded-xl overflow-hidden bg-[var(--color-surface-raised)] border border-[var(--color-border)]">
+    <div className="relative group my-3 rounded-xl overflow-hidden bg-muted border border-border">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-[var(--color-surface-overlay)] border-b border-[var(--color-border)]">
-        <span className="text-xs text-[var(--color-text-secondary)] font-mono">{language || "text"}</span>
+      <div className="flex items-center justify-between px-4 py-2.5 bg-card border-b border-border">
+        <span className="text-xs text-muted-foreground font-mono">{language || "text"}</span>
         <button
           onClick={copyCode}
-          className="text-xs text-[var(--color-text-secondary)] hover:text-white transition-colors"
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
           Copy
         </button>
       </div>
       {/* Code */}
       <pre className="p-4 overflow-x-auto">
-        <code className="text-[13px] leading-6 font-mono text-[var(--color-text-primary)]">{code}</code>
+        <code className="text-[13px] leading-6 font-mono text-foreground">{code}</code>
       </pre>
     </div>
   );
@@ -213,17 +213,17 @@ function CodeBlock({ language, code }: { language: string; code: string }) {
 // Thinking block component for extended thinking display
 function ThinkingBlock({ content, isThinking }: { content: string; isThinking?: boolean }) {
   return (
-    <div className="my-3 p-4 bg-amber-950/20 border border-amber-700/25 rounded-xl">
-      <div className="flex items-center gap-2 mb-2 text-amber-400 text-sm font-medium">
+    <div className="my-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+      <div className="flex items-center gap-2 mb-2 text-amber-500 text-sm font-medium">
         <svg className="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
         </svg>
         <span>Extended Thinking</span>
         {isThinking && (
-          <span className="ml-auto text-xs text-amber-400/70">Analyzing...</span>
+          <span className="ml-auto text-xs opacity-70">Analyzing...</span>
         )}
       </div>
-      <div className="text-[13px] leading-6 text-amber-200/80 whitespace-pre-wrap font-mono">
+      <div className="text-[13px] leading-6 text-amber-500/80 whitespace-pre-wrap font-mono">
         {content}
       </div>
     </div>
@@ -252,16 +252,16 @@ export function ChatMessage({ message, isLast }: ChatMessageProps) {
         <div
           className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-1 ${
             isUser
-              ? "bg-[var(--color-accent)]/85"
-              : "bg-[var(--color-accent)]"
+              ? "bg-primary/90 text-primary-foreground"
+              : "bg-primary text-primary-foreground"
           }`}
         >
           {isUser ? (
-            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           ) : (
-            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           )}
@@ -274,10 +274,10 @@ export function ChatMessage({ message, isLast }: ChatMessageProps) {
         <div
           className={`inline-block text-left ${
             isSystem
-              ? "px-4 py-3 rounded-xl bg-blue-500/10 text-blue-200 border border-blue-500/30"
+              ? "px-4 py-3 rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/20"
               : isUser
-              ? "px-4 py-3 rounded-2xl rounded-br-md bg-[var(--color-surface-overlay)] border border-[var(--color-border)] text-[var(--color-text-primary)]"
-              : "px-0 py-1 bg-transparent text-[var(--color-text-primary)]"
+              ? "px-4 py-3 rounded-2xl rounded-br-md bg-muted border border-border text-foreground"
+              : "px-0 py-1 bg-transparent text-foreground"
           }`}
         >
           {/* Thinking indicator for active thinking */}
@@ -295,24 +295,24 @@ export function ChatMessage({ message, isLast }: ChatMessageProps) {
           {isUser ? (
             <p className="whitespace-pre-wrap text-[15px] leading-7">{message.content}</p>
           ) : (
-            <div className="prose prose-invert prose-sm max-w-none prose-p:my-2 prose-p:leading-7 prose-li:my-1 prose-pre:my-3 prose-headings:mt-4 prose-headings:mb-2 prose-code:text-[var(--color-accent)]">
+            <div className="prose prose-invert prose-sm max-w-none prose-p:my-2 prose-p:leading-7 prose-li:my-1 prose-pre:my-3 prose-headings:mt-4 prose-headings:mb-2 prose-code:text-primary">
               {parsedContent}
               {message.isStreaming && (
-                <span className="inline-block w-2 h-4 bg-[var(--color-text-secondary)] animate-pulse ml-0.5" />
+                <span className="inline-block w-2 h-4 bg-muted-foreground animate-pulse ml-0.5" />
               )}
             </div>
           )}
 
           {!isUser && !isSystem && message.toolCalls && message.toolCalls.length > 0 && (
-            <div className="mt-4 pt-3 border-t border-[var(--color-border)]/80 bg-[var(--color-surface-overlay)]/35 rounded-xl px-3 pb-3">
-              <div className="text-[10px] uppercase tracking-wide text-[var(--color-text-muted)] mb-2">
+            <div className="mt-4 pt-3 border-t border-border/80 bg-muted/35 rounded-xl px-3 pb-3">
+              <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">
                 Execution timeline
               </div>
               <div className="relative pl-4 space-y-2.5">
-                <div className="absolute left-1.5 top-0 bottom-0 w-px bg-[var(--color-border)]" />
+                <div className="absolute left-1.5 top-0 bottom-0 w-px bg-border" />
                 {message.toolCalls.map((toolCall) => (
                   <div key={toolCall.id} className="relative">
-                    <span className="absolute -left-3.5 top-3 w-2 h-2 rounded-full bg-[var(--color-accent)]" />
+                    <span className="absolute -left-3.5 top-3 w-2 h-2 rounded-full bg-primary" />
                     <ChatToolCall toolCall={toolCall} />
                   </div>
                 ))}
@@ -323,7 +323,7 @@ export function ChatMessage({ message, isLast }: ChatMessageProps) {
 
         {/* Metadata */}
         <div
-          className={`mt-1.5 flex items-center gap-2 text-[11px] text-[var(--color-text-muted)] ${
+          className={`mt-1.5 flex items-center gap-2 text-[11px] text-muted-foreground ${
             isUser ? "justify-end" : ""
           }`}
         >

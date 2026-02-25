@@ -61,7 +61,7 @@ function CapBadge({ label, active, title }: CapBadgeProps) {
   return (
     <span
       title={title}
-      className="inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded bg-[var(--color-surface-overlay)] text-[var(--color-text-secondary)] border border-[var(--color-border)]"
+      className="inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border"
     >
       {label}
     </span>
@@ -134,13 +134,13 @@ const MODALITY_ICONS: Record<Modality, string> = {
 export function ModalityBadges({ modalities, direction }: { modalities: Modality[]; direction: "in" | "out" }) {
   return (
     <div className="flex items-center gap-1">
-      <span className="text-[9px] uppercase tracking-wider text-[var(--color-text-muted)] mr-0.5">
+      <span className="text-[9px] uppercase tracking-wider text-muted-foreground mr-0.5">
         {direction === "in" ? "In" : "Out"}:
       </span>
       {modalities.map((mod) => (
         <span
           key={mod}
-          className="text-[10px] px-1 py-0 rounded bg-[var(--color-surface-overlay)] text-[var(--color-text-secondary)]"
+          className="text-[10px] px-1 py-0 rounded bg-muted text-muted-foreground"
         >
           {MODALITY_ICONS[mod] || mod}
         </span>
@@ -158,13 +158,13 @@ export function ContextWindowBar({ contextWindow, maxOutput }: { contextWindow: 
   const outputPct = Math.min((maxOutput / contextWindow) * 100, 100);
   return (
     <div className="space-y-1">
-      <div className="flex justify-between text-[10px] text-[var(--color-text-muted)]">
+      <div className="flex justify-between text-[10px] text-muted-foreground">
         <span>Context: {formatTokenCount(contextWindow)} tokens</span>
         <span>Output: {formatTokenCount(maxOutput)}</span>
       </div>
-      <div className="h-1.5 rounded-full bg-[var(--color-surface-overlay)] overflow-hidden">
+      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
         <div
-          className="h-full rounded-full bg-[var(--color-accent)]"
+          className="h-full rounded-full bg-primary"
           style={{ width: `${outputPct}%` }}
         />
       </div>
@@ -178,31 +178,31 @@ export function ContextWindowBar({ contextWindow, maxOutput }: { contextWindow: 
 
 export function PricingDisplay({ model, compact = false }: { model: ModelInfo; compact?: boolean }) {
   if (model.costTier === "free") {
-    return <span className="text-[10px] text-green-400 font-medium">Free</span>;
+    return <span className="text-[10px] text-green-500 font-medium">Free</span>;
   }
 
   if (compact) {
     return (
-      <span className="text-[10px] text-[var(--color-text-muted)]">
+      <span className="text-[10px] text-muted-foreground">
         {formatCost(model.costPerMillionInput)} / {formatCost(model.costPerMillionOutput)} per 1M
       </span>
     );
   }
 
   return (
-    <div className="text-[10px] text-[var(--color-text-muted)] space-y-0.5">
+    <div className="text-[10px] text-muted-foreground space-y-0.5">
       <div className="flex justify-between">
         <span>Input:</span>
-        <span className="text-[var(--color-text-secondary)]">{formatCost(model.costPerMillionInput)} / 1M tokens</span>
+        <span className="text-foreground">{formatCost(model.costPerMillionInput)} / 1M tokens</span>
       </div>
       <div className="flex justify-between">
         <span>Output:</span>
-        <span className="text-[var(--color-text-secondary)]">{formatCost(model.costPerMillionOutput)} / 1M tokens</span>
+        <span className="text-foreground">{formatCost(model.costPerMillionOutput)} / 1M tokens</span>
       </div>
       {model.cacheCostRead !== undefined && (
         <div className="flex justify-between">
           <span>Cache read:</span>
-          <span className="text-[var(--color-text-secondary)]">{formatCost(model.cacheCostRead)} / 1M</span>
+          <span className="text-foreground">{formatCost(model.cacheCostRead)} / 1M</span>
         </div>
       )}
     </div>
@@ -216,7 +216,7 @@ export function PricingDisplay({ model, compact = false }: { model: ModelInfo; c
 export function KnowledgeCutoff({ date }: { date?: string }) {
   if (!date) return null;
   return (
-    <span className="text-[10px] text-[var(--color-text-muted)]" title="Knowledge cutoff date">
+    <span className="text-[10px] text-muted-foreground" title="Knowledge cutoff date">
       Cutoff: {date}
     </span>
   );
@@ -228,12 +228,12 @@ export function KnowledgeCutoff({ date }: { date?: string }) {
 
 export function ModelCard({ model, showPricing = true }: { model: ModelInfo; showPricing?: boolean }) {
   return (
-    <div className="p-3 rounded-lg bg-[var(--color-surface-overlay)] border border-[var(--color-border)] space-y-2.5">
+    <div className="p-3 rounded-lg bg-card border border-border space-y-2.5">
       {/* Header: name + cost tier */}
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <h4 className="text-sm font-medium text-white truncate" title={model.id}>{model.name}</h4>
-          <p className="text-[10px] text-[var(--color-text-muted)] font-mono truncate">{model.id}</p>
+          <h4 className="text-sm font-medium text-foreground truncate" title={model.id}>{model.name}</h4>
+          <p className="text-[10px] text-muted-foreground font-mono truncate">{model.id}</p>
         </div>
         <CostTierBadge tier={model.costTier} />
       </div>

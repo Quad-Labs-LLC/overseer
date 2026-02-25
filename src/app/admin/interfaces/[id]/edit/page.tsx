@@ -153,12 +153,12 @@ export default async function EditInterfacePage({ params }: EditInterfacePagePro
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-xl text-white font-(--font-mono)">Edit Interface</h1>
+          <h1 className="text-xl text-foreground font-mono">Edit Interface</h1>
           <p className="text-text-secondary mt-1">Update channel credentials and access controls.</p>
         </div>
         <Link
           href="/interfaces"
-          className="px-3 py-2 text-sm rounded border border-border text-text-secondary hover:text-white hover:bg-surface-overlay transition-colors"
+          className="px-3 py-2 text-sm rounded border border-border text-text-secondary hover:text-foreground hover:bg-surface-overlay transition-colors"
         >
           Back
         </Link>

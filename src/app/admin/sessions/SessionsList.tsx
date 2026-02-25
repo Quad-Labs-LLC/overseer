@@ -13,7 +13,7 @@ const statusColors: Record<string, string> = {
   idle: "bg-blue-500",
   busy: "bg-yellow-500",
   error: "bg-red-500",
-  ended: "bg-[var(--color-text-muted)]",
+  ended: "bg-muted-foreground",
 };
 
 const statusBadgeColors: Record<string, string> = {
@@ -21,7 +21,7 @@ const statusBadgeColors: Record<string, string> = {
   idle: "bg-blue-500/10 text-blue-400",
   busy: "bg-yellow-500/10 text-yellow-400",
   error: "bg-red-500/10 text-red-400",
-  ended: "bg-[var(--color-surface-overlay)] text-[var(--color-text-secondary)]",
+  ended: "bg-muted text-muted-foreground",
 };
 
 export function SessionsList({ sessions }: SessionsListProps) {
@@ -60,15 +60,15 @@ export function SessionsList({ sessions }: SessionsListProps) {
   return (
     <div>
       {/* Filter Tabs */}
-      <div className="flex gap-2 p-4 border-b border-[var(--color-border)]">
+      <div className="flex gap-2 p-4 border-b border-border">
         {["all", "active", "ended"].map((status) => (
           <button
             key={status}
             onClick={() => setFilter(status)}
             className={`px-3 py-1.5 text-sm rounded transition-colors ${
               filter === status
-                ? "bg-[var(--color-accent-dim)] text-[var(--color-accent)]"
-                : "text-[var(--color-text-secondary)] hover:text-white hover:bg-[var(--color-surface-overlay)]"
+                ? "bg-[primary/10] text-primary"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
             }`}
           >
             {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -80,7 +80,7 @@ export function SessionsList({ sessions }: SessionsListProps) {
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="text-left text-sm text-[var(--color-text-secondary)] border-b border-[var(--color-border)]">
+            <tr className="text-left text-sm text-muted-foreground border-b border-border">
               <th className="px-6 py-4 font-medium">Session</th>
               <th className="px-6 py-4 font-medium">Status</th>
               <th className="px-6 py-4 font-medium">Interface</th>
@@ -92,16 +92,16 @@ export function SessionsList({ sessions }: SessionsListProps) {
               <th className="px-6 py-4 font-medium">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--color-border)]">
+          <tbody className="divide-y divide-border">
             {filteredSessions.map((session) => {
               const status = session.is_active ? "active" : "ended";
               const displayName = session.external_user_id || session.external_chat_id || "-";
               return (
-              <tr key={session.id} className="hover:bg-[var(--color-surface-overlay)] transition-colors">
+              <tr key={session.id} className="hover:bg-muted transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div className={`w-2 h-2 rounded-full ${statusColors[status]}`} />
-                    <code className="text-xs text-[var(--color-text-primary)] font-[var(--font-mono)]">
+                    <code className="text-xs text-foreground font-mono">
                       {String(session.id).padStart(6, "0")}
                     </code>
                   </div>
@@ -111,25 +111,25 @@ export function SessionsList({ sessions }: SessionsListProps) {
                     {status}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm text-[var(--color-text-primary)]">
+                <td className="px-6 py-4 text-sm text-foreground">
                   {session.interface_type}
                 </td>
                 <td className="px-6 py-4">
-                  <span className="text-sm text-[var(--color-text-primary)]">
+                  <span className="text-sm text-foreground">
                     {displayName}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm text-[var(--color-text-secondary)]">
+                <td className="px-6 py-4 text-sm text-muted-foreground">
                   {formatDuration(session.created_at)}
                 </td>
-                <td className="px-6 py-4 text-sm text-[var(--color-text-secondary)]">
+                <td className="px-6 py-4 text-sm text-muted-foreground">
                   {session.message_count}
                 </td>
-                <td className="px-6 py-4 text-sm text-[var(--color-text-secondary)]">
+                <td className="px-6 py-4 text-sm text-muted-foreground">
                   {session.total_tokens.toLocaleString()}
                 </td>
                 <td className="px-6 py-4">
-                  <span className="text-sm text-[var(--color-text-secondary)] truncate max-w-[200px] block">
+                  <span className="text-sm text-muted-foreground truncate max-w-[200px] block">
                     {"-"}
                   </span>
                 </td>
@@ -152,7 +152,7 @@ export function SessionsList({ sessions }: SessionsListProps) {
       </div>
 
       {filteredSessions.length === 0 && (
-        <div className="p-8 text-center text-[var(--color-text-muted)]">
+        <div className="p-8 text-center text-muted-foreground">
           No sessions match the current filter
         </div>
       )}

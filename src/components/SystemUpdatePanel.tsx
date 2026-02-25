@@ -69,19 +69,19 @@ export function SystemUpdatePanel({
     null;
 
   return (
-    <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-6">
+    <div className="bg-card border border-border rounded-lg p-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="min-w-0">
-          <h2 className="text-lg font-semibold text-white font-[var(--font-mono)]">
+          <h2 className="text-lg font-semibold text-foreground font-mono">
             {title}
           </h2>
-          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Update Overseer on this host.
           </p>
           {status?.head && (
-            <p className="text-xs text-[var(--color-text-muted)] mt-2">
+            <p className="text-xs text-muted-foreground mt-2">
               Current HEAD:{" "}
-              <span className="font-mono text-[var(--color-text-secondary)]">
+              <span className="font-mono text-muted-foreground">
                 {status.head.slice(0, 12)}
               </span>
             </p>
@@ -146,29 +146,29 @@ export function SystemUpdatePanel({
       )}
 
       {status?.lastRun && status.lastRun.status !== "running" && (
-        <div className="mt-4 p-4 bg-[var(--color-surface-overlay)] rounded-lg border border-[var(--color-border)]">
+        <div className="mt-4 p-4 bg-muted rounded-lg border border-border">
           <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div className="text-sm text-[var(--color-text-secondary)]">
+            <div className="text-sm text-muted-foreground">
               Last run:{" "}
-              <span className="text-white">
+              <span className="text-foreground">
                 {new Date(status.lastRun.startedAt).toLocaleString()}
               </span>{" "}
-              <span className="text-[var(--color-text-muted)]">
+              <span className="text-muted-foreground">
                 (Issue #{status.lastRun.issueId})
               </span>
             </div>
             <div
               className={`text-xs px-2 py-1 rounded border ${
                 status.lastRun.ok
-                  ? "text-green-300 border-green-500/30 bg-green-500/10"
-                  : "text-red-300 border-red-500/30 bg-red-500/10"
+                  ? "text-green-500 border-green-500/30 bg-green-500/10"
+                  : "text-red-500 border-red-500/30 bg-red-500/10"
               }`}
             >
               {status.lastRun.ok ? "SUCCESS" : "FAILED"}{" "}
               {status.lastRun.exitCode !== null ? `(exit ${status.lastRun.exitCode})` : ""}
             </div>
           </div>
-          <div className="mt-3 text-xs text-[var(--color-text-muted)] font-mono whitespace-pre-wrap max-h-64 overflow-auto">
+          <div className="mt-3 text-xs text-muted-foreground font-mono whitespace-pre-wrap max-h-64 overflow-auto">
             {status.lastRun.output || "(no output)"}
           </div>
         </div>

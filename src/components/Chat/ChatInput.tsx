@@ -260,22 +260,22 @@ export function ChatInput({
     ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
 
   return (
-    <div className="border-t border-[var(--color-border)] bg-[var(--color-surface-raised)]/80 backdrop-blur p-4">
+    <div className="border-t border-border bg-card/80 backdrop-blur p-4">
       {/* Attachments preview */}
       {attachments.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-3">
           {attachments.map((file, index) => (
             <div
               key={index}
-              className="flex items-center gap-2 px-3 py-1.5 bg-[var(--color-surface-overlay)] rounded-xl text-sm border border-[var(--color-border)]"
+              className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-xl text-sm border border-border"
             >
-              <svg className="w-4 h-4 text-[var(--color-text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
               </svg>
-              <span className="text-[var(--color-text-primary)] max-w-[150px] truncate">{file.name}</span>
+              <span className="text-foreground max-w-[150px] truncate">{file.name}</span>
               <button
                 onClick={() => removeAttachment(index)}
-                className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -291,7 +291,7 @@ export function ChatInput({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="flex-shrink-0 p-2.5 text-[var(--color-text-secondary)] hover:text-white hover:bg-[var(--color-surface-overlay)] rounded-xl transition-colors"
+          className="flex-shrink-0 p-2.5 text-muted-foreground hover:text-foreground hover:bg-primary rounded-xl transition-colors"
           title="Attach file"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -316,20 +316,20 @@ export function ChatInput({
             placeholder={placeholder}
             rows={1}
             disabled={isLoading}
-            className="w-full px-4 py-3 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-2xl text-white placeholder-[var(--color-text-muted)] resize-none focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent disabled:opacity-50 transition-all"
+            className="w-full px-4 py-3 bg-muted border border-border rounded-2xl text-foreground placeholder-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent disabled:opacity-50 transition-all"
             style={{ minHeight: "48px", maxHeight: "200px" }}
           />
 
           {mentionQuery !== null && (
-            <div className="absolute left-0 right-0 bottom-full mb-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl max-h-56 overflow-y-auto z-20">
-              <div className="px-3 py-2 text-xs text-[var(--color-text-muted)] border-b border-[var(--color-border)]">
+            <div className="absolute left-0 right-0 bottom-full mb-2 rounded-xl border border-border bg-card shadow-2xl max-h-56 overflow-y-auto z-20">
+              <div className="px-3 py-2 text-xs text-muted-foreground border-b border-border">
                 Attach from Files using @
               </div>
 
               {isLoadingFiles ? (
-                <div className="px-3 py-3 text-sm text-[var(--color-text-secondary)]">Loading files...</div>
+                <div className="px-3 py-3 text-sm text-muted-foreground">Loading files...</div>
               ) : filteredFiles.length === 0 ? (
-                <div className="px-3 py-3 text-sm text-[var(--color-text-secondary)]">No matching files</div>
+                <div className="px-3 py-3 text-sm text-muted-foreground">No matching files</div>
               ) : (
                 <div className="py-1">
                   {filteredFiles.map((path) => (
@@ -337,10 +337,10 @@ export function ChatInput({
                       key={path}
                       type="button"
                       onClick={() => void handleMentionSelect(path)}
-                      className="w-full text-left px-3 py-2 hover:bg-[var(--color-surface-overlay)] transition-colors"
+                      className="w-full text-left px-3 py-2 hover:bg-primary transition-colors"
                     >
-                      <div className="text-sm text-[var(--color-text-primary)] truncate">{path.split("/").pop()}</div>
-                      <div className="text-[11px] text-[var(--color-text-muted)] truncate">{path}</div>
+                      <div className="text-sm text-foreground truncate">{path.split("/").pop()}</div>
+                      <div className="text-[11px] text-muted-foreground truncate">{path}</div>
                     </button>
                   ))}
                 </div>
@@ -357,7 +357,7 @@ export function ChatInput({
             className={`flex-shrink-0 p-2.5 rounded-xl transition-colors ${
               isListening
                 ? "bg-red-500/20 text-red-400 hover:bg-red-500/30"
-                : "text-[var(--color-text-secondary)] hover:text-white hover:bg-[var(--color-surface-overlay)]"
+                : "text-muted-foreground hover:text-foreground hover:bg-primary"
             }`}
             title={isListening ? "Stop recording" : "Voice input"}
           >
@@ -388,7 +388,7 @@ export function ChatInput({
           <button
             type="submit"
             disabled={!message.trim() && attachments.length === 0}
-            className="flex-shrink-0 p-2.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] disabled:bg-[var(--color-border)] disabled:text-[var(--color-text-muted)] text-black rounded-xl transition-colors"
+            className="flex-shrink-0 p-2.5 bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground text-primary-foreground rounded-xl transition-colors"
             title="Send message"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -399,7 +399,7 @@ export function ChatInput({
       </form>
 
       {/* Input hints */}
-      <div className="mt-2 flex items-center justify-between text-xs text-[var(--color-text-muted)]">
+      <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
         <span>Enter to send, Shift+Enter newline, @ to attach from Files</span>
         {isListening && (
           <span className="flex items-center gap-1 text-red-400">

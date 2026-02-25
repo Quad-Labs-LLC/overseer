@@ -71,17 +71,17 @@ export function MCPServersList({ servers, connectionStatus }: MCPServersListProp
   };
 
   return (
-    <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg">
+    <div className="bg-card border border-border rounded-lg">
       {/* Filter Tabs */}
-      <div className="flex gap-2 p-4 border-b border-[var(--color-border)]">
+      <div className="flex gap-2 p-4 border-b border-border">
         {(["all", "stdio", "sse"] as const).map((type) => (
           <button
             key={type}
             onClick={() => setFilter(type)}
             className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
               filter === type
-                ? "bg-[var(--color-accent-dim)] text-[var(--color-accent)]"
-                : "text-[var(--color-text-secondary)] hover:text-white hover:bg-[var(--color-surface-overlay)]"
+                ? "bg-[primary/10] text-primary"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
             }`}
           >
             {type === "all" ? "All" : type.toUpperCase()}
@@ -90,7 +90,7 @@ export function MCPServersList({ servers, connectionStatus }: MCPServersListProp
       </div>
 
       {/* Servers List */}
-      <div className="divide-y divide-[var(--color-border)]">
+      <div className="divide-y divide-border">
         {filteredServers.map((server) => {
           const isConnected = connectionMap.has(server.name);
           const connInfo = connectionMap.get(server.name);
@@ -102,19 +102,19 @@ export function MCPServersList({ servers, connectionStatus }: MCPServersListProp
                   <div
                     className={`w-12 h-12 rounded-lg flex items-center justify-center ${
                       isConnected
-                        ? "bg-[var(--color-success)]"
+                        ? "bg-[green-500]"
                         : server.is_active
-                        ? "bg-[var(--color-accent)]"
-                        : "bg-[var(--color-surface-overlay)]"
+                        ? "bg-primary"
+                        : "bg-muted"
                     }`}
                   >
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
                     </svg>
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-white">{server.name}</h3>
+                      <h3 className="font-semibold text-foreground">{server.name}</h3>
                       <span className={`text-xs px-2 py-0.5 rounded ${
                         server.server_type === "stdio" 
                           ? "bg-blue-500/10 text-blue-400" 
@@ -128,21 +128,21 @@ export function MCPServersList({ servers, connectionStatus }: MCPServersListProp
                         </span>
                       )}
                       {!server.is_active && (
-                        <span className="text-xs px-2 py-0.5 bg-[var(--color-surface-overlay)] text-[var(--color-text-secondary)] rounded">
+                        <span className="text-xs px-2 py-0.5 bg-muted text-muted-foreground rounded">
                           Disabled
                         </span>
                       )}
                       {server.auto_connect === 1 && (
-                        <span className="text-xs px-2 py-0.5 bg-[var(--color-accent-dim)] text-[var(--color-accent)] rounded">
+                        <span className="text-xs px-2 py-0.5 bg-[primary/10] text-primary rounded">
                           Auto-connect
                         </span>
                       )}
                     </div>
-                    <div className="mt-2 text-sm text-[var(--color-text-secondary)]">
+                    <div className="mt-2 text-sm text-muted-foreground">
                       {server.server_type === "stdio" ? (
-                        <span>Command: <code className="text-[var(--color-text-primary)]">{server.command}</code></span>
+                        <span>Command: <code className="text-foreground">{server.command}</code></span>
                       ) : (
-                        <span>URL: <code className="text-[var(--color-text-primary)]">{server.url}</code></span>
+                        <span>URL: <code className="text-foreground">{server.url}</code></span>
                       )}
                     </div>
                     {isConnected && connInfo && (
@@ -155,7 +155,7 @@ export function MCPServersList({ servers, connectionStatus }: MCPServersListProp
                         Error: {server.last_error}
                       </div>
                     )}
-                    <div className="mt-2 text-xs text-[var(--color-text-muted)]">
+                    <div className="mt-2 text-xs text-muted-foreground">
                       {server.last_connected_at && (
                         <span>Last connected: {new Date(server.last_connected_at).toLocaleString()}</span>
                       )}
@@ -193,7 +193,7 @@ export function MCPServersList({ servers, connectionStatus }: MCPServersListProp
                   </button>
                   <a
                     href={`/mcp/${server.id}/edit`}
-                    className="px-3 py-1.5 text-sm text-[var(--color-text-secondary)] hover:text-white bg-[var(--color-surface-overlay)] hover:bg-[var(--color-border)] rounded-lg transition-colors"
+                    className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground bg-muted hover:bg-border rounded-lg transition-colors"
                   >
                     Edit
                   </a>
@@ -212,7 +212,7 @@ export function MCPServersList({ servers, connectionStatus }: MCPServersListProp
       </div>
 
       {filteredServers.length === 0 && (
-        <div className="p-8 text-center text-[var(--color-text-muted)]">
+        <div className="p-8 text-center text-muted-foreground">
           No servers match the current filter
         </div>
       )}

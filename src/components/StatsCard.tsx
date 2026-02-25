@@ -7,11 +7,11 @@ interface StatsCardProps {
 }
 
 const colorStyles = {
-  accent: "text-[var(--color-accent)] bg-[var(--color-accent)]/10 ring-[var(--color-accent)]/20",
-  success: "text-[var(--color-success)] bg-[var(--color-success)]/10 ring-[var(--color-success)]/20",
-  warning: "text-[var(--color-warning)] bg-[var(--color-warning)]/10 ring-[var(--color-warning)]/20",
-  danger: "text-[var(--color-danger)] bg-[var(--color-danger)]/10 ring-[var(--color-danger)]/20",
-  info: "text-[var(--color-info)] bg-[var(--color-info)]/10 ring-[var(--color-info)]/20",
+  accent: "text-primary bg-primary/10 ring-primary/20",
+  success: "text-green-500 bg-green-500/10 ring-green-500/20",
+  warning: "text-yellow-500 bg-yellow-500/10 ring-yellow-500/20",
+  danger: "text-red-500 bg-red-500/10 ring-red-500/20",
+  info: "text-blue-500 bg-blue-500/10 ring-blue-500/20",
 };
 
 export function StatsCard({ title, value, icon, color = "accent", subtitle }: StatsCardProps) {

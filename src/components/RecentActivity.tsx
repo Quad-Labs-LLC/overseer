@@ -14,7 +14,7 @@ interface RecentActivityProps {
 export function RecentActivity({ items }: RecentActivityProps) {
   if (items.length === 0) {
     return (
-      <div className="text-center py-8 text-[var(--color-text-muted)]">
+      <div className="text-center py-8 text-muted-foreground">
         No recent activity
       </div>
     );
@@ -25,22 +25,22 @@ export function RecentActivity({ items }: RecentActivityProps) {
       {items.map((item) => (
         <div
           key={item.id}
-          className="flex items-start gap-3 p-3 bg-[var(--color-surface-overlay)] rounded-lg"
+          className="flex items-start gap-3 p-3 bg-muted rounded-lg"
         >
           <div
             className={`w-1.5 h-1.5 rounded-full mt-2 ${
               item.status === "success"
-                ? "bg-[var(--color-success)]"
+                ? "bg-green-500"
                 : item.status === "error"
-                ? "bg-[var(--color-danger)]"
-                : "bg-[var(--color-text-muted)]"
+                ? "bg-red-500"
+                : "bg-muted-foreground"
             }`}
           />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-[var(--color-text-primary)]">{item.title}</p>
-            <p className="text-xs text-[var(--color-text-secondary)] truncate">{item.description}</p>
+            <p className="text-sm font-medium text-foreground">{item.title}</p>
+            <p className="text-xs text-muted-foreground truncate">{item.description}</p>
           </div>
-          <span className="text-xs text-[var(--color-text-muted)] whitespace-nowrap font-[var(--font-mono)]">
+          <span className="text-xs text-muted-foreground whitespace-nowrap font-mono">
             {item.timestamp}
           </span>
         </div>

@@ -16,7 +16,7 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[var(--color-surface)]">
+    <div className="h-screen flex flex-col bg-background">
       <ChatContainer />
     </div>
   );

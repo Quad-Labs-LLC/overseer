@@ -25,7 +25,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="h-screen flex overflow-hidden bg-[var(--color-surface)]">
+    <div className="h-screen flex overflow-hidden bg-background">
       <Sidebar user={user} permissions={permissions} />
       <main className="flex-1 overflow-y-auto custom-scrollbar">
         <DashboardShell>

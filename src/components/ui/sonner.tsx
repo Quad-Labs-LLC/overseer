@@ -10,13 +10,13 @@ export function Toaster() {
         unstyled: true,
         classNames: {
           toast:
-            "flex items-start gap-3 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 shadow-lg text-sm text-[var(--color-text-primary)]",
-          title: "font-medium text-white",
-          description: "text-[var(--color-text-secondary)] text-xs mt-0.5",
+            "flex items-start gap-3 w-full rounded-lg border border-border bg-card p-4 shadow-lg text-sm text-foreground",
+          title: "font-medium text-foreground",
+          description: "text-muted-foreground text-xs mt-0.5",
           actionButton:
-            "bg-[var(--color-accent)] text-black text-xs font-medium px-3 py-1.5 rounded hover:bg-[var(--color-accent-light)] transition-colors",
+            "bg-primary text-primary-foreground text-xs font-medium px-3 py-1.5 rounded hover:bg-primary/90 transition-colors",
           cancelButton:
-            "text-[var(--color-text-muted)] text-xs px-2 py-1 rounded hover:text-white transition-colors",
+            "text-muted-foreground text-xs px-2 py-1 rounded hover:text-foreground transition-colors",
           success: "!border-green-500/30 !bg-green-500/5",
           error: "!border-red-500/30 !bg-red-500/5",
           warning: "!border-amber-500/30 !bg-amber-500/5",

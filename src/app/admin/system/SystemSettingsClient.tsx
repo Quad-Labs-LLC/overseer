@@ -51,7 +51,7 @@ export default function SystemSettingsClient({ settings }: SystemSettingsClientP
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-sm h-9 px-4 w-full sm:w-auto">
+          <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-primary hover:text-accent-foreground shadow-sm h-9 px-4 w-full sm:w-auto">
             <RotateCcwIcon className="w-4 h-4" />
             Reset to Defaults
           </button>
@@ -127,7 +127,7 @@ export default function SystemSettingsClient({ settings }: SystemSettingsClientP
                     </button>
                     <button
                       onClick={() => setEditingSetting(null)}
-                      className="inline-flex items-center justify-center gap-1.5 h-9 px-3 text-xs font-medium rounded-md bg-background border border-input text-foreground hover:bg-accent hover:text-accent-foreground transition-colors shadow-sm"
+                      className="inline-flex items-center justify-center gap-1.5 h-9 px-3 text-xs font-medium rounded-md bg-background border border-input text-foreground hover:bg-primary hover:text-accent-foreground transition-colors shadow-sm"
                     >
                       <XIcon className="w-3.5 h-3.5" />
                       Cancel
@@ -141,7 +141,7 @@ export default function SystemSettingsClient({ settings }: SystemSettingsClientP
                   </code>
                   <button
                     onClick={() => handleEdit(setting.key, setting.value)}
-                    className="inline-flex items-center justify-center h-8 px-3 text-xs font-medium rounded-md bg-background border border-input text-foreground hover:bg-accent hover:text-accent-foreground transition-colors shadow-sm opacity-0 group-hover:opacity-100 focus-within:opacity-100 shrink-0"
+                    className="inline-flex items-center justify-center h-8 px-3 text-xs font-medium rounded-md bg-background border border-input text-foreground hover:bg-primary hover:text-accent-foreground transition-colors shadow-sm opacity-0 group-hover:opacity-100 focus-within:opacity-100 shrink-0"
                   >
                     Edit
                   </button>
@@ -186,7 +186,7 @@ export default function SystemSettingsClient({ settings }: SystemSettingsClientP
                     </button>
                     <button
                       onClick={() => setEditingSetting(null)}
-                      className="inline-flex items-center justify-center gap-1.5 h-9 px-3 text-xs font-medium rounded-md bg-background border border-input text-foreground hover:bg-accent hover:text-accent-foreground transition-colors shadow-sm"
+                      className="inline-flex items-center justify-center gap-1.5 h-9 px-3 text-xs font-medium rounded-md bg-background border border-input text-foreground hover:bg-primary hover:text-accent-foreground transition-colors shadow-sm"
                     >
                       <XIcon className="w-3.5 h-3.5" />
                       Cancel
@@ -200,7 +200,7 @@ export default function SystemSettingsClient({ settings }: SystemSettingsClientP
                   </code>
                   <button
                     onClick={() => handleEdit(setting.key, setting.value)}
-                    className="inline-flex items-center justify-center h-8 px-3 text-xs font-medium rounded-md bg-background border border-input text-foreground hover:bg-accent hover:text-accent-foreground transition-colors shadow-sm opacity-0 group-hover:opacity-100 focus-within:opacity-100 shrink-0"
+                    className="inline-flex items-center justify-center h-8 px-3 text-xs font-medium rounded-md bg-background border border-input text-foreground hover:bg-primary hover:text-accent-foreground transition-colors shadow-sm opacity-0 group-hover:opacity-100 focus-within:opacity-100 shrink-0"
                   >
                     Edit
                   </button>

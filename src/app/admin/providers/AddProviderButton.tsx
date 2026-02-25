@@ -221,7 +221,7 @@ export function AddProviderButton({ variant = "default" }: AddProviderButtonProp
 
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="font-[var(--font-mono)]">Add Provider</DialogTitle>
+          <DialogTitle className="font-mono">Add Provider</DialogTitle>
           <DialogDescription>
             Configure a new LLM provider and model for your AI agent.
           </DialogDescription>
@@ -275,7 +275,7 @@ export function AddProviderButton({ variant = "default" }: AddProviderButtonProp
               </Select>
             )}
             {selectedProvider && (
-              <p className="text-[11px] text-[var(--color-text-muted)]">
+              <p className="text-[11px] text-muted-foreground">
                 {selectedProvider.description}
               </p>
             )}
@@ -292,7 +292,7 @@ export function AddProviderButton({ variant = "default" }: AddProviderButtonProp
                   placeholder="Enter model id (manual)"
                   required
                 />
-                <p className="text-[11px] text-[var(--color-text-muted)]">
+                <p className="text-[11px] text-muted-foreground">
                   No models were returned for this provider. You can still add it by typing a model id manually.
                 </p>
               </>
@@ -318,12 +318,12 @@ export function AddProviderButton({ variant = "default" }: AddProviderButtonProp
 
           {/* --- Model info panel --- */}
           {selectedModelInfo && (
-            <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-overlay)] p-3.5 space-y-3">
+            <div className="rounded-lg border border-border bg-muted p-3.5 space-y-3">
               {/* Row 1: name + cost tier */}
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <span className="text-sm font-medium text-white">{selectedModelInfo.name}</span>
-                  <span className="ml-2 text-[10px] text-[var(--color-text-muted)] font-mono">{selectedModelInfo.id}</span>
+                  <span className="text-sm font-medium text-foreground">{selectedModelInfo.name}</span>
+                  <span className="ml-2 text-[10px] text-muted-foreground font-mono">{selectedModelInfo.id}</span>
                 </div>
                 <CostTierBadge tier={selectedModelInfo.costTier} />
               </div>

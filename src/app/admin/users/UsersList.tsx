@@ -69,16 +69,16 @@ export function UsersList({ users }: UsersListProps) {
   };
 
   return (
-    <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg">
+    <div className="bg-card border border-border rounded-lg">
       {/* Search and Filter */}
-      <div className="p-4 border-b border-[var(--color-border)] flex flex-col md:flex-row gap-4">
+      <div className="p-4 border-b border-border flex flex-col md:flex-row gap-4">
         <div className="flex-1">
           <input
             type="text"
             placeholder="Search users..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-4 py-2 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded text-white placeholder-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent)]"
+            className="w-full px-4 py-2 bg-muted border border-border rounded text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary"
           />
         </div>
         <div className="flex gap-2">
@@ -88,8 +88,8 @@ export function UsersList({ users }: UsersListProps) {
               onClick={() => setFilter(role)}
               className={`px-3 py-1.5 text-sm rounded transition-colors ${
                 filter === role
-                  ? "bg-[var(--color-accent-dim)] text-[var(--color-accent)]"
-                  : "text-[var(--color-text-secondary)] hover:text-white hover:bg-[var(--color-surface-overlay)]"
+                  ? "bg-[primary/10] text-primary"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >
               {role.charAt(0).toUpperCase() + role.slice(1)}
@@ -102,7 +102,7 @@ export function UsersList({ users }: UsersListProps) {
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="text-left text-sm text-[var(--color-text-secondary)] border-b border-[var(--color-border)]">
+            <tr className="text-left text-sm text-muted-foreground border-b border-border">
               <th className="px-6 py-4 font-medium">User</th>
               <th className="px-6 py-4 font-medium">Role</th>
               <th className="px-6 py-4 font-medium">Created</th>
@@ -110,19 +110,19 @@ export function UsersList({ users }: UsersListProps) {
               <th className="px-6 py-4 font-medium">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--color-border)]">
+          <tbody className="divide-y divide-border">
             {filteredUsers.map((user) => (
-              <tr key={user.id} className="hover:bg-[var(--color-surface-overlay)] transition-colors">
+              <tr key={user.id} className="hover:bg-muted transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${roleAvatarColors[user.role] || "bg-[var(--color-accent)]"}`}>
-                      <span className="text-sm font-bold text-white">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${roleAvatarColors[user.role] || "bg-primary"}`}>
+                      <span className="text-sm font-bold text-foreground">
                         {user.username.charAt(0).toUpperCase()}
                       </span>
                     </div>
                     <div>
-                      <p className="font-medium text-white">{user.username}</p>
-                      <p className="text-xs text-[var(--color-text-muted)]">ID: {user.id}</p>
+                      <p className="font-medium text-foreground">{user.username}</p>
+                      <p className="text-xs text-muted-foreground">ID: {user.id}</p>
                     </div>
                   </div>
                 </td>
@@ -132,16 +132,16 @@ export function UsersList({ users }: UsersListProps) {
                     onChange={(e) => handleRoleChange(user.id, e.target.value)}
                     className={`text-xs px-3 py-1.5 rounded border ${roleColors[user.role]} ${roleBorderColors[user.role]} bg-transparent cursor-pointer focus:outline-none`}
                   >
-                      <option value="admin" className="bg-[var(--color-surface)]">Admin</option>
-                      <option value="developer" className="bg-[var(--color-surface)]">Developer</option>
-                      <option value="operator" className="bg-[var(--color-surface)]">Operator</option>
-                      <option value="viewer" className="bg-[var(--color-surface)]">Viewer</option>
+                      <option value="admin" className="bg-background">Admin</option>
+                      <option value="developer" className="bg-background">Developer</option>
+                      <option value="operator" className="bg-background">Operator</option>
+                      <option value="viewer" className="bg-background">Viewer</option>
                   </select>
                 </td>
-                <td className="px-6 py-4 text-sm text-[var(--color-text-secondary)]">
+                <td className="px-6 py-4 text-sm text-muted-foreground">
                   {new Date(user.created_at).toLocaleDateString()}
                 </td>
-                <td className="px-6 py-4 text-sm text-[var(--color-text-secondary)]">
+                <td className="px-6 py-4 text-sm text-muted-foreground">
                   {user.last_login_at 
                     ? new Date(user.last_login_at).toLocaleString()
                     : "Never"
@@ -151,7 +151,7 @@ export function UsersList({ users }: UsersListProps) {
                   <div className="flex gap-2">
                     <a
                       href={`/users/${user.id}/edit`}
-                      className="px-3 py-1.5 text-sm text-[var(--color-text-secondary)] hover:text-white bg-[var(--color-surface-overlay)] hover:bg-[var(--color-border)] rounded transition-colors"
+                      className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground bg-muted hover:bg-border rounded transition-colors"
                     >
                       Edit
                     </a>
@@ -171,7 +171,7 @@ export function UsersList({ users }: UsersListProps) {
       </div>
 
       {filteredUsers.length === 0 && (
-        <div className="p-8 text-center text-[var(--color-text-muted)]">
+        <div className="p-8 text-center text-muted-foreground">
           No users match the current filter
         </div>
       )}

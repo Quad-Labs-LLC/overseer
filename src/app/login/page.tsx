@@ -10,12 +10,12 @@ export default async function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--color-surface)]">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-lg bg-[var(--color-accent)] mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-lg bg-primary mb-4">
             <svg
-              className="w-7 h-7 text-black"
+              className="w-7 h-7 text-primary-foreground"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -34,17 +34,17 @@ export default async function LoginPage() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-white font-[var(--font-mono)]">OVERSEER</h1>
-          <p className="text-[var(--color-text-muted)] text-sm mt-1 font-[var(--font-mono)]">
+          <h1 className="text-2xl font-bold text-foreground font-mono">OVERSEER</h1>
+          <p className="text-muted-foreground text-sm mt-1 font-mono">
             Control Panel
           </p>
         </div>
 
-        <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-8">
+        <div className="bg-card border border-border rounded-lg p-8">
           <LoginForm />
         </div>
 
-        <p className="text-center text-[var(--color-text-muted)] text-xs mt-6 font-[var(--font-mono)]">
+        <p className="text-center text-muted-foreground text-xs mt-6 font-mono">
           Self-hosted AI agent with full VPS access
         </p>
       </div>

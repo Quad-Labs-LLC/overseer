@@ -56,18 +56,18 @@ export function SessionCard({ session, onTerminate }: SessionCardProps) {
   const displayName = session.external_user_id || session.external_chat_id || "Unknown";
 
   return (
-    <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-6 hover:border-[var(--color-border-light)] transition-colors">
+    <div className="bg-card border border-border rounded-lg p-6 hover:border-primary transition-colors">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className={`w-3 h-3 rounded-full ${statusColors[status] || statusColors.ended}`} />
           <div>
             <div className="flex items-center gap-2">
-              <code className="text-sm font-mono text-white">{String(session.id).padStart(6, "0")}</code>
+              <code className="text-sm font-mono text-foreground">{String(session.id).padStart(6, "0")}</code>
               <span className={`text-xs px-2 py-0.5 rounded ${badgeClass}`}>
                 {status}
               </span>
             </div>
-            <div className="flex items-center gap-2 mt-1 text-xs text-[var(--color-text-muted)]">
+            <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
                 {interfaceIcons[session.interface_type] || interfaceIcons.web}
                 {session.interface_type}
@@ -89,22 +89,22 @@ export function SessionCard({ session, onTerminate }: SessionCardProps) {
       </div>
 
       <div className="space-y-2">
-        <div className="grid grid-cols-4 gap-4 pt-3 border-t border-[var(--color-border)]">
+        <div className="grid grid-cols-4 gap-4 pt-3 border-t border-border">
           <div>
-            <p className="text-xs text-[var(--color-text-muted)]">Duration</p>
-            <p className="text-sm font-medium text-white mt-1">{formatDuration()}</p>
+            <p className="text-xs text-muted-foreground">Duration</p>
+            <p className="text-sm font-medium text-foreground mt-1">{formatDuration()}</p>
           </div>
           <div>
-            <p className="text-xs text-[var(--color-text-muted)]">Steps</p>
-            <p className="text-sm font-medium text-white mt-1">{session.message_count}</p>
+            <p className="text-xs text-muted-foreground">Steps</p>
+            <p className="text-sm font-medium text-foreground mt-1">{session.message_count}</p>
           </div>
           <div>
-            <p className="text-xs text-[var(--color-text-muted)]">Tokens</p>
-            <p className="text-sm font-medium text-white mt-1">{session.total_tokens.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground">Tokens</p>
+            <p className="text-sm font-medium text-foreground mt-1">{session.total_tokens.toLocaleString()}</p>
           </div>
           <div>
-            <p className="text-xs text-[var(--color-text-muted)]">Cost</p>
-            <p className="text-sm font-medium text-white mt-1">$0.0000</p>
+            <p className="text-xs text-muted-foreground">Cost</p>
+            <p className="text-sm font-medium text-foreground mt-1">$0.0000</p>
           </div>
         </div>
       </div>

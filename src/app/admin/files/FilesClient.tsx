@@ -391,10 +391,10 @@ export function FilesClient() {
         }}
       />
 
-      <div className="mb-4 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-xl overflow-hidden">
-        <div className="px-4 py-3 border-b border-[var(--color-border)] flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div className="mb-4 bg-card border border-border rounded-xl overflow-hidden">
+        <div className="px-4 py-3 border-b border-border flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="text-xs text-[var(--color-text-muted)] font-[var(--font-mono)]">
+            <div className="text-xs text-muted-foreground font-mono">
               {breadcrumbs.map((c, idx) => (
                 <span key={c.path}>
                   <button
@@ -436,7 +436,7 @@ export function FilesClient() {
             <div className="h-4 w-px bg-border mx-1 hidden md:block" />
             <button
               onClick={newFolder}
-              className="inline-flex items-center justify-center gap-1.5 h-8 px-2.5 text-xs font-medium rounded-md bg-background border border-input text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 h-8 px-2.5 text-xs font-medium rounded-md bg-background border border-input text-foreground hover:bg-primary hover:text-accent-foreground transition-colors"
               title="New folder"
             >
               <FolderPlusIcon className="w-3.5 h-3.5" />
@@ -444,7 +444,7 @@ export function FilesClient() {
             </button>
             <button
               onClick={newTextFile}
-              className="inline-flex items-center justify-center gap-1.5 h-8 px-2.5 text-xs font-medium rounded-md bg-background border border-input text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 h-8 px-2.5 text-xs font-medium rounded-md bg-background border border-input text-foreground hover:bg-primary hover:text-accent-foreground transition-colors"
               title="New file"
             >
               <FilePlusIcon className="w-3.5 h-3.5" />
@@ -484,7 +484,7 @@ export function FilesClient() {
           <button
             onClick={downloadSelected}
             disabled={!selectedPrimary}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md bg-transparent hover:bg-accent hover:text-accent-foreground text-foreground transition-colors disabled:opacity-50 disabled:pointer-events-none"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md bg-transparent hover:bg-primary hover:text-accent-foreground text-foreground transition-colors disabled:opacity-50 disabled:pointer-events-none"
             title="Download"
           >
             <DownloadIcon className="w-3.5 h-3.5" />
@@ -493,7 +493,7 @@ export function FilesClient() {
           <button
             onClick={renameSelected}
             disabled={!selectedPrimary}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md bg-transparent hover:bg-accent hover:text-accent-foreground text-foreground transition-colors disabled:opacity-50 disabled:pointer-events-none"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md bg-transparent hover:bg-primary hover:text-accent-foreground text-foreground transition-colors disabled:opacity-50 disabled:pointer-events-none"
             title="Rename"
           >
             <Edit2Icon className="w-3.5 h-3.5" />
@@ -502,7 +502,7 @@ export function FilesClient() {
           <button
             onClick={copyPath}
             disabled={!selectedPrimary}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md bg-transparent hover:bg-accent hover:text-accent-foreground text-foreground transition-colors disabled:opacity-50 disabled:pointer-events-none"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md bg-transparent hover:bg-primary hover:text-accent-foreground text-foreground transition-colors disabled:opacity-50 disabled:pointer-events-none"
             title="Copy path"
           >
             <CopyIcon className="w-3.5 h-3.5" />
@@ -799,7 +799,7 @@ export function FilesClient() {
                   </button>
                   <button
                     onClick={() => setPreviewPath(null)}
-                    className="inline-flex items-center justify-center gap-2 h-9 px-4 text-xs font-medium rounded-md bg-background border border-input text-foreground hover:bg-accent hover:text-accent-foreground transition-colors w-full"
+                    className="inline-flex items-center justify-center gap-2 h-9 px-4 text-xs font-medium rounded-md bg-background border border-input text-foreground hover:bg-primary hover:text-accent-foreground transition-colors w-full"
                   >
                     <XIcon className="w-3.5 h-3.5" />
                     Close Preview

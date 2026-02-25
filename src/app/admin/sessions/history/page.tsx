@@ -34,14 +34,14 @@ export default function SessionHistoryPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-xl text-white font-(--font-mono)">Session History</h1>
+          <h1 className="text-xl text-foreground font-mono">Session History</h1>
           <p className="text-text-secondary mt-1 text-pretty">
             Historical session timeline with interface source, token usage, and activity metrics.
           </p>
         </div>
         <Link
           href="/sessions"
-          className="px-3 py-2 text-sm rounded border border-border text-text-secondary hover:text-white hover:bg-surface-overlay transition-colors"
+          className="px-3 py-2 text-sm rounded border border-border text-text-secondary hover:text-foreground hover:bg-surface-overlay transition-colors"
         >
           Back to sessions
         </Link>
@@ -70,8 +70,8 @@ export default function SessionHistoryPage() {
               <tbody>
                 {sessions.map((session) => (
                   <tr key={session.id} className="border-b border-border/60 last:border-b-0">
-                    <td className="px-4 py-3 text-white font-mono tabular-nums">{session.id}</td>
-                    <td className="px-4 py-3 text-white capitalize">{session.interface_type}</td>
+                    <td className="px-4 py-3 text-foreground font-mono tabular-nums">{session.id}</td>
+                    <td className="px-4 py-3 text-foreground capitalize">{session.interface_type}</td>
                     <td className="px-4 py-3 text-text-secondary max-w-xs truncate" title={`${session.external_user_id}/${session.external_chat_id}`}>
                       {session.external_user_id || "unknown"} / {session.external_chat_id || "unknown"}
                     </td>

@@ -173,7 +173,7 @@ export function EditProviderForm({ provider }: EditProviderFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg p-6">
+    <form onSubmit={handleSubmit} className="space-y-4 bg-card border border-border rounded-lg p-6">
       {error && (
         <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded text-red-400 text-sm">
           <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
@@ -314,7 +314,7 @@ export function EditProviderForm({ provider }: EditProviderFormProps) {
             </Select>
           </div>
         ) : (
-          <div className="text-xs text-[var(--color-text-muted)] self-end pb-2">Selected model has no reasoning controls.</div>
+          <div className="text-xs text-muted-foreground self-end pb-2">Selected model has no reasoning controls.</div>
         )}
       </div>
 

@@ -9,9 +9,9 @@ const categoryColors: Record<string, string> = {
   system: "bg-red-500/10 text-red-400 border-red-500/30",
   users: "bg-blue-500/10 text-blue-400 border-blue-500/30",
   content: "bg-green-500/10 text-green-400 border-green-500/30",
-  settings: "bg-[var(--color-accent-dim)] text-[var(--color-accent)] border-[var(--color-accent-border)]",
+  settings: "bg-primary/10 text-primary border-primary",
   tools: "bg-orange-500/10 text-orange-400 border-orange-500/30",
-  default: "bg-[var(--color-surface-overlay)] text-[var(--color-text-secondary)] border-[var(--color-border)]",
+  default: "bg-muted text-muted-foreground border-border",
 };
 
 export function PermissionBadge({ permission, category = "default", granted = true, onRevoke }: PermissionBadgeProps) {

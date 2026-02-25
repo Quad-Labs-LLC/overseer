@@ -63,12 +63,12 @@ export function ProviderCatalog() {
   return (
     <div className="space-y-4">
       {/* Stats bar */}
-      <div className="flex items-center gap-6 text-xs text-[var(--color-text-muted)]">
+      <div className="flex items-center gap-6 text-xs text-muted-foreground">
         <span>
-          <span className="text-white font-medium">{entries.length}</span> providers
+          <span className="text-foreground font-medium">{entries.length}</span> providers
         </span>
         <span>
-          <span className="text-white font-medium">{totalModels}</span> models
+          <span className="text-foreground font-medium">{totalModels}</span> models
         </span>
         <span>
           <span className="text-amber-400 font-medium">{thinkingModels}</span> with thinking
@@ -86,8 +86,8 @@ export function ProviderCatalog() {
             onClick={() => setFilter(f)}
             className={`px-3 py-1 text-xs rounded transition-colors ${
               filter === f
-                ? "bg-[var(--color-accent)] text-black font-medium"
-                : "bg-[var(--color-surface-overlay)] text-[var(--color-text-secondary)] hover:bg-[var(--color-border)] border border-[var(--color-border)]"
+                ? "bg-primary text-primary-foreground font-medium"
+                : "bg-muted text-muted-foreground hover:bg-border border border-border"
             }`}
           >
             {f === "all" ? "All Providers" : f === "thinking" ? "Thinking" : f === "multimodal" ? "Multimodal" : "Free Tier"}
@@ -114,33 +114,33 @@ export function ProviderCatalog() {
                   : info.models.filter((m) => m.costTier === "free");
 
           return (
-            <div key={key} className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg overflow-hidden">
+            <div key={key} className="bg-card border border-border rounded-lg overflow-hidden">
               {/* Provider header - always visible */}
               <button
                 onClick={() => setExpandedProvider(isExpanded ? null : key)}
-                className="w-full flex items-center justify-between p-4 hover:bg-[var(--color-surface-overlay)] transition-colors text-left"
+                className="w-full flex items-center justify-between p-4 hover:bg-muted transition-colors text-left"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   {/* Provider icon */}
-                  <div className="w-10 h-10 rounded-lg bg-[var(--color-surface-overlay)] border border-[var(--color-border)] flex items-center justify-center shrink-0">
-                    <span className="text-sm font-bold text-[var(--color-accent)]">
+                  <div className="w-10 h-10 rounded-lg bg-muted border border-border flex items-center justify-center shrink-0">
+                    <span className="text-sm font-bold text-primary">
                       {info.displayName.charAt(0)}
                     </span>
                   </div>
 
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-medium text-white text-sm">{info.displayName}</h3>
-                      <span className="text-[10px] text-[var(--color-text-muted)] font-mono">{key}</span>
+                      <h3 className="font-medium text-foreground text-sm">{info.displayName}</h3>
+                      <span className="text-[10px] text-muted-foreground font-mono">{key}</span>
                     </div>
-                    <p className="text-xs text-[var(--color-text-muted)] truncate mt-0.5">{info.description}</p>
+                    <p className="text-xs text-muted-foreground truncate mt-0.5">{info.description}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0 ml-4">
                   {/* Summary badges */}
                   <div className="hidden sm:flex items-center gap-1.5">
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--color-surface-overlay)] text-[var(--color-text-secondary)]">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
                       {info.models.length} models
                     </span>
                     {thinkingCount > 0 && (
@@ -158,14 +158,14 @@ export function ProviderCatalog() {
                         {multimodalCount} vision
                       </span>
                     )}
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded ${info.requiresKey ? "bg-[var(--color-surface-overlay)] text-[var(--color-text-muted)]" : "bg-green-500/10 text-green-400"}`}>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded ${info.requiresKey ? "bg-muted text-muted-foreground" : "bg-green-500/10 text-green-400"}`}>
                       {info.requiresKey ? "API key" : "Local"}
                     </span>
                   </div>
 
                   {/* Chevron */}
                   <svg
-                    className={`w-5 h-5 text-[var(--color-text-muted)] transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                    className={`w-5 h-5 text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -177,11 +177,11 @@ export function ProviderCatalog() {
 
               {/* Expanded: model cards */}
               {isExpanded && (
-                <div className="border-t border-[var(--color-border)] p-4">
+                <div className="border-t border-border p-4">
                   {/* Provider meta */}
-                  <div className="flex items-center gap-4 mb-4 text-xs text-[var(--color-text-muted)]">
+                  <div className="flex items-center gap-4 mb-4 text-xs text-muted-foreground">
                     <span>
-                      npm: <code className="text-[var(--color-text-secondary)] font-mono">{info.npm}</code>
+                      npm: <code className="text-muted-foreground font-mono">{info.npm}</code>
                     </span>
                     {info.supportsThinking && (
                       <span className="text-amber-400">Extended Thinking</span>
@@ -199,7 +199,7 @@ export function ProviderCatalog() {
                   </div>
 
                   {filter !== "all" && visibleModels.length < info.models.length && (
-                    <p className="mt-3 text-xs text-[var(--color-text-muted)]">
+                    <p className="mt-3 text-xs text-muted-foreground">
                       Showing {visibleModels.length} of {info.models.length} models (filtered by &quot;{filter}&quot;)
                     </p>
                   )}

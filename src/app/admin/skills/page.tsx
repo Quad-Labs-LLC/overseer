@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function SkillsPage() {
   const user = await getCurrentUser();
   if (!user) {
-    return <div className="text-sm text-[var(--color-text-secondary)]">Unauthorized</div>;
+    return <div className="text-sm text-muted-foreground">Unauthorized</div>;
   }
 
   const canViewAll = hasPermission(user, Permission.TENANT_VIEW_ALL);
@@ -43,7 +43,7 @@ export default async function SkillsPage() {
         <div className="flex flex-wrap items-center gap-3">
           <a
             href="/admin/skills/import"
-            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-sm h-9 px-4 w-full sm:w-auto"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-primary hover:text-accent-foreground shadow-sm h-9 px-4 w-full sm:w-auto"
           >
             <DownloadCloudIcon className="w-4 h-4" />
             Sync Built-in
@@ -99,7 +99,7 @@ export default async function SkillsPage() {
           <div className="flex justify-center gap-3">
             <a
               href="/admin/skills/import"
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring border border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-sm h-9 px-4"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring border border-input bg-background hover:bg-primary hover:text-accent-foreground shadow-sm h-9 px-4"
             >
               <DownloadCloudIcon className="w-4 h-4" />
               Sync Built-in Skills

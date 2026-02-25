@@ -101,17 +101,17 @@ export function ChatHeader({
   const selectedProvider = providers.find((p) => p.id === selectedProviderId);
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-surface-raised)]">
+    <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card">
       {/* Left side - Title */}
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)] flex items-center justify-center">
-          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+          <svg className="w-4 h-4 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
         </div>
         <div>
-          <h1 className="text-sm font-semibold text-white font-[var(--font-mono)]">Chat</h1>
-          <p className="text-xs text-[var(--color-text-muted)]">
+          <h1 className="text-sm font-semibold text-foreground font-mono">Chat</h1>
+          <p className="text-xs text-muted-foreground">
             {conversationId ? `Conversation #${conversationId}` : "New conversation"}
           </p>
         </div>
@@ -123,12 +123,12 @@ export function ChatHeader({
         <div className="relative">
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[var(--color-surface-overlay)] hover:bg-[var(--color-border)] border border-[var(--color-border)] rounded-lg transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-muted hover:bg-primary border border-border rounded-lg transition-colors"
           >
-            <svg className="w-4 h-4 text-[var(--color-text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            <span className="text-[var(--color-text-primary)] max-w-[200px] truncate">
+            <span className="text-foreground max-w-[200px] truncate">
               {selectedProvider
                 ? `${selectedProvider.displayName} / ${selectedProvider.model}`
                 : "Select model"}
@@ -145,7 +145,7 @@ export function ChatHeader({
               </span>
             )}
             <svg
-              className={`w-4 h-4 text-[var(--color-text-secondary)] transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
+              className={`w-4 h-4 text-muted-foreground transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -161,10 +161,10 @@ export function ChatHeader({
                 className="fixed inset-0 z-10"
                 onClick={() => setIsDropdownOpen(false)}
               />
-              <div className="absolute right-0 mt-2 w-80 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg shadow-xl z-20 max-h-[400px] overflow-y-auto">
+              <div className="absolute right-0 mt-2 w-80 bg-popover border border-border rounded-lg shadow-xl z-20 max-h-[400px] overflow-y-auto">
                 <div className="py-1">
                   {providers.length === 0 ? (
-                    <div className="px-4 py-3 text-sm text-[var(--color-text-secondary)]">
+                    <div className="px-4 py-3 text-sm text-muted-foreground">
                       No providers configured
                     </div>
                   ) : (
@@ -175,23 +175,23 @@ export function ChatHeader({
                           onProviderChange(provider.id);
                           setIsDropdownOpen(false);
                         }}
-                        className={`w-full flex items-start gap-3 px-4 py-2.5 text-left hover:bg-[var(--color-border)] transition-colors ${
-                          selectedProviderId === provider.id ? "bg-[var(--color-border)]" : ""
+                        className={`w-full flex items-start gap-3 px-4 py-2.5 text-left hover:bg-primary transition-colors ${
+                          selectedProviderId === provider.id ? "bg-primary" : ""
                         }`}
                       >
                         <div className="flex-1 min-w-0">
                           {/* Row 1: name + model */}
                           <div className="flex items-center gap-2">
-                            <span className="text-sm text-white font-medium truncate">
+                            <span className="text-sm text-foreground font-medium truncate">
                               {provider.displayName}
                             </span>
                             {provider.isDefault && (
-                              <span className="text-[9px] text-[var(--color-accent)] bg-[var(--color-accent)]/10 px-1 rounded">
+                              <span className="text-[9px] text-primary bg-primary/10 px-1 rounded">
                                 Default
                               </span>
                             )}
                           </div>
-                          <div className="text-[11px] text-[var(--color-text-secondary)] font-mono truncate mt-0.5">
+                          <div className="text-[11px] text-muted-foreground font-mono truncate mt-0.5">
                             {provider.model}
                           </div>
 
@@ -205,13 +205,13 @@ export function ChatHeader({
                               <MiniCapBadge label="Reasoning" color="text-purple-400 bg-purple-500/10" />
                             )}
                             {provider.supportsTools && (
-                              <MiniCapBadge label="Tools" color="text-[var(--color-text-secondary)] bg-[var(--color-surface)]" />
+                              <MiniCapBadge label="Tools" color="text-muted-foreground bg-background" />
                             )}
                             {provider.supportsMultimodal && (
-                              <MiniCapBadge label="Vision" color="text-[var(--color-text-secondary)] bg-[var(--color-surface)]" />
+                              <MiniCapBadge label="Vision" color="text-muted-foreground bg-background" />
                             )}
                             {provider.contextWindow > 0 && (
-                              <span className="text-[9px] text-[var(--color-text-muted)]">
+                              <span className="text-[9px] text-muted-foreground">
                                 {formatCtx(provider.contextWindow)} ctx
                               </span>
                             )}
@@ -220,7 +220,7 @@ export function ChatHeader({
 
                         {/* Checkmark */}
                         {selectedProviderId === provider.id && (
-                          <svg className="w-4 h-4 text-[var(--color-accent)] mt-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 text-primary mt-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
                         )}
@@ -236,7 +236,7 @@ export function ChatHeader({
         {/* New chat button */}
         <button
           onClick={onNewChat}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] text-black rounded-lg transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

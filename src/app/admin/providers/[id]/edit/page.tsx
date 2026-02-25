@@ -32,14 +32,14 @@ export default async function EditProviderPage({ params }: PageProps) {
     <div className="max-w-3xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl text-white font-(--font-mono)">Edit Provider</h1>
+          <h1 className="text-xl text-foreground font-mono">Edit Provider</h1>
           <p className="text-text-secondary mt-1">
             Update provider settings, model selection, and reasoning options.
           </p>
         </div>
         <Link
           href="/providers"
-          className="px-3 py-2 rounded border border-border text-text-secondary hover:text-white"
+          className="px-3 py-2 rounded border border-border text-text-secondary hover:text-foreground"
         >
           Back
         </Link>

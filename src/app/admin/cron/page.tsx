@@ -160,7 +160,7 @@ export default function CronPage() {
       case "success": return "text-green-400";
       case "running": return "text-amber-400";
       case "failed": return "text-red-400";
-      default: return "text-[var(--color-text-muted)]";
+      default: return "text-muted-foreground";
     }
   };
 
@@ -188,7 +188,7 @@ export default function CronPage() {
           className={cn(
             "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow-sm h-9 px-4 w-full sm:w-auto",
             showCreate 
-              ? "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+              ? "border border-input bg-background hover:bg-primary hover:text-accent-foreground"
               : "bg-primary text-primary-foreground hover:bg-primary/90"
           )}
         >
@@ -434,7 +434,7 @@ export default function CronPage() {
                     
                     <button
                       onClick={() => handleRunNow(job.id)}
-                      className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-sm h-8 px-3"
+                      className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-primary hover:text-accent-foreground shadow-sm h-8 px-3"
                       title="Run now"
                     >
                       <PlayIcon className="w-3.5 h-3.5" />

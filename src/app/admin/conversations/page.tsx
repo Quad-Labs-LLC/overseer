@@ -126,7 +126,7 @@ export default async function ConversationsPage() {
                     <td className="px-6 py-4 text-right">
                       <Link
                         href={`/admin/conversations/${conv.id}`}
-                        className="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 px-3 opacity-0 group-hover:opacity-100 border border-transparent group-hover:border-border"
+                        className="inline-flex items-center justify-center rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-primary hover:text-accent-foreground h-8 px-3 opacity-0 group-hover:opacity-100 border border-transparent group-hover:border-border"
                       >
                         View Details
                       </Link>

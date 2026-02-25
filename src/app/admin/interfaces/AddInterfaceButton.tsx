@@ -144,8 +144,8 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
 
   const buttonClass =
     variant === "primary"
-      ? "px-4 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] text-black font-medium rounded transition-all"
-      : "flex items-center gap-2 px-4 py-2 bg-[var(--color-accent-dim)] text-[var(--color-accent)] hover:bg-[var(--color-accent-dim)] rounded-lg transition-colors";
+      ? "px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded transition-all"
+      : "flex items-center gap-2 px-4 py-2 bg-[primary/10] text-primary hover:bg-[primary/10] rounded-lg transition-colors";
 
   return (
     <>
@@ -166,12 +166,12 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center px-4 py-8 bg-black/50 backdrop-blur-sm overflow-y-auto">
-          <div className="w-full max-w-lg bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg shadow-2xl">
-            <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)]">
-              <h2 className="text-xl font-semibold text-white font-[var(--font-mono)]">Add Chat Interface</h2>
+          <div className="w-full max-w-lg bg-card border border-border rounded-lg shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-border">
+              <h2 className="text-xl font-semibold text-foreground font-mono">Add Chat Interface</h2>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-2 text-[var(--color-text-secondary)] hover:text-white rounded-lg hover:bg-[var(--color-surface-overlay)] transition-colors"
+                className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -187,7 +187,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
               )}
 
               <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Platform</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Platform</label>
                 <select
                   value={formData.type}
                   onChange={(e) => {
@@ -197,7 +197,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
                       initialFormData(type, prev.allowed_users || ""),
                     );
                   }}
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                  className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   {interfaceOptions.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -205,18 +205,18 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   {interfaceOptions.find((o) => o.value === formData.type)?.hint}
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Name</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Name</label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                  className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder="My Bot"
                   required
                 />
@@ -224,16 +224,16 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
 
               {requiresBotToken(formData.type) && (
                 <div>
-                  <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Bot Token</label>
+                  <label className="block text-sm font-medium text-foreground mb-2">Bot Token</label>
                   <input
                     type="password"
                     value={formData.bot_token}
                     onChange={(e) => setFormData((prev) => ({ ...prev, bot_token: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                    className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
                     required
                   />
-                  <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     {formData.type === "telegram"
                       ? "Get this from @BotFather on Telegram"
                       : formData.type === "discord"
@@ -245,17 +245,17 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
 
               {formData.type === "discord" && (
                 <div>
-                  <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Discord Client ID
                   </label>
                   <input
                     type="text"
                     value={formData.client_id}
                     onChange={(e) => setFormData((prev) => ({ ...prev, client_id: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                    className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder="123456789012345678"
                   />
-                  <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Needed for slash command registration.
                   </p>
                 </div>
@@ -263,17 +263,17 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
 
               {formData.type === "discord" && (
                 <div>
-                  <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Allowed Guild IDs (Optional)
                   </label>
                   <input
                     type="text"
                     value={formData.allowed_guilds}
                     onChange={(e) => setFormData((prev) => ({ ...prev, allowed_guilds: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                    className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder="123456789012345678, 987654321098765432"
                   />
-                  <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Comma-separated Discord server IDs. Leave empty to allow all.
                   </p>
                 </div>
@@ -282,29 +282,29 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
               {formData.type === "slack" && (
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Slack App Token (Optional)
                     </label>
                     <input
                       type="password"
                       value={formData.slack_app_token}
                       onChange={(e) => setFormData((prev) => ({ ...prev, slack_app_token: e.target.value }))}
-                      className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                      className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                       placeholder="xapp-..."
                     />
-                    <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Needed for Socket Mode. If using Events API, leave empty.
                     </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Slack Signing Secret (Optional)
                     </label>
                     <input
                       type="password"
                       value={formData.slack_signing_secret}
                       onChange={(e) => setFormData((prev) => ({ ...prev, slack_signing_secret: e.target.value }))}
-                      className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                      className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                       placeholder="..."
                     />
                   </div>
@@ -314,42 +314,42 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
               {formData.type === "matrix" && (
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Homeserver URL
                     </label>
                     <input
                       type="text"
                       value={formData.matrix_homeserver}
                       onChange={(e) => setFormData((prev) => ({ ...prev, matrix_homeserver: e.target.value }))}
-                      className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                      className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                       placeholder="https://matrix.org"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Access Token
                     </label>
                     <input
                       type="password"
                       value={formData.matrix_access_token}
                       onChange={(e) => setFormData((prev) => ({ ...prev, matrix_access_token: e.target.value }))}
-                      className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                      className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                       placeholder="syt_..."
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Room IDs (Optional)
                     </label>
                     <input
                       type="text"
                       value={formData.matrix_room_ids}
                       onChange={(e) => setFormData((prev) => ({ ...prev, matrix_room_ids: e.target.value }))}
-                      className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                      className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                       placeholder="!abc:matrix.org, !def:matrix.org"
                     />
                   </div>
-                  <p className="text-xs text-[var(--color-text-muted)]">
+                  <p className="text-xs text-muted-foreground">
                     Provide a homeserver and access token to enable the Matrix interface.
                   </p>
                 </div>
@@ -360,34 +360,34 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
                 formData.type !== "slack" &&
                 formData.type !== "matrix" && (
                 <div>
-                  <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Config JSON (Optional)
                   </label>
                   <textarea
                     value={formData.config_json}
                     onChange={(e) => setFormData((prev) => ({ ...prev, config_json: e.target.value }))}
                     rows={5}
-                    className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] font-[var(--font-mono)] text-xs"
+                    className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary font-mono text-xs"
                     placeholder='{"webhook_url":"...","webhook_secret":"..."}'
                   />
-                  <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     For extension interfaces, store whatever config keys you need here. Secrets are encrypted when the key is known (e.g. bot_token/webhook_secret).
                   </p>
                 </div>
               )}
 
               <div>
-                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Allowed Users (Optional)
                 </label>
                 <input
                   type="text"
                   value={formData.allowed_users}
                   onChange={(e) => setFormData((prev) => ({ ...prev, allowed_users: e.target.value }))}
-                  className="w-full px-4 py-2.5 bg-[var(--color-surface-overlay)] border border-[var(--color-border)] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                  className="w-full px-4 py-2.5 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder="123456789, 987654321"
                 />
-                <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Comma-separated user IDs. Leave empty to allow all.
                 </p>
               </div>
@@ -396,14 +396,14 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="px-4 py-2 text-[var(--color-text-secondary)] hover:text-white transition-colors"
+                  className="px-4 py-2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-4 py-2 bg-[var(--color-accent)] hover:bg-[var(--color-accent-light)] text-black font-medium rounded transition-colors disabled:opacity-50"
+                  className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded transition-colors disabled:opacity-50"
                 >
                   {loading ? "Adding..." : "Add Interface"}
                 </button>

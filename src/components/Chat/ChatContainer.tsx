@@ -54,7 +54,7 @@ export function ChatContainer({ initialConversationId }: ChatContainerProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[var(--color-surface)]">
+    <div className="flex flex-col h-full bg-background">
       {/* Header */}
       <ChatHeader
         conversationId={conversationId}
@@ -114,13 +114,13 @@ export function ChatContainer({ initialConversationId }: ChatContainerProps) {
 function EmptyState() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-      <div className="w-20 h-20 mb-6 rounded-lg bg-[var(--color-accent)] flex items-center justify-center">
-        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="w-20 h-20 mb-6 rounded-lg bg-primary flex items-center justify-center">
+        <svg className="w-10 h-10 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
       </div>
-      <h2 className="text-2xl font-bold text-white mb-2">How can I help you?</h2>
-      <p className="text-[var(--color-text-secondary)] max-w-md mb-8">
+      <h2 className="text-2xl font-bold text-foreground mb-2">How can I help you?</h2>
+      <p className="text-muted-foreground max-w-md mb-8">
         I&apos;m your AI assistant with access to your VPS. I can help you with system
         administration, file operations, code execution, and more.
       </p>
@@ -178,13 +178,13 @@ function SuggestionCard({
   description: string;
 }) {
   return (
-    <div className="flex items-start gap-3 p-4 bg-[var(--color-surface-overlay)] hover:bg-[var(--color-border)] border border-[var(--color-border)] rounded-lg cursor-pointer transition-colors">
-      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-[var(--color-border)] flex items-center justify-center text-[var(--color-text-secondary)]">
+    <div className="flex items-start gap-3 p-4 bg-card hover:bg-primary border border-border rounded-lg cursor-pointer transition-colors">
+      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
         {icon}
       </div>
       <div className="text-left">
-        <h3 className="text-sm font-medium text-white">{title}</h3>
-        <p className="text-xs text-[var(--color-text-muted)]">{description}</p>
+        <h3 className="text-sm font-medium text-card-foreground">{title}</h3>
+        <p className="text-xs text-muted-foreground">{description}</p>
       </div>
     </div>
   );

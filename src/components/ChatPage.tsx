@@ -168,7 +168,7 @@ export default function ChatPage() {
         <div className="p-2">
           <Button
             variant="ghost"
-            className="w-full justify-start gap-2 h-9 px-3 text-sm text-foreground/80 hover:bg-accent hover:text-foreground"
+            className="w-full justify-start gap-2 h-9 px-3 text-sm text-foreground/80 hover:bg-primary hover:text-foreground"
             onClick={handleNewChat}
           >
             <PlusIcon className="h-4 w-4" />

@@ -90,14 +90,14 @@ export default async function AddMcpServerPage({
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-xl text-white font-(--font-mono)">Add MCP Server</h1>
+          <h1 className="text-xl text-foreground font-mono">Add MCP Server</h1>
           <p className="text-text-secondary mt-1 text-pretty">
             Register a new Model Context Protocol server and optionally connect immediately.
           </p>
         </div>
         <Link
           href="/mcp"
-          className="px-3 py-2 text-sm rounded border border-border text-text-secondary hover:text-white hover:bg-surface-overlay transition-colors"
+          className="px-3 py-2 text-sm rounded border border-border text-text-secondary hover:text-foreground hover:bg-surface-overlay transition-colors"
         >
           Back to MCP
         </Link>
@@ -107,7 +107,7 @@ export default async function AddMcpServerPage({
         <form action={createMcpServerAction} className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="name" className="block text-sm text-white mb-2">
+              <label htmlFor="name" className="block text-sm text-foreground mb-2">
                 Server name
               </label>
               <input
@@ -115,19 +115,19 @@ export default async function AddMcpServerPage({
                 name="name"
                 required
                 placeholder="filesystem-tools"
-                className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-white placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
 
             <div>
-              <label htmlFor="server_type" className="block text-sm text-white mb-2">
+              <label htmlFor="server_type" className="block text-sm text-foreground mb-2">
                 Transport type
               </label>
               <select
                 id="server_type"
                 name="server_type"
                 defaultValue="stdio"
-                className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               >
                 <option value="stdio">STDIO</option>
                 <option value="sse">SSE</option>
@@ -136,63 +136,63 @@ export default async function AddMcpServerPage({
           </div>
 
           <div>
-            <label htmlFor="command" className="block text-sm text-white mb-2">
+            <label htmlFor="command" className="block text-sm text-foreground mb-2">
               Command (for STDIO)
             </label>
             <input
               id="command"
               name="command"
               placeholder="npx"
-              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-white placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
 
           <div>
-            <label htmlFor="args" className="block text-sm text-white mb-2">
+            <label htmlFor="args" className="block text-sm text-foreground mb-2">
               Args (comma separated)
             </label>
             <input
               id="args"
               name="args"
               placeholder="-y,@modelcontextprotocol/server-filesystem,/path"
-              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-white placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
 
           <div>
-            <label htmlFor="url" className="block text-sm text-white mb-2">
+            <label htmlFor="url" className="block text-sm text-foreground mb-2">
               SSE URL
             </label>
             <input
               id="url"
               name="url"
               placeholder="https://mcp.example.com/sse"
-              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-white placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="env_vars" className="block text-sm text-white mb-2">
+              <label htmlFor="env_vars" className="block text-sm text-foreground mb-2">
                 Env vars (one per line: KEY=VALUE)
               </label>
               <textarea
                 id="env_vars"
                 name="env_vars"
                 rows={4}
-                className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-white placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
 
             <div>
-              <label htmlFor="headers" className="block text-sm text-white mb-2">
+              <label htmlFor="headers" className="block text-sm text-foreground mb-2">
                 Headers (one per line: Name: Value)
               </label>
               <textarea
                 id="headers"
                 name="headers"
                 rows={4}
-                className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-white placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
           </div>
@@ -212,7 +212,7 @@ export default async function AddMcpServerPage({
           <div className="flex items-center gap-3">
             <button
               type="submit"
-              className="px-4 py-2 rounded bg-accent hover:bg-accent-light text-black text-sm font-medium transition-colors"
+              className="px-4 py-2 rounded bg-primary hover:bg-primary-light text-primary-foreground text-sm font-medium transition-colors"
             >
               Add server
             </button>

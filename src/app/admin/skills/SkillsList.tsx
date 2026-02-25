@@ -188,7 +188,7 @@ export function SkillsList({ skills }: SkillsListProps) {
                 {triggers.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
                     {triggers.slice(0, 3).map((trigger, i) => (
-                      <span key={i} className="text-[10px] font-medium px-2 py-0.5 bg-accent/10 text-accent-foreground border border-accent/20 rounded-full truncate max-w-[120px]" title={trigger}>
+                      <span key={i} className="text-[10px] font-medium px-2 py-0.5 bg-primary/10 text-accent-foreground border border-accent/20 rounded-full truncate max-w-[120px]" title={trigger}>
                         {trigger}
                       </span>
                     ))}
@@ -225,7 +225,7 @@ export function SkillsList({ skills }: SkillsListProps) {
                 <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100">
                   <a
                     href={`/admin/skills/${skill.id}/edit`}
-                    className="p-1.5 text-muted-foreground hover:text-foreground bg-background hover:bg-accent border border-input hover:border-accent rounded-md transition-colors shadow-sm"
+                    className="p-1.5 text-muted-foreground hover:text-foreground bg-background hover:bg-primary border border-input hover:border-accent rounded-md transition-colors shadow-sm"
                     title="Configure"
                   >
                     <Edit2Icon className="w-3.5 h-3.5" />

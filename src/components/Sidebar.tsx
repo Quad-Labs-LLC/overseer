@@ -52,7 +52,7 @@ const navigationSections: NavSection[] = [
     items: [
       {
         name: "Dashboard",
-        href: "/admin/dashboard",
+        href: "/admin",
         requires: ["agent:view"],
         icon: <LayoutDashboardIcon className="w-4 h-4" />,
       },
@@ -193,7 +193,7 @@ export function Sidebar({ user, permissions }: SidebarProps) {
   };
 
   return (
-    <aside className="w-64 h-full bg-sidebar border-r border-border flex flex-col shrink-0">
+    <aside className="w-64 h-full bg-card border-r border-border flex flex-col shrink-0">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-border/50">
         <div className="flex items-center gap-3">
@@ -227,10 +227,10 @@ export function Sidebar({ user, permissions }: SidebarProps) {
                         "flex items-center gap-3 px-3 py-2 rounded-md text-[13px] font-medium transition-all duration-200",
                         isActive
                           ? "bg-primary/10 text-primary"
-                          : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent"
+                          : "text-muted-foreground hover:text-foreground hover:bg-primary"
                       )}
                     >
-                      <span className={cn("transition-colors", isActive ? "text-primary" : "text-sidebar-foreground/50")}>
+                      <span className={cn("transition-colors", isActive ? "text-primary" : "text-muted-foreground")}>
                         {item.icon}
                       </span>
                       {item.name}
@@ -249,7 +249,7 @@ export function Sidebar({ user, permissions }: SidebarProps) {
       </nav>
 
       {/* User section */}
-      <div className="p-4 border-t border-border/50 bg-sidebar-accent/30 m-3 rounded-xl">
+      <div className="p-4 border-t border-border/50 bg-muted/30 m-3 rounded-xl">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center border border-border shadow-sm">
             <span className="text-[13px] font-semibold text-foreground">

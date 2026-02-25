@@ -233,22 +233,22 @@ export function CommandPalette() {
       {/* Command dialog */}
       <div className="absolute left-1/2 top-[20%] -translate-x-1/2 w-full max-w-xl animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200">
         <Command
-          className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-2xl overflow-hidden"
+          className="rounded-xl border border-border bg-card shadow-2xl overflow-hidden"
           loop
         >
           {/* Search input */}
-          <div className="flex items-center gap-2 border-b border-[var(--color-border)] px-4">
-            <Search className="h-4 w-4 shrink-0 text-[var(--color-text-muted)]" />
+          <div className="flex items-center gap-2 border-b border-border px-4">
+            <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
             <Command.Input
               placeholder="Type a command or search..."
-              className="flex h-12 w-full bg-transparent text-sm text-white outline-none placeholder:text-[var(--color-text-muted)]"
+              className="flex h-12 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
             />
             <Kbd>ESC</Kbd>
           </div>
 
           {/* Results */}
           <Command.List className="max-h-80 overflow-y-auto p-2 custom-scrollbar">
-            <Command.Empty className="py-8 text-center text-sm text-[var(--color-text-muted)]">
+            <Command.Empty className="py-8 text-center text-sm text-muted-foreground">
               No results found.
             </Command.Empty>
 
@@ -256,7 +256,7 @@ export function CommandPalette() {
               <Command.Group
                 key={group}
                 heading={group}
-                className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-[10px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-[var(--color-text-muted)]"
+                className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-[10px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-muted-foreground"
               >
                 {commands
                   .filter((c) => c.group === group)
@@ -265,9 +265,9 @@ export function CommandPalette() {
                       key={cmd.id}
                       value={`${cmd.label} ${cmd.keywords?.join(" ") ?? ""}`}
                       onSelect={cmd.action}
-                      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-[var(--color-text-secondary)] cursor-pointer transition-colors data-[selected=true]:bg-[var(--color-surface-overlay)] data-[selected=true]:text-white group"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground cursor-pointer transition-colors data-[selected=true]:bg-primary data-[selected=true]:text-foreground group"
                     >
-                      <span className="text-[var(--color-text-muted)] group-data-[selected=true]:text-[var(--color-accent)]">
+                      <span className="text-muted-foreground group-data-[selected=true]:text-primary">
                         {cmd.icon}
                       </span>
                       <span className="flex-1">{cmd.label}</span>
@@ -283,7 +283,7 @@ export function CommandPalette() {
           </Command.List>
 
           {/* Footer */}
-          <div className="flex items-center justify-between border-t border-[var(--color-border)] px-4 py-2 text-[10px] text-[var(--color-text-muted)]">
+          <div className="flex items-center justify-between border-t border-border px-4 py-2 text-[10px] text-muted-foreground">
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-1">
                 <Kbd>↑↓</Kbd> Navigate

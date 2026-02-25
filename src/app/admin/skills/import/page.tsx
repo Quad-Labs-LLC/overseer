@@ -83,14 +83,14 @@ export default async function ImportSkillPage({
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-xl text-white font-(--font-mono)">Import Skills</h1>
+          <h1 className="text-xl text-foreground font-mono">Import Skills</h1>
           <p className="text-text-secondary mt-1 text-pretty">
             Bring in community skills or refresh built-in skills from the local `skills/` directory.
           </p>
         </div>
         <Link
           href="/skills"
-          className="px-3 py-2 text-sm rounded border border-border text-text-secondary hover:text-white hover:bg-surface-overlay transition-colors"
+          className="px-3 py-2 text-sm rounded border border-border text-text-secondary hover:text-foreground hover:bg-surface-overlay transition-colors"
         >
           Back to skills
         </Link>
@@ -98,14 +98,14 @@ export default async function ImportSkillPage({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-surface-raised border border-border rounded-lg p-6">
-          <h2 className="text-base text-white mb-2">Sync built-in skills</h2>
+          <h2 className="text-base text-foreground mb-2">Sync built-in skills</h2>
           <p className="text-sm text-text-secondary text-pretty mb-4">
-            Found <span className="text-white tabular-nums">{builtinCount}</span> built-in skills. Sync will upsert them into the database.
+            Found <span className="text-foreground tabular-nums">{builtinCount}</span> built-in skills. Sync will upsert them into the database.
           </p>
           <form action={syncBuiltinAction}>
             <button
               type="submit"
-              className="px-4 py-2 rounded bg-surface-overlay hover:bg-border text-sm text-white transition-colors"
+              className="px-4 py-2 rounded bg-surface-overlay hover:bg-border text-sm text-foreground transition-colors"
             >
               Sync built-in skills
             </button>
@@ -113,7 +113,7 @@ export default async function ImportSkillPage({
         </div>
 
         <div className="bg-surface-raised border border-border rounded-lg p-6">
-          <h2 className="text-base text-white mb-2">Import from GitHub</h2>
+          <h2 className="text-base text-foreground mb-2">Import from GitHub</h2>
           <p className="text-sm text-text-secondary text-pretty mb-4">
             Paste a repository URL that contains a `skill.json` at its root.
           </p>
@@ -122,11 +122,11 @@ export default async function ImportSkillPage({
               name="github_url"
               required
               placeholder="https://github.com/owner/repo"
-              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-white placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
             />
             <button
               type="submit"
-              className="px-4 py-2 rounded bg-accent hover:bg-accent-light text-black text-sm font-medium transition-colors"
+              className="px-4 py-2 rounded bg-primary hover:bg-primary-light text-primary-foreground text-sm font-medium transition-colors"
             >
               Import skill
             </button>
@@ -134,10 +134,10 @@ export default async function ImportSkillPage({
         </div>
 
         <div className="bg-surface-raised border border-border rounded-lg p-6">
-          <h2 className="text-base text-white mb-2">Marketplace</h2>
+          <h2 className="text-base text-foreground mb-2">Marketplace</h2>
           <p className="text-sm text-text-secondary text-pretty mb-4">
             Curated community skills. Source:{" "}
-            <span className="text-white">
+            <span className="text-foreground">
               {marketplace.source === "remote"
                 ? "remote"
                 : marketplace.source === "local"
@@ -166,7 +166,7 @@ export default async function ImportSkillPage({
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="text-sm text-white">{skill.name}</div>
+                      <div className="text-sm text-foreground">{skill.name}</div>
                       {skill.description ? (
                         <div className="text-xs text-text-secondary mt-1 text-pretty">
                           {skill.description}
@@ -180,7 +180,7 @@ export default async function ImportSkillPage({
                       <input type="hidden" name="github_url" value={skill.github} />
                       <button
                         type="submit"
-                        className="px-3 py-1.5 rounded bg-surface-overlay hover:bg-border text-xs text-white transition-colors border border-border"
+                        className="px-3 py-1.5 rounded bg-surface-overlay hover:bg-border text-xs text-foreground transition-colors border border-border"
                       >
                         Import
                       </button>
