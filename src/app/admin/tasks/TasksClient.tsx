@@ -130,9 +130,9 @@ export function TasksClient() {
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className={cn(
                       "text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider",
-                      t.status === "completed" ? "bg-success/10 text-success" :
+                      t.status === "completed" ? "bg-emerald-500/10 text-emerald-500" :
                       t.status === "failed" ? "bg-destructive/10 text-destructive" :
-                      t.status === "running" ? "bg-warning/10 text-warning" :
+                      t.status === "running" ? "bg-amber-500/10 text-amber-500" :
                       "bg-muted text-muted-foreground border border-border/50"
                     )}>
                       {t.status}
@@ -204,9 +204,9 @@ export function TasksClient() {
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
                   <span className={cn(
                     "text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider",
-                    detail.status === "completed" ? "bg-success/10 text-success" :
+                    detail.status === "completed" ? "bg-emerald-500/10 text-emerald-500" :
                     detail.status === "failed" ? "bg-destructive/10 text-destructive" :
-                    detail.status === "running" ? "bg-warning/10 text-warning" :
+                    detail.status === "running" ? "bg-amber-500/10 text-amber-500" :
                     "bg-muted text-muted-foreground border border-border/50"
                   )}>
                     {detail.status}

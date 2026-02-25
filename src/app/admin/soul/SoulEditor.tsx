@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { SaveIcon, RefreshCcwIcon, AlertCircleIcon, CheckCircle2Icon } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 interface SoulEditorProps {
   initialContent: string;
@@ -70,12 +71,12 @@ export function SoulEditor({ initialContent, isCustom, defaultSoul }: SoulEditor
         <div className="flex items-center gap-3">
           <h2 className="text-sm font-semibold tracking-tight text-foreground font-mono">SOUL.md</h2>
           {hasChanges && (
-            <span className="text-[10px] font-medium px-2 py-0.5 bg-warning/10 text-warning border border-warning/20 rounded-full uppercase tracking-wider animate-in fade-in zoom-in-95 duration-200">
+            <span className="text-[10px] font-medium px-2 py-0.5 bg-amber-500/10 text-amber-500 border border-amber-500/20 rounded-full uppercase tracking-wider animate-in fade-in zoom-in-95 duration-200">
               Unsaved changes
             </span>
           )}
           {saved && (
-            <span className="text-[10px] font-medium px-2 py-0.5 bg-success/10 text-success border border-success/20 rounded-full uppercase tracking-wider flex items-center gap-1 animate-in fade-in zoom-in-95 duration-200">
+            <span className="text-[10px] font-medium px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full uppercase tracking-wider flex items-center gap-1 animate-in fade-in zoom-in-95 duration-200">
               <CheckCircle2Icon className="w-3 h-3" /> Saved
             </span>
           )}
@@ -111,7 +112,7 @@ export function SoulEditor({ initialContent, isCustom, defaultSoul }: SoulEditor
         </div>
       )}
 
-      <textarea
+      <Textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
         className="flex-1 w-full p-6 bg-transparent text-foreground/90 font-mono text-[13px] leading-relaxed resize-none focus:outline-none custom-scrollbar"

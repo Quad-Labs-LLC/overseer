@@ -67,7 +67,7 @@ export function SessionsList({ sessions }: SessionsListProps) {
             onClick={() => setFilter(status)}
             className={`px-3 py-1.5 text-sm rounded transition-colors ${
               filter === status
-                ? "bg-[primary/10] text-primary"
+                ? "bg-primary/10 text-primary"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted"
             }`}
           >

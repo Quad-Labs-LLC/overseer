@@ -77,7 +77,7 @@ export default async function SoulPage() {
                 <span className="text-xs font-medium text-foreground">Supplement</span>
                 <span className={cn(
                   "text-[10px] font-mono px-2 py-0.5 rounded font-semibold uppercase tracking-wider",
-                  isCustom ? "bg-success/10 text-success border border-success/20" : "bg-muted text-muted-foreground border border-border/50"
+                  isCustom ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : "bg-muted text-muted-foreground border border-border/50"
                 )}>
                   {isCustom ? "Enabled" : "None"}
                 </span>

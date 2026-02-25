@@ -120,9 +120,9 @@ export function InterfacesList({ interfaces }: InterfacesListProps) {
                     "w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors shadow-sm",
                     iface.is_active
                       ? iface.type === "telegram"
-                        ? "bg-[#0088cc]/10 text-[#0088cc] ring-1 ring-[#0088cc]/20"
+                        ? "bg-sky-500/10 text-sky-500 ring-1 ring-sky-500/20"
                         : iface.type === "discord"
-                        ? "bg-[#5865F2]/10 text-[#5865F2] ring-1 ring-[#5865F2]/20"
+                        ? "bg-indigo-500/10 text-indigo-500 ring-1 ring-indigo-500/20"
                         : "bg-primary/10 text-primary ring-1 ring-primary/20"
                       : "bg-muted text-muted-foreground ring-1 ring-border"
                   )}
@@ -138,7 +138,7 @@ export function InterfacesList({ interfaces }: InterfacesListProps) {
                       {iface.type}
                     </span>
                     {iface.is_active ? (
-                      <span className="text-[10px] px-2 py-0.5 bg-success/10 text-success rounded-full font-semibold uppercase tracking-wider">
+                      <span className="text-[10px] px-2 py-0.5 bg-emerald-500/10 text-emerald-500 rounded-full font-semibold uppercase tracking-wider">
                         Active
                       </span>
                     ) : (
@@ -156,11 +156,11 @@ export function InterfacesList({ interfaces }: InterfacesListProps) {
                   </p>
                   {iface.type === "discord" && (
                     <p className="text-xs text-muted-foreground">
-                      Client ID: {hasClientId ? <span className="text-foreground font-medium">configured</span> : <span className="text-warning">missing</span>}
+                      Client ID: {hasClientId ? <span className="text-foreground font-medium">configured</span> : <span className="text-amber-500">missing</span>}
                     </p>
                   )}
                   {!isHealthyConfig && (
-                    <p className="text-[11px] text-warning bg-warning/10 border border-warning/20 px-2 py-1 rounded inline-block mt-1">
+                    <p className="text-[11px] text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded inline-block mt-1">
                       Setup incomplete. Add all required platform fields.
                     </p>
                   )}
@@ -200,8 +200,8 @@ export function InterfacesList({ interfaces }: InterfacesListProps) {
                     className={cn(
                       "h-8 px-3 text-xs font-medium",
                       iface.is_active
-                        ? "hover:bg-warning/10 hover:text-warning"
-                        : "hover:bg-success/10 hover:text-success"
+                        ? "hover:bg-amber-500/10 hover:text-amber-500"
+                        : "hover:bg-emerald-500/10 hover:text-emerald-500"
                     )}
                   >
                     <Power className="h-3.5 w-3.5 mr-1.5" />
@@ -225,10 +225,10 @@ export function InterfacesList({ interfaces }: InterfacesListProps) {
               <div
                 className={cn(
                   "mt-4 px-4 py-3 rounded-lg text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-300",
-                  testResultForThis.success ? "bg-success/10 text-success border border-success/20" : "bg-destructive/10 text-destructive border border-destructive/20"
+                  testResultForThis.success ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : "bg-destructive/10 text-destructive border border-destructive/20"
                 )}
               >
-                <div className={cn("w-2 h-2 rounded-full", testResultForThis.success ? "bg-success" : "bg-destructive")} />
+                <div className={cn("w-2 h-2 rounded-full", testResultForThis.success ? "bg-emerald-500" : "bg-destructive")} />
                 <span className="font-medium">{testResultForThis.success ? "Connection successful:" : "Connection failed:"}</span>
                 <span className="opacity-90 font-mono text-xs">{testResultForThis.message}</span>
               </div>

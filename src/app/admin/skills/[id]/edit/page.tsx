@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { findById, updateSkill } from "@/agent/skills/registry";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 interface EditSkillPageProps {
   params: Promise<{ id: string }>;
@@ -63,60 +65,60 @@ export default async function EditSkillPage({ params }: EditSkillPageProps) {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-xl text-foreground font-mono">Configure Skill</h1>
-          <p className="text-text-secondary mt-1">Adjust runtime behavior for `{skill.name}`.</p>
+          <p className="text-muted-foreground mt-1">Adjust runtime behavior for `{skill.name}`.</p>
         </div>
         <Link
           href="/skills"
-          className="px-3 py-2 text-sm rounded border border-border text-text-secondary hover:text-foreground hover:bg-surface-overlay transition-colors"
+          className="px-3 py-2 text-sm rounded border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
         >
           Back
         </Link>
       </div>
 
-      <div className="max-w-3xl bg-surface-raised border border-border rounded-lg p-6">
+      <div className="max-w-3xl bg-card border border-border rounded-lg p-6">
         <form action={updateSkillAction} className="space-y-5">
-          <input type="hidden" name="id" value={skill.id} />
+          <Input type="hidden" name="id" value={skill.id} />
 
           <div>
             <label className="block text-sm text-foreground mb-2">Skill metadata</label>
-            <div className="rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-text-secondary">
-              <p><span className="text-text-muted">Skill ID:</span> {skill.skill_id}</p>
-              <p><span className="text-text-muted">Source:</span> {skill.source}</p>
-              <p><span className="text-text-muted">Version:</span> {skill.version}</p>
+            <div className="rounded border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
+              <p><span className="text-muted-foreground">Skill ID:</span> {skill.skill_id}</p>
+              <p><span className="text-muted-foreground">Source:</span> {skill.source}</p>
+              <p><span className="text-muted-foreground">Version:</span> {skill.version}</p>
             </div>
           </div>
 
           <div>
             <label className="block text-sm text-foreground mb-2">System Prompt</label>
-            <textarea
+            <Textarea
               name="system_prompt"
               defaultValue={skill.system_prompt || ""}
               rows={8}
-              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full rounded border border-border bg-muted px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="Optional system prompt override for this skill"
             />
           </div>
 
           <div>
             <label className="block text-sm text-foreground mb-2">Config (JSON)</label>
-            <textarea
+            <Textarea
               name="config"
               defaultValue={skill.config || ""}
               rows={10}
-              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full rounded border border-border bg-muted px-3 py-2 text-sm font-mono text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder='{"key":"value"}'
             />
-            <p className="text-xs text-text-muted mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Invalid JSON is ignored and previous config is kept.
             </p>
           </div>
 
-          <label className="flex items-center gap-2 text-sm text-text-secondary">
-            <input
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Input
               type="checkbox"
               name="is_active"
               defaultChecked={Boolean(skill.is_active)}
-              className="rounded border-border bg-surface-overlay text-accent focus:ring-accent"
+              className="rounded border-border bg-muted text-accent focus:ring-ring"
             />
             Active
           </label>

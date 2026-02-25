@@ -27,9 +27,9 @@ const levelStyles: Record<string, { bg: string, text: string, border: string, ic
     icon: <InfoIcon className="w-4 h-4" />
   },
   warn: {
-    bg: "bg-warning/10",
-    text: "text-warning",
-    border: "border-warning/20",
+    bg: "bg-amber-500/10",
+    text: "text-amber-500",
+    border: "border-amber-500/20",
     icon: <AlertTriangleIcon className="w-4 h-4" />
   },
   error: {

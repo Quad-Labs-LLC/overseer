@@ -80,7 +80,7 @@ export function MCPServersList({ servers, connectionStatus }: MCPServersListProp
             onClick={() => setFilter(type)}
             className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
               filter === type
-                ? "bg-[primary/10] text-primary"
+                ? "bg-primary/10 text-primary"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted"
             }`}
           >
@@ -102,7 +102,7 @@ export function MCPServersList({ servers, connectionStatus }: MCPServersListProp
                   <div
                     className={`w-12 h-12 rounded-lg flex items-center justify-center ${
                       isConnected
-                        ? "bg-[green-500]"
+                        ? "bg-green-500"
                         : server.is_active
                         ? "bg-primary"
                         : "bg-muted"
@@ -133,7 +133,7 @@ export function MCPServersList({ servers, connectionStatus }: MCPServersListProp
                         </span>
                       )}
                       {server.auto_connect === 1 && (
-                        <span className="text-xs px-2 py-0.5 bg-[primary/10] text-primary rounded">
+                        <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded">
                           Auto-connect
                         </span>
                       )}

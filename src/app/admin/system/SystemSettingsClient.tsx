@@ -6,6 +6,7 @@ import type { Setting } from "@/types/database";
 import { SystemUpdatePanel } from "@/components/SystemUpdatePanel";
 import { SettingsIcon, RotateCcwIcon, SaveIcon, ActivityIcon, BotIcon, WrenchIcon, ShieldCheckIcon, CheckCircle2Icon, XIcon, DatabaseIcon, PowerOffIcon, Trash2Icon, RefreshCcwIcon, ZapIcon, ShieldAlertIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 interface SystemSettingsClientProps {
   settings: Setting[];
@@ -111,7 +112,7 @@ export default function SystemSettingsClient({ settings }: SystemSettingsClientP
               </div>
               {editingSetting === setting.key ? (
                 <div className="flex flex-wrap items-center gap-2 sm:w-auto w-full">
-                  <input
+                  <Input
                     type="text"
                     value={editValue}
                     onChange={(event) => setEditValue(event.target.value)}
@@ -120,7 +121,7 @@ export default function SystemSettingsClient({ settings }: SystemSettingsClientP
                   <div className="flex gap-2 shrink-0">
                     <button
                       onClick={handleSave}
-                      className="inline-flex items-center justify-center gap-1.5 h-9 px-3 text-xs font-medium rounded-md bg-success/10 text-success hover:bg-success hover:text-success-foreground transition-colors border border-success/20"
+                      className="inline-flex items-center justify-center gap-1.5 h-9 px-3 text-xs font-medium rounded-md bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-background transition-colors border border-emerald-500/20"
                     >
                       <CheckCircle2Icon className="w-3.5 h-3.5" />
                       Save
@@ -170,7 +171,7 @@ export default function SystemSettingsClient({ settings }: SystemSettingsClientP
               </div>
               {editingSetting === setting.key ? (
                 <div className="flex flex-wrap items-center gap-2 sm:w-auto w-full">
-                  <input
+                  <Input
                     type="text"
                     value={editValue}
                     onChange={(event) => setEditValue(event.target.value)}
@@ -179,7 +180,7 @@ export default function SystemSettingsClient({ settings }: SystemSettingsClientP
                   <div className="flex gap-2 shrink-0">
                     <button
                       onClick={handleSave}
-                      className="inline-flex items-center justify-center gap-1.5 h-9 px-3 text-xs font-medium rounded-md bg-success/10 text-success hover:bg-success hover:text-success-foreground transition-colors border border-success/20"
+                      className="inline-flex items-center justify-center gap-1.5 h-9 px-3 text-xs font-medium rounded-md bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-background transition-colors border border-emerald-500/20"
                     >
                       <CheckCircle2Icon className="w-3.5 h-3.5" />
                       Save

@@ -35,28 +35,28 @@ export default function SessionHistoryPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-xl text-foreground font-mono">Session History</h1>
-          <p className="text-text-secondary mt-1 text-pretty">
+          <p className="text-muted-foreground mt-1 text-pretty">
             Historical session timeline with interface source, token usage, and activity metrics.
           </p>
         </div>
         <Link
           href="/sessions"
-          className="px-3 py-2 text-sm rounded border border-border text-text-secondary hover:text-foreground hover:bg-surface-overlay transition-colors"
+          className="px-3 py-2 text-sm rounded border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
         >
           Back to sessions
         </Link>
       </div>
 
       {sessions.length === 0 ? (
-        <div className="rounded-lg border border-border bg-surface-raised p-8 text-center text-text-secondary text-pretty">
+        <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground text-pretty">
           No sessions yet. Activity will appear here once the agent starts handling requests.
         </div>
       ) : (
-        <div className="rounded-lg border border-border bg-surface-raised overflow-hidden">
+        <div className="rounded-lg border border-border bg-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-surface-overlay border-b border-border">
-                <tr className="text-left text-text-secondary">
+              <thead className="bg-muted border-b border-border">
+                <tr className="text-left text-muted-foreground">
                   <th className="px-4 py-3 font-medium">ID</th>
                   <th className="px-4 py-3 font-medium">Interface</th>
                   <th className="px-4 py-3 font-medium">User/chat</th>
@@ -72,24 +72,24 @@ export default function SessionHistoryPage() {
                   <tr key={session.id} className="border-b border-border/60 last:border-b-0">
                     <td className="px-4 py-3 text-foreground font-mono tabular-nums">{session.id}</td>
                     <td className="px-4 py-3 text-foreground capitalize">{session.interface_type}</td>
-                    <td className="px-4 py-3 text-text-secondary max-w-xs truncate" title={`${session.external_user_id}/${session.external_chat_id}`}>
+                    <td className="px-4 py-3 text-muted-foreground max-w-xs truncate" title={`${session.external_user_id}/${session.external_chat_id}`}>
                       {session.external_user_id || "unknown"} / {session.external_chat_id || "unknown"}
                     </td>
-                    <td className="px-4 py-3 text-text-secondary tabular-nums">{session.message_count}</td>
-                    <td className="px-4 py-3 text-text-secondary tabular-nums">{session.total_tokens}</td>
-                    <td className="px-4 py-3 text-text-secondary tabular-nums">{session.error_count}</td>
+                    <td className="px-4 py-3 text-muted-foreground tabular-nums">{session.message_count}</td>
+                    <td className="px-4 py-3 text-muted-foreground tabular-nums">{session.total_tokens}</td>
+                    <td className="px-4 py-3 text-muted-foreground tabular-nums">{session.error_count}</td>
                     <td className="px-4 py-3">
                       <span
                         className={`inline-flex px-2 py-1 rounded text-xs ${
                           session.is_active
                             ? "bg-green-500/10 text-green-300"
-                            : "bg-surface-overlay text-text-secondary"
+                            : "bg-muted text-muted-foreground"
                         }`}
                       >
                         {session.is_active ? "active" : "inactive"}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-text-secondary tabular-nums">{formatUnixMillis(session.last_active_at)}</td>
+                    <td className="px-4 py-3 text-muted-foreground tabular-nums">{formatUnixMillis(session.last_active_at)}</td>
                   </tr>
                 ))}
               </tbody>

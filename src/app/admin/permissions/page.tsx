@@ -5,6 +5,7 @@ import { StatsCard } from "@/components/StatsCard";
 import { PermissionBadge } from "@/components/admin/PermissionBadge";
 import { ShieldCheckIcon, UsersIcon, KeyIcon, LockIcon, PlusIcon, SearchIcon, CheckIcon, ShieldIcon, DatabaseIcon, MessageSquareIcon, WrenchIcon, LayersIcon, XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 // Define permission categories and permissions
 const PERMISSION_CATEGORIES = {
@@ -178,7 +179,7 @@ export default function PermissionsPage() {
 
           <div className="w-full md:w-72 relative">
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
+            <Input
               type="text"
               placeholder="Search permissions..."
               value={searchQuery}
@@ -208,7 +209,7 @@ export default function PermissionsPage() {
                 </p>
               </div>
               <div className="flex gap-2">
-                <button className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-success hover:text-success-foreground bg-success/10 hover:bg-success rounded-md transition-colors border border-success/20">
+                <button className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-500 hover:text-background bg-emerald-500/10 hover:bg-emerald-500 rounded-md transition-colors border border-emerald-500/20">
                   <CheckIcon className="w-3.5 h-3.5" />
                   Grant All
                 </button>
@@ -273,21 +274,21 @@ export default function PermissionsPage() {
                     <td className="px-5 py-3 text-foreground">{permission}</td>
                     <td className="px-5 py-3 text-center">
                       {ROLE_PERMISSIONS.admin.includes(permission) ? (
-                        <div className="flex justify-center"><CheckIcon className="w-4 h-4 text-success" /></div>
+                        <div className="flex justify-center"><CheckIcon className="w-4 h-4 text-emerald-500" /></div>
                       ) : (
                         <span className="text-muted-foreground/50">—</span>
                       )}
                     </td>
                     <td className="px-5 py-3 text-center">
                       {ROLE_PERMISSIONS.user.includes(permission) ? (
-                        <div className="flex justify-center"><CheckIcon className="w-4 h-4 text-success" /></div>
+                        <div className="flex justify-center"><CheckIcon className="w-4 h-4 text-emerald-500" /></div>
                       ) : (
                         <span className="text-muted-foreground/50">—</span>
                       )}
                     </td>
                     <td className="px-5 py-3 text-center">
                       {ROLE_PERMISSIONS.viewer.includes(permission) ? (
-                        <div className="flex justify-center"><CheckIcon className="w-4 h-4 text-success" /></div>
+                        <div className="flex justify-center"><CheckIcon className="w-4 h-4 text-emerald-500" /></div>
                       ) : (
                         <span className="text-muted-foreground/50">—</span>
                       )}

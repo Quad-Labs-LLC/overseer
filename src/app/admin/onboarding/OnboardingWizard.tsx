@@ -8,6 +8,8 @@ import type { ModelInfo } from "@/agent/provider-info";
 import type { QuizAnswers } from "@/app/api/profile/generate/route";
 import { cn } from "@/lib/utils";
 import { CheckIcon, ChevronRightIcon, LoaderIcon, SparklesIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -400,41 +402,41 @@ export function OnboardingWizard() {
               <p className="text-sm text-muted-foreground mt-1">Pick a provider and paste your API key.</p>
             </div>
             {providerError && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive flex items-center gap-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>{providerError}</div>}
-            {providerCatalogError && <div className="rounded-lg bg-warning/10 border border-warning/20 px-4 py-3 text-sm text-warning flex items-center gap-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Using built-in provider list.</div>}
+            {providerCatalogError && <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 px-4 py-3 text-sm text-amber-500 flex items-center gap-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Using built-in provider list.</div>}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Field label="Provider">
-                <select value={providerForm.name} onChange={(e) => handleProviderChange(e.target.value)} className={SELECT_CLS} disabled={providerCatalogLoading}>
+                <NativeSelect value={providerForm.name} onChange={(e) => handleProviderChange(e.target.value)} className={SELECT_CLS} disabled={providerCatalogLoading}>
                   {providerCatalog.length > 0
                     ? providerCatalog.map((p) => <option key={p.id} value={p.id}>{p.displayName}</option>)
                     : Object.entries(PROVIDER_INFO).map(([k, v]) => <option key={k} value={k}>{v.displayName}</option>)
                   }
-                </select>
+                </NativeSelect>
                 {providerCatalogLoading && <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1.5"><LoaderIcon className="w-3 h-3 animate-spin" /> Loading providers…</p>}
               </Field>
               <Field label="Model">
                 {(selectedCatalogProvider?.models?.length ?? fallbackProviderInfo?.models?.length ?? 0) > 0 ? (
-                  <select value={providerForm.model} onChange={(e) => setProviderForm((p) => ({ ...p, model: e.target.value }))} className={SELECT_CLS}>
+                  <NativeSelect value={providerForm.model} onChange={(e) => setProviderForm((p) => ({ ...p, model: e.target.value }))} className={SELECT_CLS}>
                     {(selectedCatalogProvider?.models || fallbackProviderInfo?.models || []).map((m) => (
                       <option key={m.id} value={m.id}>{m.name}</option>
                     ))}
-                  </select>
+                  </NativeSelect>
                 ) : (
-                  <input type="text" value={providerForm.model} onChange={(e) => setProviderForm((p) => ({ ...p, model: e.target.value }))} className={INPUT_CLS} placeholder="gpt-4o" />
+                  <Input type="text" value={providerForm.model} onChange={(e) => setProviderForm((p) => ({ ...p, model: e.target.value }))} className={INPUT_CLS} placeholder="gpt-4o" />
                 )}
               </Field>
             </div>
             {(selectedCatalogProvider?.requiresKey ?? fallbackProviderInfo?.requiresKey ?? true) && (
               <Field label="API Key">
-                <input type="password" value={providerForm.api_key} onChange={(e) => setProviderForm((p) => ({ ...p, api_key: e.target.value }))} className={INPUT_CLS} placeholder="sk-…" />
+                <Input type="password" value={providerForm.api_key} onChange={(e) => setProviderForm((p) => ({ ...p, api_key: e.target.value }))} className={INPUT_CLS} placeholder="sk-…" />
               </Field>
             )}
             {(providerForm.name === "ollama" || selectedCatalogProvider?.runtimeAdapter === "openai-compatible") && (
               <Field label="Base URL">
-                <input type="text" value={providerForm.base_url} onChange={(e) => setProviderForm((p) => ({ ...p, base_url: e.target.value }))} className={INPUT_CLS} placeholder="http://localhost:11434/v1" />
+                <Input type="text" value={providerForm.base_url} onChange={(e) => setProviderForm((p) => ({ ...p, base_url: e.target.value }))} className={INPUT_CLS} placeholder="http://localhost:11434/v1" />
               </Field>
             )}
             <Field label="Temperature">
-              <input type="number" step="0.1" min="0" max="2" value={providerForm.temperature} onChange={(e) => setProviderForm((p) => ({ ...p, temperature: parseFloat(e.target.value) }))} className={INPUT_CLS} />
+              <Input type="number" step="0.1" min="0" max="2" value={providerForm.temperature} onChange={(e) => setProviderForm((p) => ({ ...p, temperature: parseFloat(e.target.value) }))} className={INPUT_CLS} />
             </Field>
           </div>
         )}
@@ -449,20 +451,20 @@ export function OnboardingWizard() {
             {interfaceError && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive flex items-center gap-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>{interfaceError}</div>}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Field label="Platform">
-                <select value={interfaceForm.type} onChange={(e) => setInterfaceForm((p) => ({ ...p, type: e.target.value as InterfaceType }))} className={SELECT_CLS}>
+                <NativeSelect value={interfaceForm.type} onChange={(e) => setInterfaceForm((p) => ({ ...p, type: e.target.value as InterfaceType }))} className={SELECT_CLS}>
                   <option value="telegram">Telegram</option>
                   <option value="discord">Discord</option>
-                </select>
+                </NativeSelect>
               </Field>
               <Field label="Bot name">
-                <input type="text" value={interfaceForm.name} onChange={(e) => setInterfaceForm((p) => ({ ...p, name: e.target.value }))} className={INPUT_CLS} placeholder="My Bot" />
+                <Input type="text" value={interfaceForm.name} onChange={(e) => setInterfaceForm((p) => ({ ...p, name: e.target.value }))} className={INPUT_CLS} placeholder="My Bot" />
               </Field>
             </div>
             <Field label="Bot Token (leave empty to skip)">
-              <input type="password" value={interfaceForm.bot_token} onChange={(e) => setInterfaceForm((p) => ({ ...p, bot_token: e.target.value }))} className={INPUT_CLS} placeholder="Paste token or leave blank" />
+              <Input type="password" value={interfaceForm.bot_token} onChange={(e) => setInterfaceForm((p) => ({ ...p, bot_token: e.target.value }))} className={INPUT_CLS} placeholder="Paste token or leave blank" />
             </Field>
             <Field label="Allowed Users (comma-separated IDs)">
-              <input type="text" value={interfaceForm.allowed_users} onChange={(e) => setInterfaceForm((p) => ({ ...p, allowed_users: e.target.value }))} className={INPUT_CLS} placeholder="123456789" />
+              <Input type="text" value={interfaceForm.allowed_users} onChange={(e) => setInterfaceForm((p) => ({ ...p, allowed_users: e.target.value }))} className={INPUT_CLS} placeholder="123456789" />
             </Field>
           </div>
         )}
@@ -483,13 +485,13 @@ export function OnboardingWizard() {
             {quizPage === 0 && (
               <div className="space-y-5">
                 <Field label="What's your name?">
-                  <input type="text" value={quiz.name} onChange={(e) => q("name", e.target.value)} className={INPUT_CLS} placeholder="e.g. Alex" />
+                  <Input type="text" value={quiz.name} onChange={(e) => q("name", e.target.value)} className={INPUT_CLS} placeholder="e.g. Alex" />
                 </Field>
                 <Field label="Pronouns (optional)">
-                  <input type="text" value={quiz.pronouns ?? ""} onChange={(e) => q("pronouns", e.target.value)} className={INPUT_CLS} placeholder="e.g. he/him" />
+                  <Input type="text" value={quiz.pronouns ?? ""} onChange={(e) => q("pronouns", e.target.value)} className={INPUT_CLS} placeholder="e.g. he/him" />
                 </Field>
                 <Field label="What do you do?">
-                  <input type="text" value={quiz.role} onChange={(e) => q("role", e.target.value)} className={INPUT_CLS} placeholder="e.g. Backend engineer, Startup founder" />
+                  <Input type="text" value={quiz.role} onChange={(e) => q("role", e.target.value)} className={INPUT_CLS} placeholder="e.g. Backend engineer, Startup founder" />
                 </Field>
                 <Field label="Technical experience">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -502,7 +504,7 @@ export function OnboardingWizard() {
                   </div>
                 </Field>
                 <Field label="Timezone (optional)">
-                  <input type="text" value={quiz.timezone ?? ""} onChange={(e) => q("timezone", e.target.value)} className={INPUT_CLS} placeholder="e.g. Europe/Berlin" />
+                  <Input type="text" value={quiz.timezone ?? ""} onChange={(e) => q("timezone", e.target.value)} className={INPUT_CLS} placeholder="e.g. Europe/Berlin" />
                 </Field>
               </div>
             )}
@@ -589,7 +591,7 @@ export function OnboardingWizard() {
             {quizPage === 3 && (
               <div className="space-y-6">
                 <Field label="What should we name me?">
-                  <input type="text" value={quiz.agentName} onChange={(e) => q("agentName", e.target.value)} className={INPUT_CLS} placeholder="e.g. Overseer" />
+                  <Input type="text" value={quiz.agentName} onChange={(e) => q("agentName", e.target.value)} className={INPUT_CLS} placeholder="e.g. Overseer" />
                 </Field>
                 <Field label="Tone of voice">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -642,8 +644,8 @@ export function OnboardingWizard() {
               </>
             ) : genDone ? (
               <>
-                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-success/10 ring-1 ring-success/20">
-                  <CheckIcon className="w-10 h-10 text-success" />
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-500/20">
+                  <CheckIcon className="w-10 h-10 text-emerald-500" />
                 </div>
                 <div className="space-y-2">
                   <h2 className="text-xl font-bold text-foreground">All Set!</h2>
@@ -667,8 +669,8 @@ export function OnboardingWizard() {
         {/* DONE */}
         {step.id === "done" && (
           <div className="space-y-8 text-center py-8 animate-in fade-in zoom-in-95 duration-500">
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-success/10 ring-1 ring-success/20 shadow-inner">
-              <SparklesIcon className="h-10 w-10 text-success" />
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-500/20 shadow-inner">
+              <SparklesIcon className="h-10 w-10 text-emerald-500" />
             </div>
             <div className="space-y-3">
               <h1 className="text-3xl font-bold tracking-tight text-foreground">You're ready to go</h1>

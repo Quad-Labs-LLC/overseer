@@ -75,8 +75,8 @@ export default function MCPPage() {
               <div key={status.server} className="flex items-center justify-between p-3.5 bg-muted/30 border border-border/50 rounded-lg hover:bg-muted/50 transition-colors group">
                 <div className="flex items-center gap-3 truncate pr-2">
                   <div className="relative flex h-2.5 w-2.5 shrink-0">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-success"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                   </div>
                   <span className="text-sm font-medium text-foreground truncate">{status.server}</span>
                 </div>

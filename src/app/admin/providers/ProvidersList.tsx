@@ -322,8 +322,8 @@ export function ProvidersList({ providers }: ProvidersListProps) {
                       className={cn(
                         "h-8 px-3 text-xs font-medium",
                         provider.is_active
-                          ? "hover:bg-warning/10 hover:text-warning"
-                          : "hover:bg-success/10 hover:text-success"
+                          ? "hover:bg-amber-500/10 hover:text-amber-500"
+                          : "hover:bg-emerald-500/10 hover:text-emerald-500"
                       )}
                     >
                       <Power className="h-3.5 w-3.5 mr-1.5" />
@@ -347,9 +347,9 @@ export function ProvidersList({ providers }: ProvidersListProps) {
               {testResult && testResult.id === provider.id && (
                 <div className={cn(
                   "mt-4 px-4 py-3 rounded-lg text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-300",
-                  testResult.success ? "bg-success/10 text-success border border-success/20" : "bg-destructive/10 text-destructive border border-destructive/20"
+                  testResult.success ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : "bg-destructive/10 text-destructive border border-destructive/20"
                 )}>
-                  <div className={cn("w-2 h-2 rounded-full", testResult.success ? "bg-success" : "bg-destructive")} />
+                  <div className={cn("w-2 h-2 rounded-full", testResult.success ? "bg-emerald-500" : "bg-destructive")} />
                   <span className="font-medium">{testResult.success ? "Connection successful:" : "Connection failed:"}</span>
                   <span className="opacity-90 font-mono text-xs">{testResult.message}</span>
                 </div>

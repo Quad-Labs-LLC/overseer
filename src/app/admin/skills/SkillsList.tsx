@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Skill } from "@/agent/skills/registry";
 import { SearchIcon, PlayCircleIcon, PauseCircleIcon, Edit2Icon, Trash2Icon, BoxIcon, GithubIcon, FolderIcon, ShoppingBagIcon, ActivityIcon, ClockIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 interface SkillsListProps {
   skills: Skill[];
@@ -86,7 +87,7 @@ export function SkillsList({ skills }: SkillsListProps) {
       <div className="p-4 sm:p-5 border-b border-border/50 bg-muted/10 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
         <div className="relative w-full md:w-80">
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input
+          <Input
             type="text"
             placeholder="Search skills..."
             value={search}
@@ -171,8 +172,8 @@ export function SkillsList({ skills }: SkillsListProps) {
                       className={cn(
                         "p-1.5 rounded-md transition-colors",
                         skill.is_active
-                          ? "text-success hover:bg-success/10 hover:text-success"
-                          : "text-muted-foreground hover:bg-warning/10 hover:text-warning"
+                          ? "text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-500"
+                          : "text-muted-foreground hover:bg-amber-500/10 hover:text-amber-500"
                       )}
                       title={skill.is_active ? "Disable skill" : "Enable skill"}
                     >

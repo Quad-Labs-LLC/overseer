@@ -139,7 +139,7 @@ export default async function DashboardPage() {
                           <span
                             className={cn(
                               "text-[10px] font-mono px-1.5 py-0.5 rounded font-semibold",
-                              ok ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
+                              ok ? "bg-emerald-500/10 text-emerald-500" : "bg-amber-500/10 text-amber-500"
                             )}
                           >
                             {ok ? "GRANTED" : "DENIED"}
@@ -152,7 +152,7 @@ export default async function DashboardPage() {
                     !effectivePerms.has(Permission.SYSTEM_FILES_READ) &&
                     !effectivePerms.has(Permission.SYSTEM_FILES_WRITE) &&
                     !effectivePerms.has(Permission.SYSTEM_FILES_DELETE) && (
-                      <p className="mt-3 text-[11px] text-muted-foreground bg-warning/10 text-warning border border-warning/20 p-2 rounded-md">
+                      <p className="mt-3 text-[11px] text-muted-foreground bg-amber-500/10 text-amber-500 border border-amber-500/20 p-2 rounded-md">
                         Your workspace is sandboxed. Ask an administrator if you require VPS-level access.
                       </p>
                     )}
@@ -216,11 +216,11 @@ export default async function DashboardPage() {
                   <div className="relative flex h-2 w-2">
                     {providerCount > 0 ? (
                       <>
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                       </>
                     ) : (
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-danger"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-destructive"></span>
                     )}
                   </div>
                   <span className="text-sm font-medium text-foreground">Models</span>
@@ -233,11 +233,11 @@ export default async function DashboardPage() {
                   <div className="relative flex h-2 w-2">
                     {interfaceCount > 0 ? (
                       <>
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                       </>
                     ) : (
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-warning"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
                     )}
                   </div>
                   <span className="text-sm font-medium text-foreground">Connectors</span>
@@ -248,12 +248,12 @@ export default async function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </div>
                   <span className="text-sm font-medium text-foreground">Core Agent</span>
                 </div>
-                <span className="text-xs font-medium text-success">Online</span>
+                <span className="text-xs font-medium text-emerald-500">Online</span>
               </div>
             </div>
           </div>
@@ -321,7 +321,7 @@ export default async function DashboardPage() {
                     </div>
                     <span className={cn(
                       "text-[10px] font-mono px-2 py-0.5 rounded font-semibold",
-                      exec.success ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
+                      exec.success ? "bg-emerald-500/10 text-emerald-500" : "bg-destructive/10 text-destructive"
                     )}>
                       {exec.success ? 'OK' : 'FAIL'}
                     </span>

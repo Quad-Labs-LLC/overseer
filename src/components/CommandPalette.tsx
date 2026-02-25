@@ -39,6 +39,7 @@ export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const isDark = theme === "dark";
 
   // Toggle open on ⌘K / Ctrl+K
   useEffect(() => {
@@ -195,10 +196,10 @@ export function CommandPalette() {
     },
     {
       id: "action-toggle-theme",
-      label: theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode",
-      icon: theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />,
+      label: isDark ? "Switch to Light Mode" : "Switch to Dark Mode",
+      icon: isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />,
       action: () => {
-        setTheme(theme === "dark" ? "light" : "dark");
+        setTheme(isDark ? "light" : "dark");
         setOpen(false);
       },
       group: "Actions",
@@ -226,7 +227,7 @@ export function CommandPalette() {
     <div className="fixed inset-0 z-[100]">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in duration-150"
+        className="absolute inset-0 bg-background/80 backdrop-blur-sm animate-in fade-in duration-150"
         onClick={() => setOpen(false)}
       />
 

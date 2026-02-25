@@ -7,6 +7,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { Permission, requirePermission } from "@/lib/permissions";
 import { ArrowLeftIcon, UserPlusIcon, KeyIcon, ShieldIcon, AlertCircleIcon, CheckCircle2Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -105,7 +107,7 @@ export default async function AddUserPage({
                   <UserPlusIcon className="w-4 h-4 text-muted-foreground" />
                   Username
                 </label>
-                <input
+                <Input
                   id="username"
                   name="username"
                   required
@@ -120,7 +122,7 @@ export default async function AddUserPage({
                   <KeyIcon className="w-4 h-4 text-muted-foreground" />
                   Temporary password
                 </label>
-                <input
+                <Input
                   id="password"
                   name="password"
                   required
@@ -136,7 +138,7 @@ export default async function AddUserPage({
                   <ShieldIcon className="w-4 h-4 text-muted-foreground" />
                   Role
                 </label>
-                <select
+                <NativeSelect
                   id="role"
                   name="role"
                   defaultValue="viewer"
@@ -146,7 +148,7 @@ export default async function AddUserPage({
                   <option value="developer">Developer</option>
                   <option value="operator">Operator</option>
                   <option value="viewer">Viewer</option>
-                </select>
+                </NativeSelect>
               </div>
             </div>
 
@@ -158,7 +160,7 @@ export default async function AddUserPage({
             )}
             
             {success && (
-              <div className="p-3 bg-success/10 border border-success/20 text-success text-sm rounded-lg flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-sm rounded-lg flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
                 <CheckCircle2Icon className="w-4 h-4" />
                 {success}
               </div>

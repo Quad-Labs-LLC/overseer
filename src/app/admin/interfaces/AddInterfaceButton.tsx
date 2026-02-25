@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { InterfaceType } from "@/types/database";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { NativeSelect } from "@/components/ui/native-select";
 
 interface AddInterfaceButtonProps {
   variant?: "default" | "primary";
@@ -145,7 +148,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
   const buttonClass =
     variant === "primary"
       ? "px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded transition-all"
-      : "flex items-center gap-2 px-4 py-2 bg-[primary/10] text-primary hover:bg-[primary/10] rounded-lg transition-colors";
+      : "flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary hover:bg-primary/10 rounded-lg transition-colors";
 
   return (
     <>
@@ -165,7 +168,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center px-4 py-8 bg-black/50 backdrop-blur-sm overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-start justify-center px-4 py-8 bg-background/80 backdrop-blur-sm overflow-y-auto">
           <div className="w-full max-w-lg bg-card border border-border rounded-lg shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-border">
               <h2 className="text-xl font-semibold text-foreground font-mono">Add Chat Interface</h2>
@@ -188,7 +191,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">Platform</label>
-                <select
+                <NativeSelect
                   value={formData.type}
                   onChange={(e) => {
                     const type = e.target.value as InterfaceType;
@@ -204,7 +207,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
                       {opt.label}
                     </option>
                   ))}
-                </select>
+                </NativeSelect>
                 <p className="text-xs text-muted-foreground mt-1">
                   {interfaceOptions.find((o) => o.value === formData.type)?.hint}
                 </p>
@@ -212,7 +215,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">Name</label>
-                <input
+                <Input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
@@ -225,7 +228,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
               {requiresBotToken(formData.type) && (
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">Bot Token</label>
-                  <input
+                  <Input
                     type="password"
                     value={formData.bot_token}
                     onChange={(e) => setFormData((prev) => ({ ...prev, bot_token: e.target.value }))}
@@ -248,7 +251,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
                   <label className="block text-sm font-medium text-foreground mb-2">
                     Discord Client ID
                   </label>
-                  <input
+                  <Input
                     type="text"
                     value={formData.client_id}
                     onChange={(e) => setFormData((prev) => ({ ...prev, client_id: e.target.value }))}
@@ -266,7 +269,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
                   <label className="block text-sm font-medium text-foreground mb-2">
                     Allowed Guild IDs (Optional)
                   </label>
-                  <input
+                  <Input
                     type="text"
                     value={formData.allowed_guilds}
                     onChange={(e) => setFormData((prev) => ({ ...prev, allowed_guilds: e.target.value }))}
@@ -285,7 +288,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
                     <label className="block text-sm font-medium text-foreground mb-2">
                       Slack App Token (Optional)
                     </label>
-                    <input
+                    <Input
                       type="password"
                       value={formData.slack_app_token}
                       onChange={(e) => setFormData((prev) => ({ ...prev, slack_app_token: e.target.value }))}
@@ -300,7 +303,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
                     <label className="block text-sm font-medium text-foreground mb-2">
                       Slack Signing Secret (Optional)
                     </label>
-                    <input
+                    <Input
                       type="password"
                       value={formData.slack_signing_secret}
                       onChange={(e) => setFormData((prev) => ({ ...prev, slack_signing_secret: e.target.value }))}
@@ -317,7 +320,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
                     <label className="block text-sm font-medium text-foreground mb-2">
                       Homeserver URL
                     </label>
-                    <input
+                    <Input
                       type="text"
                       value={formData.matrix_homeserver}
                       onChange={(e) => setFormData((prev) => ({ ...prev, matrix_homeserver: e.target.value }))}
@@ -329,7 +332,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
                     <label className="block text-sm font-medium text-foreground mb-2">
                       Access Token
                     </label>
-                    <input
+                    <Input
                       type="password"
                       value={formData.matrix_access_token}
                       onChange={(e) => setFormData((prev) => ({ ...prev, matrix_access_token: e.target.value }))}
@@ -341,7 +344,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
                     <label className="block text-sm font-medium text-foreground mb-2">
                       Room IDs (Optional)
                     </label>
-                    <input
+                    <Input
                       type="text"
                       value={formData.matrix_room_ids}
                       onChange={(e) => setFormData((prev) => ({ ...prev, matrix_room_ids: e.target.value }))}
@@ -363,7 +366,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
                   <label className="block text-sm font-medium text-foreground mb-2">
                     Config JSON (Optional)
                   </label>
-                  <textarea
+                  <Textarea
                     value={formData.config_json}
                     onChange={(e) => setFormData((prev) => ({ ...prev, config_json: e.target.value }))}
                     rows={5}
@@ -380,7 +383,7 @@ export function AddInterfaceButton({ variant = "default" }: AddInterfaceButtonPr
                 <label className="block text-sm font-medium text-foreground mb-2">
                   Allowed Users (Optional)
                 </label>
-                <input
+                <Input
                   type="text"
                   value={formData.allowed_users}
                   onChange={(e) => setFormData((prev) => ({ ...prev, allowed_users: e.target.value }))}

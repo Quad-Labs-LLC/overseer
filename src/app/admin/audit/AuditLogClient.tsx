@@ -6,6 +6,8 @@ import { AuditLogEntry } from "@/components/admin/AuditLogEntry";
 import type { Log } from "@/types/database";
 import { cn } from "@/lib/utils";
 import { DownloadIcon, Trash2Icon, SearchIcon, FilterIcon, RefreshCcwIcon, InfoIcon, ShieldAlertIcon, AlertCircleIcon, DatabaseIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
 
 interface AuditLogClientProps {
   logs: Log[];
@@ -64,7 +66,7 @@ export default function AuditLogClient({ logs, stats }: AuditLogClientProps) {
           title="Warning Logs"
           value={warnCount}
           subtitle="Last 24 hours"
-          icon={<AlertCircleIcon className="w-5 h-5 text-warning" />}
+          icon={<AlertCircleIcon className="w-5 h-5 text-amber-500" />}
           color="warning"
         />
         <StatsCard
@@ -89,7 +91,7 @@ export default function AuditLogClient({ logs, stats }: AuditLogClientProps) {
             <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Search</label>
             <div className="relative">
               <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
+              <Input
                 type="text"
                 placeholder="Search logs..."
                 value={searchQuery}
@@ -103,7 +105,7 @@ export default function AuditLogClient({ logs, stats }: AuditLogClientProps) {
             <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Level</label>
             <div className="relative">
               <FilterIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <select
+              <NativeSelect
                 value={levelFilter}
                 onChange={(event) => setLevelFilter(event.target.value)}
                 className="w-full h-9 pl-9 pr-8 bg-background border border-input rounded-md text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring transition-colors appearance-none"
@@ -113,7 +115,7 @@ export default function AuditLogClient({ logs, stats }: AuditLogClientProps) {
                 <option value="warn">Warning</option>
                 <option value="info">Info</option>
                 <option value="debug">Debug</option>
-              </select>
+              </NativeSelect>
             </div>
           </div>
 
@@ -121,7 +123,7 @@ export default function AuditLogClient({ logs, stats }: AuditLogClientProps) {
             <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Category</label>
             <div className="relative">
               <FilterIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <select
+              <NativeSelect
                 value={categoryFilter}
                 onChange={(event) => setCategoryFilter(event.target.value)}
                 className="w-full h-9 pl-9 pr-8 bg-background border border-input rounded-md text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring transition-colors appearance-none"
@@ -130,7 +132,7 @@ export default function AuditLogClient({ logs, stats }: AuditLogClientProps) {
                 {categories.map((category) => (
                   <option key={category} value={category}>{category}</option>
                 ))}
-              </select>
+              </NativeSelect>
             </div>
           </div>
         </div>
@@ -147,7 +149,7 @@ export default function AuditLogClient({ logs, stats }: AuditLogClientProps) {
                   "px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider transition-all duration-200 border",
                   isActive
                     ? level === "error" ? "bg-destructive/10 text-destructive border-destructive/20 shadow-sm"
-                    : level === "warn" ? "bg-warning/10 text-warning border-warning/20 shadow-sm"
+                    : level === "warn" ? "bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-sm"
                     : level === "info" ? "bg-info/10 text-info border-info/20 shadow-sm"
                     : level === "debug" ? "bg-muted text-foreground border-border shadow-sm"
                     : "bg-primary/10 text-primary border-primary/20 shadow-sm"

@@ -44,6 +44,8 @@ interface EngineStatus {
 
 import { PlayIcon, StopCircleIcon, PlusIcon, XIcon, ClockIcon, ActivityIcon, CheckCircle2Icon, XCircleIcon, AlertCircleIcon, Settings2Icon, FileTextIcon, TerminalIcon, CpuIcon, Trash2Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function CronPage() {
   const [jobs, setJobs] = useState<CronJob[]>([]);
@@ -211,7 +213,7 @@ export default function CronPage() {
             <div className="flex items-center gap-2">
               <span className={cn(
                 "w-2 h-2 rounded-full animate-pulse",
-                engine.running ? "bg-success" : "bg-destructive"
+                engine.running ? "bg-emerald-500" : "bg-destructive"
               )} />
               <span className="text-lg font-bold tracking-tight text-foreground">
                 {engine.running ? "Running" : "Stopped"}
@@ -280,7 +282,7 @@ export default function CronPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1.5">
                 <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Name</label>
-                <input
+                <Input
                   type="text"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
@@ -293,7 +295,7 @@ export default function CronPage() {
                 <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                   Cron Expression
                 </label>
-                <input
+                <Input
                   type="text"
                   value={formCron}
                   onChange={(e) => setFormCron(e.target.value)}
@@ -309,7 +311,7 @@ export default function CronPage() {
                 <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                   AI Prompt
                 </label>
-                <textarea
+                <Textarea
                   value={formPrompt}
                   onChange={(e) => setFormPrompt(e.target.value)}
                   placeholder="Check disk space usage and report if any partition exceeds 80%..."
@@ -322,7 +324,7 @@ export default function CronPage() {
                 <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                   Description <span className="text-muted-foreground/50 lowercase normal-case font-normal">(optional)</span>
                 </label>
-                <input
+                <Input
                   type="text"
                   value={formDesc}
                   onChange={(e) => setFormDesc(e.target.value)}
@@ -333,7 +335,7 @@ export default function CronPage() {
               
               <div className="space-y-1.5">
                 <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Timezone</label>
-                <input
+                <Input
                   type="text"
                   value={formTimezone}
                   onChange={(e) => setFormTimezone(e.target.value)}
@@ -391,7 +393,7 @@ export default function CronPage() {
                     <div className={cn(
                       "w-10 h-10 rounded-full flex items-center justify-center shrink-0 ring-4 mt-0.5",
                       job.enabled 
-                        ? "bg-success/10 text-success ring-success/5" 
+                        ? "bg-emerald-500/10 text-emerald-500 ring-emerald-500/20" 
                         : "bg-muted text-muted-foreground ring-muted/20"
                     )}>
                       {job.enabled ? <PlayIcon className="w-5 h-5 ml-0.5" /> : <StopCircleIcon className="w-5 h-5" />}
@@ -406,8 +408,8 @@ export default function CronPage() {
                         {job.last_status && (
                           <span className={cn(
                             "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border",
-                            job.last_status === "success" ? "bg-success/10 text-success border-success/20" :
-                            job.last_status === "running" ? "bg-warning/10 text-warning border-warning/20 animate-pulse" :
+                            job.last_status === "success" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                            job.last_status === "running" ? "bg-amber-500/10 text-amber-500 border-amber-500/20 animate-pulse" :
                             job.last_status === "failed" ? "bg-destructive/10 text-destructive border-destructive/20" :
                             "bg-muted text-muted-foreground border-border/50"
                           )}>
@@ -446,8 +448,8 @@ export default function CronPage() {
                       className={cn(
                         "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow-sm h-8 px-3",
                         job.enabled
-                          ? "border border-warning/20 bg-warning/10 text-warning hover:bg-warning hover:text-warning-foreground"
-                          : "border border-success/20 bg-success/10 text-success hover:bg-success hover:text-success-foreground"
+                          ? "border border-amber-500/20 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-background"
+                          : "border border-emerald-500/20 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-background"
                       )}
                       title={job.enabled ? "Disable" : "Enable"}
                     >
@@ -517,14 +519,14 @@ export default function CronPage() {
                                 <div className="flex items-center gap-3">
                                   <div className={cn(
                                     "w-2 h-2 rounded-full",
-                                    exec.status === "success" ? "bg-success" : 
-                                    exec.status === "running" ? "bg-warning animate-pulse" : 
+                                    exec.status === "success" ? "bg-emerald-500" : 
+                                    exec.status === "running" ? "bg-amber-500 animate-pulse" : 
                                     "bg-destructive"
                                   )} />
                                   <span className={cn(
                                     "font-medium capitalize text-xs",
-                                    exec.status === "success" ? "text-success" : 
-                                    exec.status === "running" ? "text-warning" : 
+                                    exec.status === "success" ? "text-emerald-500" : 
+                                    exec.status === "running" ? "text-amber-500" : 
                                     "text-destructive"
                                   )}>
                                     {exec.status}

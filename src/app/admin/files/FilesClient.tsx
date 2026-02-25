@@ -61,6 +61,7 @@ function isPdf(name: string): boolean {
 }
 
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 export function FilesClient() {
   const [cwd, setCwd] = useState<string>(".");
@@ -379,7 +380,7 @@ export function FilesClient() {
 
   return (
     <div className="relative">
-      <input
+      <Input
         ref={fileInputRef}
         type="file"
         multiple
@@ -418,7 +419,7 @@ export function FilesClient() {
           <div className="flex items-center gap-2">
             <div className="relative">
               <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-              <input
+              <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search files..."
@@ -748,7 +749,7 @@ export function FilesClient() {
                 </div>
 
                 {isImage(previewName) ? (
-                  <div className="rounded-xl overflow-hidden border border-border bg-black/10 flex items-center justify-center min-h-[200px] p-2">
+                  <div className="rounded-xl overflow-hidden border border-border bg-muted/30 flex items-center justify-center min-h-[200px] p-2">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={previewDownloadUrl} alt={previewName} className="max-w-full max-h-[300px] object-contain rounded-lg" />
                   </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
 
 export function LoginForm() {
   const router = useRouter();
@@ -61,7 +62,7 @@ export function LoginForm() {
         <label htmlFor="username" className="block text-[11px] font-mono uppercase tracking-[0.08em] text-muted-foreground mb-2">
           Username
         </label>
-        <input
+        <Input
           id="username"
           type="text"
           value={username}
@@ -77,7 +78,7 @@ export function LoginForm() {
         <label htmlFor="password" className="block text-[11px] font-mono uppercase tracking-[0.08em] text-muted-foreground mb-2">
           Password
         </label>
-        <input
+        <Input
           id="password"
           type="password"
           value={password}

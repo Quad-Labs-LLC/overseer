@@ -1,30 +1,40 @@
-"use client";
+"use client"
 
-import { Toaster as SonnerToaster } from "sonner";
+import {
+  CircleCheckIcon,
+  InfoIcon,
+  Loader2Icon,
+  OctagonXIcon,
+  TriangleAlertIcon,
+} from "lucide-react"
+import { useTheme } from "next-themes"
+import { Toaster as Sonner, type ToasterProps } from "sonner"
 
-export function Toaster() {
+const Toaster = ({ ...props }: ToasterProps) => {
+  const { theme = "system" } = useTheme()
+
   return (
-    <SonnerToaster
-      position="bottom-right"
-      toastOptions={{
-        unstyled: true,
-        classNames: {
-          toast:
-            "flex items-start gap-3 w-full rounded-lg border border-border bg-card p-4 shadow-lg text-sm text-foreground",
-          title: "font-medium text-foreground",
-          description: "text-muted-foreground text-xs mt-0.5",
-          actionButton:
-            "bg-primary text-primary-foreground text-xs font-medium px-3 py-1.5 rounded hover:bg-primary/90 transition-colors",
-          cancelButton:
-            "text-muted-foreground text-xs px-2 py-1 rounded hover:text-foreground transition-colors",
-          success: "!border-green-500/30 !bg-green-500/5",
-          error: "!border-red-500/30 !bg-red-500/5",
-          warning: "!border-amber-500/30 !bg-amber-500/5",
-          info: "!border-blue-500/30 !bg-blue-500/5",
-        },
+    <Sonner
+      theme={theme as ToasterProps["theme"]}
+      className="toaster group"
+      icons={{
+        success: <CircleCheckIcon className="size-4" />,
+        info: <InfoIcon className="size-4" />,
+        warning: <TriangleAlertIcon className="size-4" />,
+        error: <OctagonXIcon className="size-4" />,
+        loading: <Loader2Icon className="size-4 animate-spin" />,
       }}
-      theme="dark"
-      richColors
+      style={
+        {
+          "--normal-bg": "var(--popover)",
+          "--normal-text": "var(--popover-foreground)",
+          "--normal-border": "var(--border)",
+          "--border-radius": "var(--radius)",
+        } as React.CSSProperties
+      }
+      {...props}
     />
-  );
+  )
 }
+
+export { Toaster }

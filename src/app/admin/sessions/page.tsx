@@ -33,7 +33,7 @@ export default function SessionsPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-warning/20 bg-warning/10 text-warning hover:bg-warning hover:text-warning-foreground shadow-sm h-9 px-4 w-full sm:w-auto">
+          <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-amber-500/20 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-background shadow-sm h-9 px-4 w-full sm:w-auto">
             <ClockIcon className="w-4 h-4" />
             Kill Idle Sessions
           </button>
@@ -80,12 +80,12 @@ export default function SessionsPage() {
           Session Status Overview
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          <div className="flex flex-col items-center justify-center p-4 bg-background border border-border/50 rounded-lg hover:border-success/30 transition-colors group">
-            <div className="text-3xl font-bold text-success group-hover:scale-110 transition-transform">{stats.active}</div>
+          <div className="flex flex-col items-center justify-center p-4 bg-background border border-border/50 rounded-lg hover:border-emerald-500/30 transition-colors group">
+            <div className="text-3xl font-bold text-emerald-500 group-hover:scale-110 transition-transform">{stats.active}</div>
             <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mt-2">Active</div>
           </div>
-          <div className="flex flex-col items-center justify-center p-4 bg-background border border-border/50 rounded-lg hover:border-warning/30 transition-colors group">
-            <div className="text-3xl font-bold text-warning group-hover:scale-110 transition-transform">{stats.busy}</div>
+          <div className="flex flex-col items-center justify-center p-4 bg-background border border-border/50 rounded-lg hover:border-amber-500/30 transition-colors group">
+            <div className="text-3xl font-bold text-amber-500 group-hover:scale-110 transition-transform">{stats.busy}</div>
             <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mt-2">Busy</div>
           </div>
           <div className="flex flex-col items-center justify-center p-4 bg-background border border-border/50 rounded-lg hover:border-blue-500/30 transition-colors group">

@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { NativeSelect } from "@/components/ui/native-select";
 
 interface MemoryEntry {
   id: number;
@@ -179,7 +182,7 @@ export default function MemoryPage() {
           <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <input
+          <Input
             type="text"
             placeholder="Search memories..."
             value={search}
@@ -187,7 +190,7 @@ export default function MemoryPage() {
             className="w-full pl-9 pr-4 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200"
           />
         </div>
-        <select
+        <NativeSelect
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className="w-full sm:w-48 px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 appearance-none cursor-pointer"
@@ -198,7 +201,7 @@ export default function MemoryPage() {
           <option value="project">Projects</option>
           <option value="context">Context</option>
           <option value="custom">Custom</option>
-        </select>
+        </NativeSelect>
       </div>
 
       {showForm && (
@@ -210,7 +213,7 @@ export default function MemoryPage() {
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-foreground tracking-tight">Key</label>
-                <input
+                <Input
                   type="text"
                   value={form.key}
                   onChange={(e) => setForm({ ...form, key: e.target.value })}
@@ -221,7 +224,7 @@ export default function MemoryPage() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-foreground tracking-tight">Value</label>
-                <textarea
+                <Textarea
                   value={form.value}
                   onChange={(e) => setForm({ ...form, value: e.target.value })}
                   className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm text-foreground placeholder:text-muted-foreground h-28 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 shadow-sm resize-none"
@@ -232,7 +235,7 @@ export default function MemoryPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground tracking-tight">Category</label>
-                  <select
+                  <NativeSelect
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value as any })}
                     className="w-full px-3 py-2 bg-background border border-border rounded-md text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-200 shadow-sm appearance-none"
@@ -242,11 +245,11 @@ export default function MemoryPage() {
                     <option value="fact">Fact</option>
                     <option value="project">Project</option>
                     <option value="context">Context</option>
-                  </select>
+                  </NativeSelect>
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-foreground tracking-tight">Importance (1-10)</label>
-                  <input
+                  <Input
                     type="number"
                     min={1}
                     max={10}
@@ -316,7 +319,7 @@ export default function MemoryPage() {
                       {memory.category}
                     </span>
                     <span className="text-[11px] font-medium text-muted-foreground flex items-center gap-1 bg-muted/50 px-2 py-0.5 rounded border border-border/50">
-                      <svg className="w-3 h-3 text-warning" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-3 h-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
                       {memory.importance}/10

@@ -154,17 +154,17 @@ export default async function EditInterfacePage({ params }: EditInterfacePagePro
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-xl text-foreground font-mono">Edit Interface</h1>
-          <p className="text-text-secondary mt-1">Update channel credentials and access controls.</p>
+          <p className="text-muted-foreground mt-1">Update channel credentials and access controls.</p>
         </div>
         <Link
           href="/interfaces"
-          className="px-3 py-2 text-sm rounded border border-border text-text-secondary hover:text-foreground hover:bg-surface-overlay transition-colors"
+          className="px-3 py-2 text-sm rounded border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
         >
           Back
         </Link>
       </div>
 
-      <div className="max-w-2xl bg-surface-raised border border-border rounded-lg p-6">
+      <div className="max-w-2xl bg-card border border-border rounded-lg p-6">
         <EditInterfaceForm
           iface={{
             id: iface.id,

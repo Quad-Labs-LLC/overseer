@@ -46,10 +46,10 @@ export function UserCard({ user, onEdit, onDelete, onResetPassword, onToggleStat
   const [showMenu, setShowMenu] = useState(false);
 
   const getAvatarColor = () => {
-    if (user.role === "admin") return "bg-[red-500]";
-    if (user.role === "developer") return "bg-[yellow-500]";
-    if (user.role === "operator") return "bg-[green-500]";
-    return "bg-[blue-500]";
+    if (user.role === "admin") return "bg-red-500";
+    if (user.role === "developer") return "bg-yellow-500";
+    if (user.role === "operator") return "bg-green-500";
+    return "bg-blue-500";
   };
 
   return (

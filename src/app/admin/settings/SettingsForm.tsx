@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
 
 interface SettingsFormProps {
   settings: Record<string, string>;
@@ -44,7 +45,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
     <form onSubmit={handleSubmit} className="card-hover rounded-xl border border-border bg-card shadow-sm overflow-hidden">
       <div className="px-5 py-4 border-b border-border/50 bg-muted/20 flex items-center justify-between">
         <h2 className="text-sm font-semibold tracking-tight text-foreground">Agent Settings</h2>
-        {saved && <span className="text-[10px] font-medium px-2 py-0.5 bg-success/10 text-success border border-success/20 rounded-full uppercase tracking-wider flex items-center gap-1 animate-in fade-in zoom-in-95 duration-200">
+        {saved && <span className="text-[10px] font-medium px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full uppercase tracking-wider flex items-center gap-1 animate-in fade-in zoom-in-95 duration-200">
           Saved
         </span>}
       </div>
@@ -53,7 +54,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
         <div className="space-y-4">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground tracking-tight">Max Steps</label>
-            <input
+            <Input
               type="number"
               value={formData["agent.max_steps"]}
               onChange={(e) => setFormData((prev) => ({ ...prev, "agent.max_steps": e.target.value }))}
@@ -64,7 +65,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground tracking-tight">Max Retries</label>
-            <input
+            <Input
               type="number"
               value={formData["agent.max_retries"]}
               onChange={(e) => setFormData((prev) => ({ ...prev, "agent.max_retries": e.target.value }))}
@@ -75,7 +76,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground tracking-tight">Agent Timeout (ms)</label>
-            <input
+            <Input
               type="number"
               value={formData["agent.timeout_ms"]}
               onChange={(e) => setFormData((prev) => ({ ...prev, "agent.timeout_ms": e.target.value }))}
@@ -85,7 +86,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground tracking-tight">Shell Command Timeout (ms)</label>
-            <input
+            <Input
               type="number"
               value={formData["tools.shell_timeout_ms"]}
               onChange={(e) => setFormData((prev) => ({ ...prev, "tools.shell_timeout_ms": e.target.value }))}
@@ -95,7 +96,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground tracking-tight">Max File Size (MB)</label>
-            <input
+            <Input
               type="number"
               value={formData["tools.max_file_size_mb"]}
               onChange={(e) => setFormData((prev) => ({ ...prev, "tools.max_file_size_mb": e.target.value }))}
@@ -107,7 +108,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
         <div className="pt-4 border-t border-border/50">
           <label htmlFor="require_confirmation" className="flex items-center gap-3 cursor-pointer group">
             <div className="relative flex items-center justify-center">
-              <input
+              <Input
                 type="checkbox"
                 id="require_confirmation"
                 checked={formData["tools.require_confirmation"] === "true"}

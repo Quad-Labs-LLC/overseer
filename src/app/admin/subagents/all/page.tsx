@@ -19,8 +19,8 @@ interface SubAgentRow {
 
 const statusClasses: Record<SubAgentRow["status"], string> = {
   idle: "bg-muted text-muted-foreground border-border/50",
-  working: "bg-warning/10 text-warning border-warning/20",
-  completed: "bg-success/10 text-success border-success/20",
+  working: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+  completed: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
   error: "bg-destructive/10 text-destructive border-destructive/20",
 };
 

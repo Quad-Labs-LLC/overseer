@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { User } from "@/types/database";
+import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
 
 interface UsersListProps {
   users: User[];
@@ -73,7 +75,7 @@ export function UsersList({ users }: UsersListProps) {
       {/* Search and Filter */}
       <div className="p-4 border-b border-border flex flex-col md:flex-row gap-4">
         <div className="flex-1">
-          <input
+          <Input
             type="text"
             placeholder="Search users..."
             value={search}
@@ -88,7 +90,7 @@ export function UsersList({ users }: UsersListProps) {
               onClick={() => setFilter(role)}
               className={`px-3 py-1.5 text-sm rounded transition-colors ${
                 filter === role
-                  ? "bg-[primary/10] text-primary"
+                  ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >
@@ -127,7 +129,7 @@ export function UsersList({ users }: UsersListProps) {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <select
+                  <NativeSelect
                     value={user.role}
                     onChange={(e) => handleRoleChange(user.id, e.target.value)}
                     className={`text-xs px-3 py-1.5 rounded border ${roleColors[user.role]} ${roleBorderColors[user.role]} bg-transparent cursor-pointer focus:outline-none`}
@@ -136,7 +138,7 @@ export function UsersList({ users }: UsersListProps) {
                       <option value="developer" className="bg-background">Developer</option>
                       <option value="operator" className="bg-background">Operator</option>
                       <option value="viewer" className="bg-background">Viewer</option>
-                  </select>
+                  </NativeSelect>
                 </td>
                 <td className="px-6 py-4 text-sm text-muted-foreground">
                   {new Date(user.created_at).toLocaleDateString()}

@@ -44,6 +44,7 @@ import {
   SunIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "@/components/ThemeProvider";
 import { cn } from "@/lib/utils";
 
 /* ── Types ── */
@@ -61,38 +62,17 @@ const SUGGESTIONS = [
   "What can you do?",
 ];
 
-/* ── Theme hook ── */
-function useTheme() {
-  const [theme, setThemeState] = useState<"dark" | "light">("dark");
-
-  useEffect(() => {
-    const stored = localStorage.getItem("overseer-theme") as "dark" | "light" | null;
-    const initial = stored ?? "dark";
-    setThemeState(initial);
-    document.documentElement.classList.toggle("dark", initial === "dark");
-    document.documentElement.classList.toggle("light", initial === "light");
-  }, []);
-
-  const toggleTheme = useCallback(() => {
-    setThemeState((prev) => {
-      const next = prev === "dark" ? "light" : "dark";
-      localStorage.setItem("overseer-theme", next);
-      document.documentElement.classList.toggle("dark", next === "dark");
-      document.documentElement.classList.toggle("light", next === "light");
-      return next;
-    });
-  }, []);
-
-  return { theme, toggleTheme };
-}
-
 /* ── Main Chat Page ── */
 export default function ChatPage() {
   const [text, setText] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [providers, setProviders] = useState<ProviderOption[]>([]);
   const [selectedProviderId, setSelectedProviderId] = useState<string>("");
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === "dark";
+  const toggleTheme = useCallback(() => {
+    setTheme(isDark ? "light" : "dark");
+  }, [isDark, setTheme]);
 
   const { messages, sendMessage, status, setMessages, regenerate } = useChat({
     transport: new DefaultChatTransport({
@@ -192,12 +172,12 @@ export default function ChatPage() {
             className="w-full justify-start gap-2.5 h-9 px-3 text-sm text-muted-foreground hover:text-foreground"
             onClick={toggleTheme}
           >
-            {theme === "dark" ? (
+            {isDark ? (
               <SunIcon className="h-4 w-4" />
             ) : (
               <MoonIcon className="h-4 w-4" />
             )}
-            {theme === "dark" ? "Light mode" : "Dark mode"}
+            {isDark ? "Light mode" : "Dark mode"}
           </Button>
           <Button
             variant="ghost"

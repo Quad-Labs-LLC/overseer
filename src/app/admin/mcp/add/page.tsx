@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 import * as mcpClient from "@/agent/mcp/client";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { NativeSelect } from "@/components/ui/native-select";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -91,31 +94,31 @@ export default async function AddMcpServerPage({
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-xl text-foreground font-mono">Add MCP Server</h1>
-          <p className="text-text-secondary mt-1 text-pretty">
+          <p className="text-muted-foreground mt-1 text-pretty">
             Register a new Model Context Protocol server and optionally connect immediately.
           </p>
         </div>
         <Link
           href="/mcp"
-          className="px-3 py-2 text-sm rounded border border-border text-text-secondary hover:text-foreground hover:bg-surface-overlay transition-colors"
+          className="px-3 py-2 text-sm rounded border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
         >
           Back to MCP
         </Link>
       </div>
 
-      <div className="max-w-3xl bg-surface-raised border border-border rounded-lg p-6">
+      <div className="max-w-3xl bg-card border border-border rounded-lg p-6">
         <form action={createMcpServerAction} className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="name" className="block text-sm text-foreground mb-2">
                 Server name
               </label>
-              <input
+              <Input
                 id="name"
                 name="name"
                 required
                 placeholder="filesystem-tools"
-                className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full rounded border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
 
@@ -123,15 +126,15 @@ export default async function AddMcpServerPage({
               <label htmlFor="server_type" className="block text-sm text-foreground mb-2">
                 Transport type
               </label>
-              <select
+              <NativeSelect
                 id="server_type"
                 name="server_type"
                 defaultValue="stdio"
-                className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full rounded border border-border bg-muted px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value="stdio">STDIO</option>
                 <option value="sse">SSE</option>
-              </select>
+              </NativeSelect>
             </div>
           </div>
 
@@ -139,11 +142,11 @@ export default async function AddMcpServerPage({
             <label htmlFor="command" className="block text-sm text-foreground mb-2">
               Command (for STDIO)
             </label>
-            <input
+            <Input
               id="command"
               name="command"
               placeholder="npx"
-              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full rounded border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
 
@@ -151,11 +154,11 @@ export default async function AddMcpServerPage({
             <label htmlFor="args" className="block text-sm text-foreground mb-2">
               Args (comma separated)
             </label>
-            <input
+            <Input
               id="args"
               name="args"
               placeholder="-y,@modelcontextprotocol/server-filesystem,/path"
-              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full rounded border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
 
@@ -163,11 +166,11 @@ export default async function AddMcpServerPage({
             <label htmlFor="url" className="block text-sm text-foreground mb-2">
               SSE URL
             </label>
-            <input
+            <Input
               id="url"
               name="url"
               placeholder="https://mcp.example.com/sse"
-              className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full rounded border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
 
@@ -176,11 +179,11 @@ export default async function AddMcpServerPage({
               <label htmlFor="env_vars" className="block text-sm text-foreground mb-2">
                 Env vars (one per line: KEY=VALUE)
               </label>
-              <textarea
+              <Textarea
                 id="env_vars"
                 name="env_vars"
                 rows={4}
-                className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full rounded border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
 
@@ -188,20 +191,20 @@ export default async function AddMcpServerPage({
               <label htmlFor="headers" className="block text-sm text-foreground mb-2">
                 Headers (one per line: Name: Value)
               </label>
-              <textarea
+              <Textarea
                 id="headers"
                 name="headers"
                 rows={4}
-                className="w-full rounded border border-border bg-surface-overlay px-3 py-2 text-sm text-foreground placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full rounded border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
           </div>
 
-          <label className="flex items-center gap-2 text-sm text-text-secondary">
-            <input
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Input
               name="auto_connect"
               type="checkbox"
-              className="rounded border-border bg-surface-overlay text-accent focus:ring-accent"
+              className="rounded border-border bg-muted text-accent focus:ring-ring"
             />
             Connect immediately after saving
           </label>
@@ -216,7 +219,7 @@ export default async function AddMcpServerPage({
             >
               Add server
             </button>
-            <p className="text-xs text-text-muted text-pretty">
+            <p className="text-xs text-muted-foreground text-pretty">
               For STDIO, provide command + args. For SSE, provide URL and optional headers.
             </p>
           </div>

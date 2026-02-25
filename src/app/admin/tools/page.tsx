@@ -52,9 +52,9 @@ export default function ToolsPage() {
                         </span>
                         <span className={cn(
                           "px-1.5 py-0.5 rounded",
-                          stats.success_rate >= 90 ? "bg-success/10 text-success" : 
-                          stats.success_rate >= 50 ? "bg-warning/10 text-warning" : 
-                          "bg-danger/10 text-danger"
+                          stats.success_rate >= 90 ? "bg-emerald-500/10 text-emerald-500" : 
+                          stats.success_rate >= 50 ? "bg-amber-500/10 text-amber-500" : 
+                          "bg-destructive/10 text-destructive"
                         )}>
                           {stats.success_rate}%
                         </span>

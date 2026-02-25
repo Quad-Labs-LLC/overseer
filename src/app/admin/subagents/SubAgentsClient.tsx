@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { StatsCard } from "@/components/StatsCard";
 import { SubAgentsList } from "./SubAgentsList";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 interface HealthData {
   timestamp: string;
@@ -141,7 +142,7 @@ export default function SubAgentsClient({ stats, allTypes }: SubAgentsClientProp
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <label className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-md border border-border/50 cursor-pointer hover:bg-muted/50 transition-colors">
-            <input
+            <Input
               type="checkbox"
               checked={autoRefresh}
               onChange={(event) => setAutoRefresh(event.target.checked)}
@@ -193,7 +194,7 @@ export default function SubAgentsClient({ stats, allTypes }: SubAgentsClientProp
                 Last updated: <span className="font-mono text-foreground">{new Date(healthData.timestamp).toLocaleTimeString()}</span>
               </div>
               {healthData.overall.degradedAgents > 0 && (
-                <div className="text-[11px] font-medium text-warning bg-warning/10 border border-warning/20 px-2 py-0.5 rounded inline-flex items-center gap-1.5 sm:self-end">
+                <div className="text-[11px] font-medium text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded inline-flex items-center gap-1.5 sm:self-end">
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                   {healthData.overall.degradedAgents} degraded agent(s)
                 </div>
@@ -277,8 +278,8 @@ export default function SubAgentsClient({ stats, allTypes }: SubAgentsClientProp
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {healthData.circuitBreakers.states.map((state) => {
               const stateColors = {
-                CLOSED: "border-success/30 bg-success/5",
-                HALF_OPEN: "border-warning/30 bg-warning/5",
+                CLOSED: "border-emerald-500/30 bg-emerald-500/5",
+                HALF_OPEN: "border-amber-500/30 bg-amber-500/5",
                 OPEN: "border-destructive/30 bg-destructive/5",
               };
 
@@ -300,8 +301,8 @@ export default function SubAgentsClient({ stats, allTypes }: SubAgentsClientProp
                         state.state === "OPEN"
                           ? "bg-destructive/10 text-destructive border-destructive/20"
                           : state.state === "HALF_OPEN"
-                          ? "bg-warning/10 text-warning border-warning/20"
-                          : "bg-success/10 text-success border-success/20"
+                          ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                          : "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
                       )}
                     >
                       {state.state}
@@ -333,13 +334,13 @@ export default function SubAgentsClient({ stats, allTypes }: SubAgentsClientProp
           <h2 className="text-sm font-semibold tracking-tight text-foreground uppercase tracking-wider mb-5">Resource Pools</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="flex flex-col items-center justify-center p-4 bg-muted/30 rounded-lg border border-border/50">
-              <div className="text-3xl font-bold tracking-tight text-success tabular-nums">
+              <div className="text-3xl font-bold tracking-tight text-emerald-500 tabular-nums">
                 {healthData.resourcePools.summary.totalActive}
               </div>
               <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mt-1.5">Active</div>
             </div>
             <div className="flex flex-col items-center justify-center p-4 bg-muted/30 rounded-lg border border-border/50">
-              <div className="text-3xl font-bold tracking-tight text-warning tabular-nums">
+              <div className="text-3xl font-bold tracking-tight text-amber-500 tabular-nums">
                 {healthData.resourcePools.summary.totalQueued}
               </div>
               <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mt-1.5">Queued</div>
@@ -379,9 +380,9 @@ export default function SubAgentsClient({ stats, allTypes }: SubAgentsClientProp
                         className={cn(
                           "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border",
                           successRate > 0.9
-                            ? "bg-success/10 text-success border-success/20"
+                            ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
                             : successRate > 0.7
-                            ? "bg-warning/10 text-warning border-warning/20"
+                            ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
                             : "bg-destructive/10 text-destructive border-destructive/20"
                         )}
                       >

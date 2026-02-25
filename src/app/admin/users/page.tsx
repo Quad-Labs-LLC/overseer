@@ -7,6 +7,8 @@ import { getAllowedModels, getUserPolicy, getUserTokenUsage, upsertUserPolicy } 
 import { getCurrentUser } from "@/lib/auth";
 import { Permission, requirePermission } from "@/lib/permissions";
 import { redirect } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
 
 async function updateUserPolicyAction(formData: FormData) {
   "use server";
@@ -136,7 +138,7 @@ export default async function UsersPage() {
           title="Total Monthly Cost"
           value={`$${quotaRows.reduce((acc, row) => acc + row.cost.monthlyCost, 0).toFixed(2)}`}
           color="warning"
-          icon={<svg className="w-5 h-5 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V6m0 12v-2m9-4a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+          icon={<svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V6m0 12v-2m9-4a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
         />
       </div>
 
@@ -214,8 +216,8 @@ export default async function UsersPage() {
                 </div>
 
                 <form action={updateTierAction} className="flex items-center gap-2">
-                  <input type="hidden" name="user_id" value={user.username} />
-                  <select
+                  <Input type="hidden" name="user_id" value={user.username} />
+                  <NativeSelect
                     name="tier"
                     defaultValue={tier}
                     className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
@@ -223,7 +225,7 @@ export default async function UsersPage() {
                     <option value="free">free</option>
                     <option value="pro">pro</option>
                     <option value="enterprise">enterprise</option>
-                  </select>
+                  </NativeSelect>
                   <button
                     type="submit"
                     className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-primary hover:text-accent-foreground shadow-sm h-9 px-4"
@@ -234,12 +236,12 @@ export default async function UsersPage() {
               </div>
 
               <form action={updateUserPolicyAction} className="space-y-4">
-                <input type="hidden" name="user_id" value={user.username} />
+                <Input type="hidden" name="user_id" value={user.username} />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="space-y-1.5 lg:col-span-2">
                     <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Allowed Models</label>
-                    <input
+                    <Input
                       name="allowed_models"
                       defaultValue={allowedModels}
                       placeholder="comma-separated"
@@ -249,7 +251,7 @@ export default async function UsersPage() {
                   
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Max Input Tokens</label>
-                    <input
+                    <Input
                       name="max_input_tokens_per_request"
                       defaultValue={policy?.max_input_tokens_per_request ?? ""}
                       placeholder="per request"
@@ -259,7 +261,7 @@ export default async function UsersPage() {
                   
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Max Output Tokens</label>
-                    <input
+                    <Input
                       name="max_output_tokens_per_request"
                       defaultValue={policy?.max_output_tokens_per_request ?? ""}
                       placeholder="per request"
@@ -269,7 +271,7 @@ export default async function UsersPage() {
                   
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Daily Token Limit</label>
-                    <input
+                    <Input
                       name="daily_token_limit"
                       defaultValue={policy?.daily_token_limit ?? ""}
                       placeholder="daily tokens"
@@ -279,7 +281,7 @@ export default async function UsersPage() {
                   
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Monthly Token Limit</label>
-                    <input
+                    <Input
                       name="monthly_token_limit"
                       defaultValue={policy?.monthly_token_limit ?? ""}
                       placeholder="monthly tokens"
@@ -289,7 +291,7 @@ export default async function UsersPage() {
                   
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Daily Cost Limit ($)</label>
-                    <input
+                    <Input
                       name="daily_cost_limit"
                       defaultValue={policy?.daily_cost_limit ?? ""}
                       placeholder="daily $"
@@ -299,7 +301,7 @@ export default async function UsersPage() {
                   
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Monthly Cost Limit ($)</label>
-                    <input
+                    <Input
                       name="monthly_cost_limit"
                       defaultValue={policy?.monthly_cost_limit ?? ""}
                       placeholder="monthly $"

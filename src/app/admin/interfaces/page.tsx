@@ -50,7 +50,7 @@ export default async function InterfacesPage() {
         <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-border/50 bg-muted/20">
             <h2 className="text-sm font-semibold tracking-tight text-foreground flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#0088cc]"></span>
+              <span className="w-2 h-2 rounded-full bg-sky-500"></span>
               Telegram Setup
             </h2>
           </div>
@@ -79,7 +79,7 @@ export default async function InterfacesPage() {
         <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-border/50 bg-muted/20">
             <h2 className="text-sm font-semibold tracking-tight text-foreground flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#5865F2]"></span>
+              <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
               Discord Setup
             </h2>
           </div>

@@ -43,7 +43,7 @@ const typeColors: Record<string, string> = {
   docker: "bg-cyan-500/10 text-cyan-400",
   db: "bg-yellow-500/10 text-yellow-400",
   security: "bg-pink-500/10 text-pink-400",
-  network: "bg-[primary/10] text-primary",
+  network: "bg-primary/10 text-primary",
 };
 
 export function SubAgentsList() {
@@ -117,7 +117,7 @@ export function SubAgentsList() {
             onClick={() => setFilter(status)}
             className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
               filter === status
-                ? "bg-[primary/10] text-primary"
+                ? "bg-primary/10 text-primary"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted"
             }`}
           >
@@ -191,7 +191,7 @@ export function SubAgentsList() {
                     {agent.task_result && (
                       <button
                         onClick={() => alert(agent.task_result)}
-                        className="px-3 py-1.5 text-xs text-primary hover:text-primary bg-[primary/10] hover:bg-[primary/10] rounded-lg transition-colors"
+                        className="px-3 py-1.5 text-xs text-primary hover:text-primary bg-primary/10 hover:bg-primary/10 rounded-lg transition-colors"
                       >
                         View Result
                       </button>

@@ -1,6 +1,5 @@
 "use client";
 
-import { ThemeProvider } from "@/components/ThemeProvider";
 import { QueryProvider } from "@/components/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { CommandPalette } from "@/components/CommandPalette";
@@ -13,14 +12,12 @@ function ShortcutsRoot({ children }: { children: React.ReactNode }) {
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider>
-      <QueryProvider>
-        <ShortcutsRoot>
-          {children}
-          <CommandPalette />
-          <Toaster />
-        </ShortcutsRoot>
-      </QueryProvider>
-    </ThemeProvider>
+    <QueryProvider>
+      <ShortcutsRoot>
+        {children}
+        <CommandPalette />
+        <Toaster />
+      </ShortcutsRoot>
+    </QueryProvider>
   );
 }

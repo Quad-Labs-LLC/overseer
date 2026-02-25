@@ -166,7 +166,7 @@ export function ChatToolCall({ toolCall }: ChatToolCallProps) {
           {/* Arguments */}
           <div>
             <div className="text-xs opacity-70 mb-1">Arguments</div>
-            <pre className="text-xs font-mono bg-black/20 rounded p-2 overflow-x-auto max-h-32 overflow-y-auto">
+            <pre className="text-xs font-mono bg-muted/60 rounded p-2 overflow-x-auto max-h-32 overflow-y-auto">
               {formatArgs(toolCall.args)}
             </pre>
           </div>
@@ -175,7 +175,7 @@ export function ChatToolCall({ toolCall }: ChatToolCallProps) {
           {toolCall.result !== undefined && (
             <div>
               <div className="text-xs opacity-70 mb-1">Result</div>
-              <pre className="text-xs font-mono bg-black/20 rounded p-2 overflow-x-auto max-h-48 overflow-y-auto">
+              <pre className="text-xs font-mono bg-muted/60 rounded p-2 overflow-x-auto max-h-48 overflow-y-auto">
                 {formatResult(toolCall.result)}
               </pre>
             </div>

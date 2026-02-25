@@ -224,7 +224,7 @@ export default function AnalyticsPage() {
                 </span>
               </div>
               <div className="h-64 mt-auto">
-                <AreaChart data={dailyData} dataKey="cost" color="hsl(var(--primary))" label="$" />
+                <AreaChart data={dailyData} dataKey="cost" color="var(--primary)" label="$" />
               </div>
             </div>
 
@@ -242,14 +242,14 @@ export default function AnalyticsPage() {
             <div className="rounded-xl border border-border bg-card shadow-sm p-6 flex flex-col hover:border-primary/50 transition-colors duration-200">
               <h2 className="text-base font-semibold tracking-tight text-foreground mb-6">Requests per Day</h2>
               <div className="h-44 mt-auto">
-                <BarChart data={dailyData} dataKey="requests" color="hsl(var(--chart-1))" />
+                <BarChart data={dailyData} dataKey="requests" color="var(--chart-1)" />
               </div>
             </div>
 
             <div className="rounded-xl border border-border bg-card shadow-sm p-6 flex flex-col hover:border-primary/50 transition-colors duration-200">
               <h2 className="text-base font-semibold tracking-tight text-foreground mb-6">Token Usage</h2>
               <div className="h-44 mt-auto">
-                <AreaChart data={dailyData} dataKey="tokens" color="hsl(var(--chart-2))" label="" />
+                <AreaChart data={dailyData} dataKey="tokens" color="var(--chart-2)" label="" />
               </div>
             </div>
           </div>
@@ -396,10 +396,10 @@ function KpiCard({
   subValue?: string;
 }) {
   const accentColors: Record<string, string> = {
-    green: "text-success bg-success/10 ring-1 ring-success/20",
+    green: "text-emerald-500 bg-emerald-500/10 ring-1 ring-emerald-500/20",
     blue: "text-chart-1 bg-chart-1/10 ring-1 ring-chart-1/20",
     purple: "text-chart-2 bg-chart-2/10 ring-1 ring-chart-2/20",
-    amber: "text-warning bg-warning/10 ring-1 ring-warning/20",
+    amber: "text-amber-500 bg-amber-500/10 ring-1 ring-amber-500/20",
   };
 
   return (
@@ -472,8 +472,8 @@ function AreaChart({
         {/* Grid lines */}
         {gridLines.map((g, i) => (
           <g key={i}>
-            <line x1={PAD.left} y1={g.y} x2={W - PAD.right} y2={g.y} stroke="border" strokeWidth="0.5" strokeDasharray="4 4" />
-            <text x={PAD.left - 6} y={g.y + 3} textAnchor="end" fontSize="8" fill="muted-foreground" fontFamily="system-ui">{g.label}</text>
+            <line x1={PAD.left} y1={g.y} x2={W - PAD.right} y2={g.y} stroke="var(--border)" strokeWidth="0.5" strokeDasharray="4 4" />
+            <text x={PAD.left - 6} y={g.y + 3} textAnchor="end" fontSize="8" fill="var(--muted-foreground)" fontFamily="system-ui">{g.label}</text>
           </g>
         ))}
 
@@ -483,17 +483,17 @@ function AreaChart({
 
         {/* Data points */}
         {points.filter((_, i) => data.length <= 15 || i % Math.ceil(data.length / 10) === 0).map((p, i) => (
-          <circle key={i} cx={p.x} cy={p.y} r="3" fill={color} stroke="card" strokeWidth="1.5" />
+          <circle key={i} cx={p.x} cy={p.y} r="3" fill={color} stroke="var(--card)" strokeWidth="1.5" />
         ))}
 
         {/* X-axis labels */}
         {data.length > 0 && (
           <>
-            <text x={PAD.left} y={H - 4} fontSize="8" fill="muted-foreground" fontFamily="system-ui">{data[0]?.day?.slice(5)}</text>
+            <text x={PAD.left} y={H - 4} fontSize="8" fill="var(--muted-foreground)" fontFamily="system-ui">{data[0]?.day?.slice(5)}</text>
             {data.length > 2 && (
-              <text x={PAD.left + chartW / 2} y={H - 4} textAnchor="middle" fontSize="8" fill="muted-foreground" fontFamily="system-ui">{data[Math.floor(data.length / 2)]?.day?.slice(5)}</text>
+              <text x={PAD.left + chartW / 2} y={H - 4} textAnchor="middle" fontSize="8" fill="var(--muted-foreground)" fontFamily="system-ui">{data[Math.floor(data.length / 2)]?.day?.slice(5)}</text>
             )}
-            <text x={W - PAD.right} y={H - 4} textAnchor="end" fontSize="8" fill="muted-foreground" fontFamily="system-ui">{data[data.length - 1]?.day?.slice(5)}</text>
+            <text x={W - PAD.right} y={H - 4} textAnchor="end" fontSize="8" fill="var(--muted-foreground)" fontFamily="system-ui">{data[data.length - 1]?.day?.slice(5)}</text>
           </>
         )}
       </svg>
@@ -537,8 +537,8 @@ function BarChart({
         {/* Grid */}
         {gridLines.map((g, i) => (
           <g key={i}>
-            <line x1={PAD.left} y1={g.y} x2={W - PAD.right} y2={g.y} stroke="border" strokeWidth="0.5" strokeDasharray="4 4" />
-            <text x={PAD.left - 4} y={g.y + 3} textAnchor="end" fontSize="8" fill="muted-foreground" fontFamily="system-ui">{g.label}</text>
+            <line x1={PAD.left} y1={g.y} x2={W - PAD.right} y2={g.y} stroke="var(--border)" strokeWidth="0.5" strokeDasharray="4 4" />
+            <text x={PAD.left - 4} y={g.y + 3} textAnchor="end" fontSize="8" fill="var(--muted-foreground)" fontFamily="system-ui">{g.label}</text>
           </g>
         ))}
 
@@ -558,8 +558,8 @@ function BarChart({
         {/* X labels */}
         {data.length > 0 && (
           <>
-            <text x={PAD.left} y={H - 4} fontSize="8" fill="muted-foreground" fontFamily="system-ui">{data[0]?.day?.slice(5)}</text>
-            <text x={W - PAD.right} y={H - 4} textAnchor="end" fontSize="8" fill="muted-foreground" fontFamily="system-ui">{data[data.length - 1]?.day?.slice(5)}</text>
+            <text x={PAD.left} y={H - 4} fontSize="8" fill="var(--muted-foreground)" fontFamily="system-ui">{data[0]?.day?.slice(5)}</text>
+            <text x={W - PAD.right} y={H - 4} textAnchor="end" fontSize="8" fill="var(--muted-foreground)" fontFamily="system-ui">{data[data.length - 1]?.day?.slice(5)}</text>
           </>
         )}
       </svg>
@@ -570,7 +570,7 @@ function BarChart({
 function DonutChart({ data }: { data: ModelData[] }) {
   if (data.length === 0) return <EmptyState text="No model data" />;
 
-  const COLORS = ["#22c55e", "#3b82f6", "#a855f7", "#f59e0b", "#ef4444", "#ec4899"];
+  const COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)", "var(--primary)"];
   const total = data.reduce((s, d) => s + d.cost, 0);
   if (total === 0) return <EmptyState text="No cost data" />;
 
@@ -606,12 +606,12 @@ function DonutChart({ data }: { data: ModelData[] }) {
       <div className="relative shrink-0">
         <svg viewBox="0 0 120 120" className="w-32 h-32">
           {arcs.map((a, i) => (
-            <path key={i} d={a.path} fill={a.color} stroke="card" strokeWidth="1" />
+            <path key={i} d={a.path} fill={a.color} stroke="var(--card)" strokeWidth="1" />
           ))}
-          <text x={cx} y={cy - 4} textAnchor="middle" fontSize="12" fontWeight="bold" fill="white" fontFamily="system-ui">
+          <text x={cx} y={cy - 4} textAnchor="middle" fontSize="12" fontWeight="bold" fill="var(--foreground)" fontFamily="system-ui">
             ${total.toFixed(2)}
           </text>
-          <text x={cx} y={cy + 10} textAnchor="middle" fontSize="7" fill="muted-foreground" fontFamily="system-ui">
+          <text x={cx} y={cy + 10} textAnchor="middle" fontSize="7" fill="var(--muted-foreground)" fontFamily="system-ui">
             total
           </text>
         </svg>
@@ -640,7 +640,7 @@ function StatsCard({
   accentClass: string;
   items: Array<{ label: string; value: string | number; status?: "good" | "warning" | "bad" }>;
 }) {
-  const statusColors = { good: "bg-success", warning: "bg-warning", bad: "bg-destructive" };
+  const statusColors = { good: "bg-emerald-500", warning: "bg-amber-500", bad: "bg-destructive" };
 
   return (
     <div className="rounded-xl border border-border bg-card shadow-sm p-6 hover:border-primary/50 transition-colors duration-200">
