@@ -213,14 +213,8 @@ function useOverseerRuntime(selectedProviderId: string) {
     () =>
       new AssistantChatTransport({
         api: "/api/webui/chat",
-        prepareSendMessagesRequest: async (request) => {
-          return {
-            ...request,
-            body: {
-              ...request.body,
-              providerId: selectedProviderId ? Number(selectedProviderId) : undefined,
-            },
-          };
+        body: {
+          providerId: selectedProviderId ? Number(selectedProviderId) : undefined,
         },
       }),
     [selectedProviderId],
