@@ -16,7 +16,7 @@ export function SystemUpdatePanel({
 }) {
  const utils = trpc.useUtils();
  const [autoUpdateStatus, setAutoUpdateStatus] = useState<
-  { created: boolean; jobId?: number; error?: string } | null
+  { created: boolean; jobId?: number; error?: string; existed?: boolean } | null
  >(null);
  const [forbidden, setForbidden] = useState(false);
 
@@ -54,8 +54,12 @@ export function SystemUpdatePanel({
 
  const autoUpdateMutation = trpc.system.enableAutoUpdate.useMutation({
   onSuccess: (data) => {
-   setAutoUpdateStatus({ created: true, jobId: data.jobId });
-   toast.success("Auto-update enabled", { description: "Weekly updates every Sunday at 3 AM UTC." });
+   setAutoUpdateStatus({ created: true, jobId: data.jobId, existed: data.existed });
+   toast.success(data.existed ? "Auto-update already enabled" : "Auto-update enabled", {
+    description: data.existed
+     ? "Using existing weekly auto-update cron job."
+     : "Weekly updates every Sunday at 3 AM UTC.",
+   });
   },
   onError: (err) => {
    setAutoUpdateStatus({ created: false, error: err.message });
@@ -134,7 +138,8 @@ export function SystemUpdatePanel({
    {autoUpdateStatus?.created && (
     <div className="mt-4 flex items-center gap-2 p-3 bg-green-500/10 border border-green-500/30 rounded text-sm text-green-300">
      <CheckCircle2 className="h-4 w-4 shrink-0" />
-     Weekly auto-update cron job created{autoUpdateStatus.jobId ? ` (Job #${autoUpdateStatus.jobId})` : ""}.
+     {autoUpdateStatus.existed ? "Weekly auto-update cron job is already configured" : "Weekly auto-update cron job created"}
+     {autoUpdateStatus.jobId ? ` (Job #${autoUpdateStatus.jobId})` : ""}.
     </div>
    )}
 

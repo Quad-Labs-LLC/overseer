@@ -1,31 +1,61 @@
 /**
  * MCP (Model Context Protocol) Support
- * Connects to MCP servers for extended tool capabilities
+ * Connects to MCP servers for extended tool capabilities.
  *
- * NOTE: MCP functionality is optional. To enable, install:
- * npm install @modelcontextprotocol/sdk
+ * The MCP SDK is optional at runtime. If not installed, connection attempts fail
+ * gracefully with a clear last_error message.
  */
 
 import { db } from "../../database/db";
 import { createLogger } from "../../lib/logger";
-// Uncomment below line after installing @modelcontextprotocol/sdk
-// import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-// import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
-// import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
 import type { Tool } from "ai";
 import { tool } from "ai";
 import { z } from "zod";
 
 const logger = createLogger("mcp");
 
-// Runtime stubs for MCP when SDK is not installed
-const Client: any = undefined;
-const StdioClientTransport: any = undefined;
-const SSEClientTransport: any = undefined;
-type Client = any;
+interface LoadedMcpSdk {
+  Client: any;
+  StdioClientTransport: any;
+  SSEClientTransport: any;
+}
+
+let sdkLoadPromise: Promise<LoadedMcpSdk | null> | null = null;
+
+async function loadMcpSdk(): Promise<LoadedMcpSdk | null> {
+  if (sdkLoadPromise) return sdkLoadPromise;
+
+  sdkLoadPromise = (async () => {
+    try {
+      // Keep specifiers dynamic to avoid hard compile/runtime coupling.
+      const clientModulePath = "@modelcontextprotocol/sdk/client/index.js";
+      const stdioModulePath = "@modelcontextprotocol/sdk/client/stdio.js";
+      const sseModulePath = "@modelcontextprotocol/sdk/client/sse.js";
+
+      const [clientMod, stdioMod, sseMod] = await Promise.all([
+        import(clientModulePath),
+        import(stdioModulePath),
+        import(sseModulePath),
+      ]);
+
+      return {
+        Client: (clientMod as any).Client,
+        StdioClientTransport: (stdioMod as any).StdioClientTransport,
+        SSEClientTransport: (sseMod as any).SSEClientTransport,
+      };
+    } catch (error) {
+      logger.warn("MCP SDK not available", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return null;
+    }
+  })();
+
+  return sdkLoadPromise;
+}
 
 // Active MCP connections
-const mcpClients = new Map<string, Client>();
+const mcpClients = new Map<string, any>();
 const mcpTools = new Map<string, Map<string, Tool>>();
 
 export interface MCPServer {
@@ -57,6 +87,41 @@ export interface CreateMCPServerInput {
   auto_connect?: boolean;
 }
 
+type UpdateMCPServerInput = Partial<CreateMCPServerInput> & {
+  is_active?: boolean;
+};
+
+function hasColumn(table: string, column: string): boolean {
+  const rows = db
+    .prepare(`PRAGMA table_info(${table})`)
+    .all() as Array<{ name: string }>;
+  return rows.some((r) => r.name === column);
+}
+
+function parseJson<T>(raw: string | null, fallback: T): T {
+  if (!raw) return fallback;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function buildTransportConfig(input: CreateMCPServerInput): Record<string, unknown> {
+  if (input.server_type === "stdio") {
+    return {
+      command: input.command || null,
+      args: input.args || [],
+      env_vars: input.env_vars || {},
+    };
+  }
+
+  return {
+    url: input.url || null,
+    headers: input.headers || {},
+  };
+}
+
 /**
  * Get all MCP servers
  */
@@ -85,24 +150,50 @@ export function findServerById(id: number): MCPServer | null {
  * Create a new MCP server
  */
 export function createServer(input: CreateMCPServerInput): MCPServer {
-  const stmt = db.prepare(`
-    INSERT INTO mcp_servers (
-      name, server_type, command, args, env_vars, url, headers, auto_connect
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-  
-  const result = stmt.run(
-    input.name,
-    input.server_type,
-    input.command || null,
-    input.args ? JSON.stringify(input.args) : null,
-    input.env_vars ? JSON.stringify(input.env_vars) : null,
-    input.url || null,
-    input.headers ? JSON.stringify(input.headers) : null,
-    input.auto_connect ? 1 : 0
-  );
-  
-  logger.info("Created MCP server", { name: input.name, type: input.server_type });
+  const transportConfig = JSON.stringify(buildTransportConfig(input));
+
+  const withTransportConfig = hasColumn("mcp_servers", "transport_config");
+
+  const result = withTransportConfig
+    ? db
+        .prepare(
+          `INSERT INTO mcp_servers (
+            name, server_type, transport_config, command, args, env_vars, url, headers, auto_connect
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        )
+        .run(
+          input.name,
+          input.server_type,
+          transportConfig,
+          input.command || null,
+          input.args ? JSON.stringify(input.args) : null,
+          input.env_vars ? JSON.stringify(input.env_vars) : null,
+          input.url || null,
+          input.headers ? JSON.stringify(input.headers) : null,
+          input.auto_connect ? 1 : 0,
+        )
+    : db
+        .prepare(
+          `INSERT INTO mcp_servers (
+            name, server_type, command, args, env_vars, url, headers, auto_connect
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        )
+        .run(
+          input.name,
+          input.server_type,
+          input.command || null,
+          input.args ? JSON.stringify(input.args) : null,
+          input.env_vars ? JSON.stringify(input.env_vars) : null,
+          input.url || null,
+          input.headers ? JSON.stringify(input.headers) : null,
+          input.auto_connect ? 1 : 0,
+        );
+
+  logger.info("Created MCP server", {
+    name: input.name,
+    type: input.server_type,
+  });
+
   return findServerById(result.lastInsertRowid as number)!;
 }
 
@@ -115,74 +206,117 @@ export async function connectToServer(serverId: number): Promise<boolean> {
     logger.error("MCP server not found", { serverId });
     return false;
   }
-  
+
+  if (server.is_active !== 1) {
+    logger.warn("MCP server is inactive", { serverId, name: server.name });
+    return false;
+  }
+
   // Disconnect if already connected
   if (mcpClients.has(server.name)) {
     await disconnectFromServer(serverId);
   }
-  
+
+  const sdk = await loadMcpSdk();
+  if (!sdk?.Client || !sdk?.StdioClientTransport || !sdk?.SSEClientTransport) {
+    const errorText =
+      "@modelcontextprotocol/sdk is not installed. Install it to enable MCP connections.";
+    db.prepare("UPDATE mcp_servers SET last_error = ? WHERE id = ?").run(
+      errorText,
+      serverId,
+    );
+    logger.error("MCP connect failed: SDK missing", {
+      serverId,
+      name: server.name,
+    });
+    return false;
+  }
+
   try {
     let transport;
-    
+
+    const cfg = parseJson<Record<string, unknown>>(server.transport_config, {});
+
     if (server.server_type === "stdio") {
-      if (!server.command) {
+      const command =
+        server.command ||
+        (typeof cfg.command === "string" ? cfg.command : null);
+      if (!command) {
         throw new Error("STDIO server requires a command");
       }
-      
-      const args = server.args ? JSON.parse(server.args) : [];
-      const env = server.env_vars ? JSON.parse(server.env_vars) : {};
-      
-      transport = new StdioClientTransport({
-        command: server.command,
+
+      const args =
+        parseJson<string[]>(server.args, []) ||
+        (Array.isArray(cfg.args) ? (cfg.args as string[]) : []);
+      const env =
+        parseJson<Record<string, string>>(server.env_vars, {}) ||
+        (typeof cfg.env_vars === "object" && cfg.env_vars
+          ? (cfg.env_vars as Record<string, string>)
+          : {});
+
+      transport = new sdk.StdioClientTransport({
+        command,
         args,
         env: { ...process.env, ...env },
       });
     } else if (server.server_type === "sse") {
-      if (!server.url) {
+      const url =
+        server.url ||
+        (typeof cfg.url === "string" ? cfg.url : null);
+      if (!url) {
         throw new Error("SSE server requires a URL");
       }
-      
-      const headers = server.headers ? JSON.parse(server.headers) : {};
-      
-      transport = new SSEClientTransport(new URL(server.url), {
+
+      const headers =
+        parseJson<Record<string, string>>(server.headers, {}) ||
+        (typeof cfg.headers === "object" && cfg.headers
+          ? (cfg.headers as Record<string, string>)
+          : {});
+
+      transport = new sdk.SSEClientTransport(new URL(url), {
         eventSourceInit: { headers },
       });
     } else {
       throw new Error(`Unknown server type: ${server.server_type}`);
     }
-    
-    const client = new Client(
+
+    const client = new sdk.Client(
       { name: "overseer-mcp-client", version: "1.0.0" },
-      { capabilities: {} }
+      { capabilities: {} },
     );
-    
+
     await client.connect(transport);
     mcpClients.set(server.name, client);
-    
+
     // Load tools from this server
     await loadToolsFromServer(server.name, client);
-    
-    // Update last connected
-    const updateStmt = db.prepare(`
-      UPDATE mcp_servers 
-      SET last_connected_at = CURRENT_TIMESTAMP, last_error = NULL
-      WHERE id = ?
-    `);
-    updateStmt.run(serverId);
-    
-    logger.info("Connected to MCP server", { name: server.name });
+
+    db.prepare(
+      `UPDATE mcp_servers
+       SET last_connected_at = CURRENT_TIMESTAMP, last_error = NULL
+       WHERE id = ?`,
+    ).run(serverId);
+
+    logger.info("Connected to MCP server", {
+      id: serverId,
+      name: server.name,
+    });
+
     return true;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    
-    const updateStmt = db.prepare(`
-      UPDATE mcp_servers 
-      SET last_error = ?
-      WHERE id = ?
-    `);
-    updateStmt.run(errorMessage, serverId);
-    
-    logger.error("Failed to connect to MCP server", { name: server.name, error: errorMessage });
+
+    db.prepare(
+      `UPDATE mcp_servers
+       SET last_error = ?
+       WHERE id = ?`,
+    ).run(errorMessage, serverId);
+
+    logger.error("Failed to connect to MCP server", {
+      id: serverId,
+      name: server.name,
+      error: errorMessage,
+    });
     return false;
   }
 }
@@ -193,29 +327,33 @@ export async function connectToServer(serverId: number): Promise<boolean> {
 export async function disconnectFromServer(serverId: number): Promise<void> {
   const server = findServerById(serverId);
   if (!server) return;
-  
+
   const client = mcpClients.get(server.name);
-  if (client) {
-    try {
-      await client.close();
-      mcpClients.delete(server.name);
-      mcpTools.delete(server.name);
-      logger.info("Disconnected from MCP server", { name: server.name });
-    } catch (error) {
-      logger.error("Error disconnecting from MCP server", { name: server.name, error });
-    }
+  if (!client) return;
+
+  try {
+    await client.close();
+  } catch (error) {
+    logger.error("Error disconnecting from MCP server", {
+      server: server.name,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  } finally {
+    mcpClients.delete(server.name);
+    mcpTools.delete(server.name);
+    logger.info("Disconnected from MCP server", { server: server.name });
   }
 }
 
 /**
  * Load tools from an MCP server
  */
-async function loadToolsFromServer(serverName: string, client: Client): Promise<void> {
+async function loadToolsFromServer(serverName: string, client: any): Promise<void> {
   try {
     const toolsResponse = await client.listTools();
     const serverTools = new Map<string, Tool>();
-    
-    for (const mcpTool of toolsResponse.tools) {
+
+    for (const mcpTool of toolsResponse.tools || []) {
       // Convert MCP tool to AI SDK tool
       const aiTool = tool<any, any>({
         description: mcpTool.description || `MCP tool: ${mcpTool.name}`,
@@ -228,14 +366,20 @@ async function loadToolsFromServer(serverName: string, client: Client): Promise<
           return JSON.stringify(result);
         },
       });
-      
+
       serverTools.set(mcpTool.name, aiTool);
     }
-    
+
     mcpTools.set(serverName, serverTools);
-    logger.info("Loaded MCP tools", { server: serverName, count: serverTools.size });
+    logger.info("Loaded MCP tools", {
+      server: serverName,
+      count: serverTools.size,
+    });
   } catch (error) {
-    logger.error("Failed to load MCP tools", { server: serverName, error });
+    logger.error("Failed to load MCP tools", {
+      server: serverName,
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 }
 
@@ -246,14 +390,14 @@ function convertMCPSchemaToZod(schema: any): z.ZodTypeAny {
   if (!schema || schema.type !== "object") {
     return z.object({});
   }
-  
+
   const shape: Record<string, z.ZodTypeAny> = {};
-  
+
   if (schema.properties) {
     for (const [key, prop] of Object.entries(schema.properties)) {
       const propSchema = prop as any;
       let zodType: z.ZodTypeAny;
-      
+
       switch (propSchema.type) {
         case "string":
           zodType = z.string();
@@ -276,21 +420,19 @@ function convertMCPSchemaToZod(schema: any): z.ZodTypeAny {
         default:
           zodType = z.any();
       }
-      
+
       if (propSchema.description) {
         zodType = zodType.describe(propSchema.description);
       }
-      
+
       shape[key] = zodType;
     }
   }
-  
+
   let zodSchema = z.object(shape);
-  
+
   // Handle required fields
   if (schema.required && Array.isArray(schema.required)) {
-    // Zod objects are required by default, so we only need to handle optionals
-    // Actually, we need to make non-required fields optional
     const optionalShape: Record<string, z.ZodTypeAny> = {};
     for (const [key, val] of Object.entries(shape)) {
       if (!schema.required.includes(key)) {
@@ -301,7 +443,7 @@ function convertMCPSchemaToZod(schema: any): z.ZodTypeAny {
     }
     zodSchema = z.object(optionalShape);
   }
-  
+
   return zodSchema;
 }
 
@@ -310,14 +452,14 @@ function convertMCPSchemaToZod(schema: any): z.ZodTypeAny {
  */
 export function getAllMCPTools(): Record<string, Tool> {
   const allTools: Record<string, Tool> = {};
-  
+
   for (const [serverName, tools] of mcpTools) {
-    for (const [toolName, tool] of tools) {
-      // Prefix tool name with server to avoid conflicts
-      allTools[`${serverName}_${toolName}`] = tool;
+    for (const [toolName, loadedTool] of tools) {
+      // Prefix tool name with server to avoid conflicts.
+      allTools[`${serverName}_${toolName}`] = loadedTool;
     }
   }
-  
+
   return allTools;
 }
 
@@ -325,9 +467,10 @@ export function getAllMCPTools(): Record<string, Tool> {
  * Connect to all auto-connect servers
  */
 export async function connectAutoConnectServers(): Promise<void> {
-  const stmt = db.prepare("SELECT id FROM mcp_servers WHERE auto_connect = 1 AND is_active = 1");
-  const servers = stmt.all() as { id: number }[];
-  
+  const servers = db
+    .prepare("SELECT id FROM mcp_servers WHERE auto_connect = 1 AND is_active = 1")
+    .all() as Array<{ id: number }>;
+
   for (const server of servers) {
     await connectToServer(server.id);
   }
@@ -338,14 +481,18 @@ export async function connectAutoConnectServers(): Promise<void> {
  */
 export function updateServer(
   serverId: number,
-  updates: Partial<CreateMCPServerInput>
+  updates: UpdateMCPServerInput,
 ): void {
   const fields: string[] = ["updated_at = CURRENT_TIMESTAMP"];
   const values: any[] = [];
-  
+
   if (updates.name !== undefined) {
     fields.push("name = ?");
     values.push(updates.name);
+  }
+  if (updates.server_type !== undefined) {
+    fields.push("server_type = ?");
+    values.push(updates.server_type);
   }
   if (updates.command !== undefined) {
     fields.push("command = ?");
@@ -371,13 +518,44 @@ export function updateServer(
     fields.push("auto_connect = ?");
     values.push(updates.auto_connect ? 1 : 0);
   }
-  
+  if (updates.is_active !== undefined) {
+    fields.push("is_active = ?");
+    values.push(updates.is_active ? 1 : 0);
+  }
+
+  if (hasColumn("mcp_servers", "transport_config")) {
+    const existing = findServerById(serverId);
+    if (existing) {
+      const nextType = updates.server_type ?? existing.server_type;
+      const nextConfig =
+        nextType === "stdio"
+          ? {
+              command: updates.command ?? existing.command,
+              args:
+                updates.args ??
+                parseJson<string[]>(existing.args, []),
+              env_vars:
+                updates.env_vars ??
+                parseJson<Record<string, string>>(existing.env_vars, {}),
+            }
+          : {
+              url: updates.url ?? existing.url,
+              headers:
+                updates.headers ??
+                parseJson<Record<string, string>>(existing.headers, {}),
+            };
+
+      fields.push("transport_config = ?");
+      values.push(JSON.stringify(nextConfig));
+    }
+  }
+
   const stmt = db.prepare(`
-    UPDATE mcp_servers 
+    UPDATE mcp_servers
     SET ${fields.join(", ")}
     WHERE id = ?
   `);
-  
+
   stmt.run(...values, serverId);
 }
 
@@ -389,20 +567,19 @@ export async function deleteServer(serverId: number): Promise<void> {
   if (server) {
     await disconnectFromServer(serverId);
   }
-  
-  const stmt = db.prepare("DELETE FROM mcp_servers WHERE id = ?");
-  stmt.run(serverId);
+
+  db.prepare("DELETE FROM mcp_servers WHERE id = ?").run(serverId);
 }
 
 /**
  * Get connection status
  */
-export function getConnectionStatus(): {
+export function getConnectionStatus(): Array<{
   server: string;
   connected: boolean;
   tools: number;
-}[] {
-  return Array.from(mcpClients.keys()).map(serverName => ({
+}> {
+  return Array.from(mcpClients.keys()).map((serverName) => ({
     server: serverName,
     connected: true,
     tools: mcpTools.get(serverName)?.size || 0,

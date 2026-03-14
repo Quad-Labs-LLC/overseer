@@ -82,7 +82,8 @@ async function reviewFile(params) {
     const activePatterns = focus_areas?.length ? allPatterns.filter((p) => focus_areas.some((area) => p.category.includes(area))) : allPatterns;
     for (const pattern of activePatterns) {
       let match;
-      while ((match = pattern.regex.exec(content)) !== null) {
+      const regex = new RegExp(pattern.regex.source, pattern.regex.flags);
+      while ((match = regex.exec(content)) !== null) {
         const lineNumber = content.substring(0, match.index).split("\n").length;
         issues.push({
           severity: pattern.severity,

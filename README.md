@@ -14,7 +14,7 @@
 
 > Note: This project is newly renamed and hasn't been promoted yet, so the star history is effectively flat for now.
 
-[Quick Start](https://github.com/ErzenXz/overseer#-quick-start) • [Features](#-features) • [Documentation](#-documentation) • [Demo](#-demo) • [Repo](https://github.com/ErzenXz/overseer)
+[Quick Start](https://github.com/Quad-Labs-LLC/overseer#-quick-start) • [Features](#-features) • [Documentation](#-documentation) • [Demo](#-demo) • [Repo](https://github.com/Quad-Labs-LLC/overseer)
 
 </div>
 
@@ -223,14 +223,14 @@ Never: Execute destructive commands without confirmation
 > Windows note: `install.sh`/`update.sh` are supported via **WSL2** (Ubuntu/Debian/etc). Git-Bash/MSYS/Cygwin are not supported for these scripts. For native Windows Server deployment, see [Deployment Guide](https://docs.overseer.sh/guides/deployment) (Windows Server section).
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ErzenXz/overseer/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Quad-Labs-LLC/overseer/main/scripts/install.sh | bash
 ```
 
 #### Option 2: Manual Install
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/ErzenXz/overseer.git
+git clone https://github.com/Quad-Labs-LLC/overseer.git
 cd overseer
 
 # 2. Install dependencies
@@ -477,8 +477,8 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ### Ways to Contribute
 
-- 🐛 **Report Bugs**: [Open an issue](https://github.com/ErzenXz/overseer/issues)
-- 💡 **Request Features**: [Start a discussion](https://github.com/ErzenXz/overseer/discussions)
+- 🐛 **Report Bugs**: [Open an issue](https://github.com/Quad-Labs-LLC/overseer/issues)
+- 💡 **Request Features**: [Start a discussion](https://github.com/Quad-Labs-LLC/overseer/discussions)
 - 🔧 **Submit PRs**: Fix bugs or add features
 - 📚 **Improve Docs**: Help make documentation better
 - 🧩 **Create Skills**: Build and share custom skills
@@ -508,8 +508,8 @@ Overseer is built on the shoulders of giants:
 ## 🔗 Links
 
 - **Documentation**: [docs-site/](docs-site/)
-- **Issues**: [GitHub Issues](https://github.com/ErzenXz/overseer/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/ErzenXz/overseer/discussions)
+- **Issues**: [GitHub Issues](https://github.com/Quad-Labs-LLC/overseer/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/Quad-Labs-LLC/overseer/discussions)
 - **Twitter**: [@overseer](https://twitter.com/overseer)
 - **Discord Community**: [Join Server](https://discord.gg/overseer)
 
@@ -517,7 +517,7 @@ Overseer is built on the shoulders of giants:
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=ErzenXz/overseer&type=Date)](https://star-history.com/#ErzenXz/overseer&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=Quad-Labs-LLC/overseer&type=Date)](https://star-history.com/#Quad-Labs-LLC/overseer&Date)
 
 ---
 

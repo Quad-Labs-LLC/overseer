@@ -8,8 +8,10 @@ import { SessionManager, estimateTokens } from "@/lib/session-manager";
 import { extractMemoriesFromConversation } from "@/agent/super-memory";
 import { runAgentStream } from "@/agent";
 import type { AgentOptions } from "@/agent/agent";
+import { ensureAgentReady } from "@/agent/bootstrap";
 import { getModelById } from "@/agent/providers";
 import { conversationsModel, interfacesModel, messagesModel, usersModel } from "@/database";
+import { poolManager } from "@/lib/resource-pool";
 import type { GatewayEvent } from "./sse";
 import { formatToolReceiptText } from "./tool-receipts";
 import { saveAttachmentsToSandbox, type GatewayAttachment } from "./attachments";
@@ -53,6 +55,43 @@ export interface GatewayChatDeps {
   streamId?: string;
 }
 
+function shouldAutoOrchestrate(input: GatewayChatInput): boolean {
+  const text = String(input.message || "").trim();
+  if (!text) return false;
+
+  const lower = text.toLowerCase();
+
+  const explicitNoPlan = [
+    "quick answer",
+    "just answer",
+    "no plan",
+    "don't use subagents",
+    "do not use subagents",
+  ].some((k) => lower.includes(k));
+  if (explicitNoPlan) return false;
+
+  const listLike = (text.match(/^[\-\*\d]+[\.)]?\s+/gm) || []).length >= 3;
+  const longPrompt = text.length >= 700;
+  const hasMultipleActionVerbs =
+    (lower.match(/\b(build|implement|refactor|migrate|deploy|audit|analyze|fix|optimize|test|document|integrate)\b/g) || [])
+      .length >= 3;
+  const multiScopeHints = [
+    "end-to-end",
+    "across the project",
+    "project-wide",
+    "step by step",
+    "for each",
+    "all files",
+    "entire codebase",
+    "multiple",
+    "phases",
+  ].some((k) => lower.includes(k));
+
+  const hasAttachments = Array.isArray(input.attachments) && input.attachments.length > 0;
+
+  return longPrompt || listLike || hasMultipleActionVerbs || multiScopeHints || hasAttachments;
+}
+
 export async function runGatewayChat(
   auth: GatewayAuthContext,
   input: GatewayChatInput,
@@ -63,6 +102,13 @@ export async function runGatewayChat(
   if (!input.message || typeof input.message !== "string") {
     throw new Error("message is required");
   }
+
+  // One-time runtime bootstrap (skills sync + MCP auto-connect where configured).
+  await ensureAgentReady();
+
+  // Single-mode intelligence: no separate /plan endpoint.
+  // Explicit planMode=true still works, but "big/complex" tasks auto-escalate.
+  const effectivePlanMode = Boolean(input.planMode) || shouldAutoOrchestrate(input);
 
   // Resolve tenant + interface metadata.
   let ownerUserId: number;
@@ -184,7 +230,7 @@ export async function runGatewayChat(
   });
   SessionManager.addMessage(session.id, "user", input.message, {
     source: auth.kind,
-    planMode: Boolean(input.planMode),
+    planMode: effectivePlanMode,
     providerId: input.providerId ?? null,
   });
 
@@ -206,19 +252,8 @@ export async function runGatewayChat(
     );
   }
 
-  // Attachments
+  // Attachments (saved when execution slot is acquired).
   const attachments = Array.isArray(input.attachments) ? input.attachments : [];
-  let promptAppend = "";
-  if (attachments.length > 0) {
-    const saved = await saveAttachmentsToSandbox({
-      sandboxRoot,
-      interfaceType,
-      conversationId: conversationId!,
-      attachments,
-      telegramBotToken,
-    });
-    promptAppend = saved.promptAppend;
-  }
 
   const toolCalls: { name: string; args: unknown; result?: unknown }[] = [];
   let finalText = "";
@@ -229,132 +264,176 @@ export async function runGatewayChat(
     interfaceType,
     interfaceId,
     ownerUserId,
-    planMode: Boolean(input.planMode),
+    planMode: effectivePlanMode,
     attachmentCount: attachments.length,
   });
 
-  const result = await withToolContext(
+  const pooledTimeoutMsRaw = Number.parseInt(process.env.AGENT_TIMEOUT_MS || "120000", 10);
+  const pooledTimeoutMs = Number.isFinite(pooledTimeoutMsRaw)
+    ? Math.max(30_000, pooledTimeoutMsRaw * 2)
+    : 240_000;
+
+  return poolManager.execute(
+    "agent-execution",
+    "gateway-chat",
+    async () => {
+      let promptAppend = "";
+      if (attachments.length > 0) {
+        const saved = await saveAttachmentsToSandbox({
+          sandboxRoot,
+          interfaceType,
+          conversationId: conversationId!,
+          attachments,
+          telegramBotToken,
+        });
+        promptAppend = saved.promptAppend;
+      }
+
+      const result = await withToolContext(
+        {
+          sandboxRoot,
+          allowSystem,
+          actor: { kind: "web", id: String(ownerUserId) },
+          conversationId: conversationId!,
+          agentSessionId: session.session_id,
+          interface: {
+            type: interfaceType,
+            id: interfaceId,
+            externalChatId,
+            externalUserId,
+          },
+        },
+        () =>
+          runAgentStream(`${input.message}${promptAppend ? `\n\n${promptAppend}` : ""}`.trim(), {
+            conversationId: conversationId!,
+            model: model || undefined,
+            planMode: effectivePlanMode,
+            steering: input.steering,
+            multimodalAttachments: attachments
+              .filter(
+                (attachment): attachment is Extract<GatewayAttachment, { source: "inline" }> =>
+                  attachment.source === "inline" &&
+                  typeof attachment.base64 === "string" &&
+                  attachment.base64.length > 0,
+              )
+              .map((attachment) => ({
+                fileName: attachment.fileName,
+                mimeType: attachment.mimeType ?? undefined,
+                base64: attachment.base64,
+              })),
+            sandboxRoot,
+            allowSystem,
+            actor: { kind: "web", id: String(ownerUserId) },
+            onToolCall: (toolName, args) => {
+              SessionManager.recordToolCall(session.id);
+              deps.emit({ type: "tool_call", toolName, args });
+              toolCalls.push({ name: toolName, args });
+            },
+            onToolResult: (toolName, toolResult) => {
+              deps.emit({ type: "tool_result", toolName, result: toolResult });
+              const tc = toolCalls.find((t) => t.name === toolName && t.result === undefined);
+              if (tc) tc.result = toolResult;
+            },
+          }),
+      );
+
+      for await (const chunk of result.textStream) {
+        finalText += chunk;
+        deps.emit({ type: "text_delta", text: chunk });
+      }
+
+      const fullText = await result.fullText;
+      const usage = await result.usage;
+
+      // Persist assistant message
+      messagesModel.create({
+        conversation_id: conversationId!,
+        role: "assistant",
+        content: fullText,
+        tool_calls: toolCalls.length > 0 ? toolCalls : undefined,
+        input_tokens: usage?.inputTokens,
+        output_tokens: usage?.outputTokens,
+      });
+
+      const summariesBefore = SessionManager.getSession(session.id)?.summaries.length ?? 0;
+      const updatedSession = SessionManager.addMessage(session.id, "assistant", fullText, {
+        source: auth.kind,
+        usage,
+        model: modelId,
+      });
+
+      const summariesAfter = updatedSession?.summaries.length ?? summariesBefore;
+      if (summariesAfter > summariesBefore) {
+        const latestSummary = updatedSession?.summaries[summariesAfter - 1];
+        deps.emit({
+          type: "session_summarized",
+          sessionId: session.id,
+          messagesSummarized: latestSummary?.messages_summarized ?? 0,
+        });
+      }
+
+      if (updatedSession && updatedSession.total_tokens >= updatedSession.token_limit * 0.95) {
+        const nextSession = SessionManager.rolloverSession(session.id, {
+          trigger: "context_limit_reached",
+        });
+        if (nextSession) {
+          deps.emit({
+            type: "session_rollover",
+            previousSessionId: session.id,
+            newSessionId: nextSession.id,
+            reason: "context_limit_reached",
+          });
+        }
+      }
+
+      if (usage) {
+        rateLimiter.recordRequest({
+          userId: String(ownerUserId),
+          interfaceType,
+          conversationId: conversationId!,
+          inputTokens: usage.inputTokens,
+          outputTokens: usage.outputTokens,
+          model: modelId,
+        });
+      }
+
+      // Tool receipt
+      const receipts = await result.toolCalls;
+      const receiptText = formatToolReceiptText(receipts);
+      if (receiptText) {
+        deps.emit({ type: "tool_receipt", text: receiptText });
+      }
+
+      deps.emit({ type: "done", fullText, usage });
+
+      extractMemoriesFromConversation(
+        ownerUserId,
+        `user: ${input.message}\n\nassistant: ${fullText}`,
+      ).catch((err) =>
+        logger.warn("Memory extraction failed", {
+          error: err instanceof Error ? err.message : String(err),
+        }),
+      );
+
+      return {
+        streamId,
+        conversationId: conversationId!,
+        sessionDbId: session.id,
+        sessionExternalId: session.session_id,
+        finalText: fullText,
+        usage,
+      };
+    },
     {
-      sandboxRoot,
-      allowSystem,
-      actor: { kind: "web", id: String(ownerUserId) },
-      conversationId: conversationId!,
-      agentSessionId: session.session_id,
-      interface: {
-        type: interfaceType,
-        id: interfaceId,
-        externalChatId,
-        externalUserId,
+      taskId: `${ownerUserId}:${streamId}`,
+      priority: effectivePlanMode ? 6 : 5,
+      timeout: pooledTimeoutMs,
+      poolConfig: {
+        maxConcurrent: Number.parseInt(process.env.AGENT_EXECUTION_MAX_CONCURRENT || "5", 10) || 5,
+        maxQueueSize: Number.parseInt(process.env.AGENT_EXECUTION_MAX_QUEUE || "100", 10) || 100,
       },
     },
-    () =>
-      runAgentStream(`${input.message}${promptAppend ? `\n\n${promptAppend}` : ""}`.trim(), {
-        conversationId: conversationId!,
-        model: model || undefined,
-        planMode: Boolean(input.planMode),
-        steering: input.steering,
-        sandboxRoot,
-        allowSystem,
-        actor: { kind: "web", id: String(ownerUserId) },
-        onToolCall: (toolName, args) => {
-          SessionManager.recordToolCall(session.id);
-          deps.emit({ type: "tool_call", toolName, args });
-          toolCalls.push({ name: toolName, args });
-        },
-        onToolResult: (toolName, toolResult) => {
-          deps.emit({ type: "tool_result", toolName, result: toolResult });
-          const tc = toolCalls.find((t) => t.name === toolName && t.result === undefined);
-          if (tc) tc.result = toolResult;
-        },
-      }),
   );
-
-  for await (const chunk of result.textStream) {
-    finalText += chunk;
-    deps.emit({ type: "text_delta", text: chunk });
-  }
-
-  const fullText = await result.fullText;
-  const usage = await result.usage;
-
-  // Persist assistant message
-  messagesModel.create({
-    conversation_id: conversationId!,
-    role: "assistant",
-    content: fullText,
-    tool_calls: toolCalls.length > 0 ? toolCalls : undefined,
-    input_tokens: usage?.inputTokens,
-    output_tokens: usage?.outputTokens,
-  });
-
-  const summariesBefore = SessionManager.getSession(session.id)?.summaries.length ?? 0;
-  const updatedSession = SessionManager.addMessage(session.id, "assistant", fullText, {
-    source: auth.kind,
-    usage,
-    model: modelId,
-  });
-
-  const summariesAfter = updatedSession?.summaries.length ?? summariesBefore;
-  if (summariesAfter > summariesBefore) {
-    const latestSummary = updatedSession?.summaries[summariesAfter - 1];
-    deps.emit({
-      type: "session_summarized",
-      sessionId: session.id,
-      messagesSummarized: latestSummary?.messages_summarized ?? 0,
-    });
-  }
-
-  if (updatedSession && updatedSession.total_tokens >= updatedSession.token_limit * 0.95) {
-    const nextSession = SessionManager.rolloverSession(session.id, {
-      trigger: "context_limit_reached",
-    });
-    if (nextSession) {
-      deps.emit({
-        type: "session_rollover",
-        previousSessionId: session.id,
-        newSessionId: nextSession.id,
-        reason: "context_limit_reached",
-      });
-    }
-  }
-
-  if (usage) {
-    rateLimiter.recordRequest({
-      userId: String(ownerUserId),
-      interfaceType,
-      conversationId: conversationId!,
-      inputTokens: usage.inputTokens,
-      outputTokens: usage.outputTokens,
-      model: modelId,
-    });
-  }
-
-  // Tool receipt
-  const receipts = await result.toolCalls;
-  const receiptText = formatToolReceiptText(receipts);
-  if (receiptText) {
-    deps.emit({ type: "tool_receipt", text: receiptText });
-  }
-
-  deps.emit({ type: "done", fullText, usage });
-
-  extractMemoriesFromConversation(
-    ownerUserId,
-    `user: ${input.message}\n\nassistant: ${fullText}`,
-  ).catch((err) =>
-    logger.warn("Memory extraction failed", {
-      error: err instanceof Error ? err.message : String(err),
-    }),
-  );
-
-  return {
-    streamId,
-    conversationId: conversationId!,
-    sessionDbId: session.id,
-    sessionExternalId: session.session_id,
-    finalText: fullText,
-    usage,
-  };
 }
 
 function normalizeWhatsAppId(raw: string): string {

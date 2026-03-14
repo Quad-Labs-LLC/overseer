@@ -191,12 +191,6 @@ export function MCPServersList({ servers, connectionStatus }: MCPServersListProp
          >
           {server.is_active ? "Disable" : "Enable"}
          </button>
-         <a
-          href={`/mcp/${server.id}/edit`}
-          className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground bg-muted hover:bg-border rounded-lg transition-colors"
-         >
-          Edit
-         </a>
          <button
           onClick={() => handleDelete(server.id)}
           disabled={actioningId === server.id}

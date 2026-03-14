@@ -3,6 +3,14 @@
   "version": "1.0.0",
   "description": "Self-hosted AI Agent with full VPS access - Telegram, Discord, and Web Admin. Cross-platform: Windows, Linux, macOS.",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Quad-Labs-LLC/overseer.git"
+  },
+  "homepage": "https://github.com/Quad-Labs-LLC/overseer#readme",
+  "bugs": {
+    "url": "https://github.com/Quad-Labs-LLC/overseer/issues"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

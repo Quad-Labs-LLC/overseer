@@ -87,19 +87,43 @@ export const systemRouter = router({
     requirePermission(ctx.user, Permission.SYSTEM_UPDATE, {
       resource: "system_update",
     });
+    requirePermission(ctx.user, Permission.SYSTEM_SHELL, {
+      resource: "system_update",
+      metadata: { action: "enable_auto_update" },
+    });
 
-    // Forward to existing cron API
     const { cronJobsModel } = await import("@/database");
+
+    const existing = cronJobsModel
+      .findAllByOwner(ctx.user.id, 200)
+      .find((job) => job.name === "Overseer Auto Update");
+
+    if (existing) {
+      if (!existing.enabled) {
+        cronJobsModel.enable(existing.id);
+      }
+      return { success: true, jobId: existing.id, existed: true };
+    }
+
+    const updateScriptPath = path.join(repoRoot(), "scripts", "update.sh");
+
     const job = cronJobsModel.create({
+      owner_user_id: ctx.user.id,
+      created_by: ctx.user.username,
       name: "Overseer Auto Update",
       description: "Weekly self-update via scripts/update.sh",
       cron_expression: "0 3 * * 0",
       timezone: "UTC",
       enabled: 1,
       prompt:
-        "Run the shell tool to execute exactly: bash ./scripts/update.sh --yes --stash\nReturn a brief status including the exit code.",
+        `Run the shell tool exactly once with this command (do not modify it):\n` +
+        `bash "${updateScriptPath}" --yes --stash\n\n` +
+        "Return a brief status including success/failure and exit code.",
+      metadata: {
+        kind: "system_auto_update",
+      },
     });
 
-    return { success: true, jobId: job.id };
+    return { success: true, jobId: job.id, existed: false };
   }),
 });

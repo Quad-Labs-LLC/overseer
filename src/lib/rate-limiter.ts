@@ -176,9 +176,12 @@ export class RateLimiter {
     const pool = poolManager.getPool("agent-execution");
     const poolMetrics = pool.getMetrics();
 
-    // Count user's concurrent requests
+    // Count user's concurrent + queued requests.
     const userConcurrent = pool
       .getActiveTasks()
+      .filter((task) => task.id.startsWith(userId)).length;
+    const userQueued = pool
+      .getQueueInfo()
       .filter((task) => task.id.startsWith(userId)).length;
 
     if (userConcurrent >= limits.maxConcurrent) {
@@ -186,6 +189,15 @@ export class RateLimiter {
         allowed: false,
         reason: `Concurrent request limit exceeded: ${limits.maxConcurrent} requests`,
         retryAfter: 5000, // Retry in 5 seconds
+      };
+    }
+
+    // Prevent per-user queue flooding.
+    if (userQueued >= Math.max(2, limits.maxConcurrent * 2)) {
+      return {
+        allowed: false,
+        reason: "Too many queued requests for this user. Please wait for current jobs to finish.",
+        retryAfter: 5000,
       };
     }
 

@@ -16,7 +16,7 @@
 #           macOS, Windows (via WSL2)
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/ErzenXz/overseer/main/scripts/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/Quad-Labs-LLC/overseer/main/scripts/install.sh | bash
 #   
 #   # With options:
 #   OVERSEER_PORT=8080 bash install.sh
@@ -38,7 +38,7 @@ DIM='\033[2m'
 # Configuration
 OVERSEER_VERSION="${OVERSEER_VERSION:-main}"
 OVERSEER_DIR="${OVERSEER_DIR:-$HOME/overseer}"
-OVERSEER_REPO="${OVERSEER_REPO:-https://github.com/ErzenXz/overseer.git}"
+OVERSEER_REPO="${OVERSEER_REPO:-https://github.com/Quad-Labs-LLC/overseer.git}"
 OVERSEER_USER="${OVERSEER_USER:-$USER}"
 NODE_VERSION="20"
 MIN_MEMORY_MB=512
@@ -1294,7 +1294,7 @@ create_systemd_services() {
     sudo_cmd tee /etc/systemd/system/overseer.service > /dev/null << EOF
 [Unit]
 Description=Overseer AI Agent - Web Admin Dashboard
-Documentation=https://github.com/ErzenXz/overseer
+Documentation=https://github.com/Quad-Labs-LLC/overseer
 After=network.target
 Wants=network-online.target
 

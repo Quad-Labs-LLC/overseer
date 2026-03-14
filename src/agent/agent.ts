@@ -326,6 +326,11 @@ export interface AgentOptions {
     prioritizeSafety?: boolean;
     includeReasoningSummary?: boolean;
   };
+  multimodalAttachments?: Array<{
+    fileName: string;
+    mimeType?: string | null;
+    base64: string;
+  }>;
   onToolCall?: (toolName: string, args: unknown) => void;
   onToolResult?: (toolName: string, result: unknown) => void;
   onError?: (error: Error) => void;
@@ -429,6 +434,59 @@ function buildResumeMessages(
   ];
 }
 
+function modelSupportsInputModality(
+  model: LanguageModel,
+  modality: "image" | "pdf",
+): boolean {
+  const modelId = extractModelId(model);
+  const info = findModelInfo(modelId);
+  if (!info) return false;
+  return info.model.inputModalities.includes(modality);
+}
+
+function buildUserMessageContent(
+  prompt: string,
+  model: LanguageModel,
+  attachments?: AgentOptions["multimodalAttachments"],
+): Extract<CoreMessage, { role: "user" }>["content"] {
+  const usableAttachments = Array.isArray(attachments) ? attachments : [];
+  if (usableAttachments.length === 0) {
+    return prompt;
+  }
+
+  const contentParts: Array<
+    | { type: "text"; text: string }
+    | { type: "image"; image: Buffer; mediaType?: string }
+    | { type: "file"; data: Buffer; mediaType: string; filename?: string }
+  > = [{ type: "text", text: prompt }];
+
+  for (const attachment of usableAttachments) {
+    const mimeType = String(attachment.mimeType || "").trim().toLowerCase();
+    if (!mimeType) continue;
+
+    const binary = Buffer.from(attachment.base64, "base64");
+    if (mimeType.startsWith("image/") && modelSupportsInputModality(model, "image")) {
+      contentParts.push({
+        type: "image",
+        image: binary,
+        mediaType: mimeType,
+      });
+      continue;
+    }
+
+    if (mimeType === "application/pdf" && modelSupportsInputModality(model, "pdf")) {
+      contentParts.push({
+        type: "file",
+        data: binary,
+        mediaType: mimeType,
+        filename: attachment.fileName || undefined,
+      });
+    }
+  }
+
+  return contentParts.length === 1 ? prompt : contentParts;
+}
+
 /**
  * Convert database messages to CoreMessage format
  */
@@ -470,6 +528,7 @@ export async function runAgent(
     allowSystem,
     actor,
     steering,
+    multimodalAttachments,
     onToolCall,
     onToolResult,
     onError,
@@ -521,12 +580,13 @@ export async function runAgent(
   // Build messages
   const messages: CoreMessage[] = [
     ...history,
-    { role: "user", content: prompt },
+    { role: "user", content: buildUserMessageContent(prompt, model, multimodalAttachments) },
   ];
 
   // Get all available tools (built-in + MCP + Skills)
   const combinedTools = getAllAvailableTools();
 
+  const allowCache = !multimodalAttachments || multimodalAttachments.length === 0;
   const cacheKey = [
     "runAgent:v2",
     prompt,
@@ -539,46 +599,65 @@ export async function runAgent(
     `sandbox:${sandboxRoot ?? "none"}`,
   ].join("|");
 
-  const cached = agentCache.get<AgentResult>("agent", cacheKey);
-  if (cached) {
-    return {
-      ...cached,
-      model:
-        cached.model ?? (model as { modelId?: string }).modelId ?? "unknown",
-    };
+  if (allowCache) {
+    const cached = agentCache.get<AgentResult>("agent", cacheKey);
+    if (cached) {
+      return {
+        ...cached,
+        model:
+          cached.model ?? (model as { modelId?: string }).modelId ?? "unknown",
+      };
+    }
   }
 
   if (planMode) {
-    const orchestration = await runPlanModeOrchestration(prompt, {
-      parentSessionId: conversationId
-        ? `conversation:${conversationId}`
-        : `session:${Date.now()}`,
-      model,
-      tools: combinedTools,
-      context: history
-        .map((h) => (typeof h.content === "string" ? h.content : ""))
-        .join("\n\n"),
-      steering: JSON.stringify(steering ?? {}),
-      ownerUserId,
-      conversationId,
-    });
+    try {
+      const orchestration = await runPlanModeOrchestration(prompt, {
+        parentSessionId: conversationId
+          ? `conversation:${conversationId}`
+          : `session:${Date.now()}`,
+        model,
+        tools: combinedTools,
+        context: history
+          .map((h) => (typeof h.content === "string" ? h.content : ""))
+          .join("\n\n"),
+        steering: JSON.stringify(steering ?? {}),
+        ownerUserId,
+        conversationId,
+      });
 
-    const planResult: AgentResult = {
-      success: orchestration.success,
-      text: orchestration.text,
-      toolCalls: [],
-      model: (model as { modelId?: string }).modelId || "unknown",
-    };
+      if (orchestration.success) {
+        const planResult: AgentResult = {
+          success: true,
+          text: orchestration.text,
+          toolCalls: [],
+          model: (model as { modelId?: string }).modelId || "unknown",
+        };
 
-    agentCache.set({
-      scope: "agent",
-      key: cacheKey,
-      value: planResult,
-      ttlSeconds: 300,
-      tags: ["agent", "plan-mode"],
-    });
+        if (allowCache) {
+          agentCache.set({
+            scope: "agent",
+            key: cacheKey,
+            value: planResult,
+            ttlSeconds: 300,
+            tags: ["agent", "plan-mode"],
+          });
+        }
 
-    return planResult;
+        return planResult;
+      }
+
+      logger.warn("Plan-mode orchestration failed; falling back to direct agent execution", {
+        conversationId,
+        modelId: extractModelId(model),
+      });
+    } catch (error) {
+      logger.warn("Plan-mode orchestration threw; falling back to direct agent execution", {
+        conversationId,
+        modelId: extractModelId(model),
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   }
 
   logger.info("Running agent", {
@@ -710,18 +789,20 @@ export async function runAgent(
 
       const ttlSeconds =
         output.toolCalls && output.toolCalls.length > 0 ? 120 : 600;
-      agentCache.set({
-        scope: "agent",
-        key: cacheKey,
-        value: output,
-        ttlSeconds,
-        tags: [
-          "agent",
-          output.toolCalls && output.toolCalls.length > 0
-            ? "toolful"
-            : "toolfree",
-        ],
-      });
+      if (allowCache) {
+        agentCache.set({
+          scope: "agent",
+          key: cacheKey,
+          value: output,
+          ttlSeconds,
+          tags: [
+            "agent",
+            output.toolCalls && output.toolCalls.length > 0
+              ? "toolful"
+              : "toolfree",
+          ],
+        });
+      }
 
       return output;
     } catch (error) {
@@ -786,6 +867,7 @@ export async function runAgentStream(
     onToolCall,
     onToolResult,
     actor,
+    multimodalAttachments,
   } = options;
 
   const ownerUserId =
@@ -837,7 +919,7 @@ export async function runAgentStream(
 
   const messages: CoreMessage[] = [
     ...history,
-    { role: "user", content: prompt },
+    { role: "user", content: buildUserMessageContent(prompt, model, multimodalAttachments) },
   ];
 
   // Get all available tools (built-in + MCP + Skills)
@@ -855,6 +937,7 @@ export async function runAgentStream(
     resolveToolCalls = resolve;
   });
 
+  const allowStreamCache = !multimodalAttachments || multimodalAttachments.length === 0;
   const streamCacheKey = [
     "runAgentStream:v2",
     prompt,
@@ -866,61 +949,80 @@ export async function runAgentStream(
     `sandbox:${sandboxRoot ?? "none"}`,
   ].join("|");
 
-  const cached = agentCache.get<{
-    text: string;
-    usage?: { inputTokens: number; outputTokens: number };
-  }>("agent", streamCacheKey);
-  if (cached) {
-    return {
-      textStream: (async function* () {
-        yield cached.text;
-      })(),
-      fullText: Promise.resolve(cached.text),
-      usage: Promise.resolve(cached.usage),
-      toolCalls: Promise.resolve([]),
-    };
+  if (allowStreamCache) {
+    const cached = agentCache.get<{
+      text: string;
+      usage?: { inputTokens: number; outputTokens: number };
+    }>("agent", streamCacheKey);
+    if (cached) {
+      return {
+        textStream: (async function* () {
+          yield cached.text;
+        })(),
+        fullText: Promise.resolve(cached.text),
+        usage: Promise.resolve(cached.usage),
+        toolCalls: Promise.resolve([]),
+      };
+    }
   }
 
   if (planMode) {
-    if (!canUseTools) {
-      logger.info("Plan mode requested, but model does not support tools; running plan mode tool-free", {
+    try {
+      if (!canUseTools) {
+        logger.info("Plan mode requested, but model does not support tools; running plan mode tool-free", {
+          modelId: extractModelId(model),
+        });
+      }
+      const orchestration = await runPlanModeOrchestration(prompt, {
+        parentSessionId: conversationId
+          ? `conversation:${conversationId}`
+          : `session:${Date.now()}`,
+        model,
+        tools: canUseTools ? combinedTools : {},
+        context: history
+          .map((h) => (typeof h.content === "string" ? h.content : ""))
+          .join("\n\n"),
+        steering: JSON.stringify(steering ?? {}),
+        ownerUserId,
+        conversationId,
+      });
+
+      if (orchestration.success) {
+        const full = orchestration.text;
+        if (allowStreamCache) {
+          agentCache.set({
+            scope: "agent",
+            key: streamCacheKey,
+            value: { text: full },
+            ttlSeconds: 240,
+            tags: ["agent", "plan-mode", "stream"],
+          });
+        }
+
+        return {
+          textStream: (async function* () {
+            const chunks = full.match(/.{1,160}/g) ?? [full];
+            for (const chunk of chunks) {
+              yield chunk;
+            }
+          })(),
+          fullText: Promise.resolve(full),
+          usage: Promise.resolve(undefined),
+          toolCalls: Promise.resolve([]),
+        };
+      }
+
+      logger.warn("Plan-mode stream orchestration failed; falling back to direct stream", {
+        conversationId,
         modelId: extractModelId(model),
       });
+    } catch (error) {
+      logger.warn("Plan-mode stream orchestration threw; falling back to direct stream", {
+        conversationId,
+        modelId: extractModelId(model),
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
-    const orchestration = await runPlanModeOrchestration(prompt, {
-      parentSessionId: conversationId
-        ? `conversation:${conversationId}`
-        : `session:${Date.now()}`,
-      model,
-      tools: canUseTools ? combinedTools : {},
-      context: history
-        .map((h) => (typeof h.content === "string" ? h.content : ""))
-        .join("\n\n"),
-      steering: JSON.stringify(steering ?? {}),
-      ownerUserId,
-      conversationId,
-    });
-
-    const full = orchestration.text;
-    agentCache.set({
-      scope: "agent",
-      key: streamCacheKey,
-      value: { text: full },
-      ttlSeconds: 240,
-      tags: ["agent", "plan-mode", "stream"],
-    });
-
-    return {
-      textStream: (async function* () {
-        const chunks = full.match(/.{1,160}/g) ?? [full];
-        for (const chunk of chunks) {
-          yield chunk;
-        }
-      })(),
-      fullText: Promise.resolve(full),
-      usage: Promise.resolve(undefined),
-      toolCalls: Promise.resolve([]),
-    };
   }
 
   logger.info("Starting agent stream", {
@@ -1114,13 +1216,15 @@ export async function runAgentStream(
           ? String(finalText ?? partial)
           : "No output generated. Check the stream for errors and confirm your provider supports streaming/tool-calling.";
 
-      agentCache.set({
-        scope: "agent",
-        key: streamCacheKey,
-        value: { text: normalized, usage: finalUsage },
-        ttlSeconds: 180,
-        tags: ["agent", "stream"],
-      });
+      if (allowStreamCache) {
+        agentCache.set({
+          scope: "agent",
+          key: streamCacheKey,
+          value: { text: normalized, usage: finalUsage },
+          ttlSeconds: 180,
+          tags: ["agent", "stream"],
+        });
+      }
 
       // Resolve after the stream is finished (even on error) so callers can
       // reliably emit a final "done" event without clobbering streamed output.

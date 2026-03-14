@@ -290,24 +290,44 @@ export async function executeTask(
       };
     };
 
-    const poolKey = `subagent-${subAgentId}`;
+    const poolName = "subagent-execution";
+    const taskName = `subagent:${subAgentId}`;
+    const breakerKey = `subagent-owner:${subAgent.owner_user_id}`;
+    const taskId = `${subAgent.owner_user_id}:${subAgentId}`;
     const priority = options.priority ?? SUB_AGENT_CONFIG.priority ?? 5;
 
+    const subagentPoolConfig = {
+      maxConcurrent:
+        Number.parseInt(process.env.SUBAGENT_MAX_CONCURRENT || "8", 10) || 8,
+      maxQueueSize:
+        Number.parseInt(process.env.SUBAGENT_MAX_QUEUE || "200", 10) || 200,
+    };
+
     let output: TaskResult;
-    
+
     if (options.bypassCircuitBreaker) {
       output = await poolManager.execute(
-        poolKey,
-        poolKey,
+        poolName,
+        taskName,
         executeWithProtection,
-        { priority, timeout: options.timeout },
+        {
+          priority,
+          timeout: options.timeout,
+          taskId,
+          poolConfig: subagentPoolConfig,
+        },
       );
     } else {
       output = await poolManager.execute(
-        poolKey,
-        poolKey,
-        () => circuitBreakerManager.execute(poolKey, executeWithProtection),
-        { priority, timeout: options.timeout },
+        poolName,
+        taskName,
+        () => circuitBreakerManager.execute(breakerKey, executeWithProtection),
+        {
+          priority,
+          timeout: options.timeout,
+          taskId,
+          poolConfig: subagentPoolConfig,
+        },
       );
     }
 

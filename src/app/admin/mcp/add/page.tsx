@@ -76,7 +76,7 @@ async function createMcpServerAction(formData: FormData) {
   await mcpClient.connectToServer(created.id);
  }
 
- revalidatePath("/mcp");
+ revalidatePath("/admin/mcp");
  redirect("/admin/mcp/add?success=MCP%20server%20created%20successfully");
 }
 
@@ -99,7 +99,7 @@ export default async function AddMcpServerPage({
      </p>
     </div>
     <Link
-     href="/mcp"
+     href="/admin/mcp"
      className="px-3 py-2 text-sm rounded border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
     >
      Back to MCP

@@ -275,7 +275,7 @@ module.exports = {
       user: 'deploy',
       host: ['your-server.com'],
       ref: 'origin/main',
-      repo: 'git@github.com:ErzenXz/overseer.git',
+      repo: 'git@github.com:Quad-Labs-LLC/overseer.git',
       path: '/opt/overseer',
       'pre-deploy-local': '',
       'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.js --env production',
@@ -287,7 +287,7 @@ module.exports = {
       user: 'deploy',
       host: ['staging-server.com'],
       ref: 'origin/develop',
-      repo: 'git@github.com:ErzenXz/overseer.git',
+      repo: 'git@github.com:Quad-Labs-LLC/overseer.git',
       path: '/opt/overseer-staging',
       'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.js --env staging',
       env: {

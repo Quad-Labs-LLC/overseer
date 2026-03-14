@@ -23,7 +23,7 @@
   ],
   "topbarCtaButton": {
     "name": "GitHub",
-    "url": "https://github.com/ErzenXz/overseer"
+    "url": "https://github.com/Quad-Labs-LLC/overseer"
   },
   "tabs": [
     {
@@ -35,7 +35,7 @@
     {
       "name": "GitHub",
       "icon": "github",
-      "url": "https://github.com/ErzenXz/overseer"
+      "url": "https://github.com/Quad-Labs-LLC/overseer"
     },
     {
       "name": "Community",
@@ -102,7 +102,7 @@
     }
   ],
   "footerSocials": {
-    "github": "https://github.com/ErzenXz/overseer",
+    "github": "https://github.com/Quad-Labs-LLC/overseer",
     "discord": "https://discord.gg/overseer"
   },
   "feedback": {

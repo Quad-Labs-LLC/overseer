@@ -47,6 +47,14 @@ interface InlineGatewayAttachment {
   base64: string;
 }
 
+interface ActiveSkillSummary {
+  id: string;
+  name: string;
+  description: string;
+  tools: string[];
+  triggers: string[];
+}
+
 interface ActiveStreamState {
   streamId: string;
   assistantMessageId: string;
@@ -70,6 +78,7 @@ interface ActiveStreamState {
 
 const ACTIVE_STREAM_STORAGE_KEY = "overseer.chat.active-stream";
 const LAST_CONVERSATION_STORAGE_KEY = "overseer.chat.last-conversation-id";
+let activeSkillsPromise: Promise<ActiveSkillSummary[]> | null = null;
 
 function getStorage(): Storage | null {
   if (typeof window === "undefined") return null;
@@ -138,6 +147,95 @@ async function uploadFileToUserFiles(file: File): Promise<string> {
 
   const data = await res.json().catch(() => null);
   return typeof data?.path === "string" ? data.path : `chat/uploads/${file.name}`;
+}
+
+async function getActiveSkills(): Promise<ActiveSkillSummary[]> {
+  if (!activeSkillsPromise) {
+    activeSkillsPromise = fetch("/api/skills", { cache: "no-store" })
+      .then(async (res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to load skills (${res.status})`);
+        }
+
+        const data = (await res.json().catch(() => null)) as
+          | { skills?: ActiveSkillSummary[] }
+          | null;
+        return Array.isArray(data?.skills) ? data.skills : [];
+      })
+      .catch(() => []);
+  }
+
+  return activeSkillsPromise;
+}
+
+function summarizeAttachments(attachments?: File[]): string | undefined {
+  if (!attachments || attachments.length === 0) return undefined;
+  const names = attachments
+    .map((file) => file.name)
+    .filter(Boolean)
+    .slice(0, 4);
+
+  if (names.length === 0) return `Attached ${attachments.length} file(s)`;
+  const suffix = attachments.length > names.length ? ", ..." : "";
+  return `Attached: ${names.join(", ")}${suffix}`;
+}
+
+async function preprocessSlashCommand(rawContent: string): Promise<string> {
+  const trimmed = rawContent.trim();
+  if (!trimmed.startsWith("/")) return rawContent;
+
+  if (trimmed === "/skills") {
+    const skills = await getActiveSkills();
+    if (skills.length === 0) {
+      return "List the skills currently available to you. If none are active, say that clearly and continue with your built-in tools.";
+    }
+
+    const catalog = skills
+      .map((skill) => {
+        const tools = skill.tools.length > 0 ? ` tools: ${skill.tools.join(", ")}` : "";
+        const triggers = skill.triggers.length > 0 ? ` triggers: ${skill.triggers.join(", ")}` : "";
+        return `- ${skill.id}: ${skill.description || skill.name}.${tools}${triggers}`;
+      })
+      .join("\n");
+
+    return `List the active skills currently available to you and explain when to use each one.\n\nActive skills:\n${catalog}`;
+  }
+
+  const explicitSkill = trimmed.match(/^\/skill\s+([^\s]+)(?:\s+([\s\S]+))?$/i);
+  if (explicitSkill) {
+    const [, skillIdRaw, taskRaw] = explicitSkill;
+    const skillId = String(skillIdRaw || "").trim();
+    const task = String(taskRaw || "").trim();
+    const skills = await getActiveSkills();
+    const matched = skills.find((skill) => skill.id === skillId);
+    const context = matched
+      ? `Skill details: ${matched.name} — ${matched.description || "No description provided."}`
+      : `If the skill "${skillId}" is not available, say that briefly and continue with the best available tools.`;
+
+    if (!task) {
+      return `Explain what the skill "${skillId}" does, whether it is available, and when it should be used.\n\n${context}`;
+    }
+
+    return `Use the skill "${skillId}" if it is available and relevant. Prefer its tools when they fit the task.\n\n${context}\n\nUser task:\n${task}`;
+  }
+
+  const shorthand = trimmed.match(/^\/([^\s/]+)(?:\s+([\s\S]+))?$/);
+  if (!shorthand) return rawContent;
+
+  const [, command, taskRaw] = shorthand;
+  const reserved = new Set(["skills", "skill"]);
+  if (reserved.has(command)) return rawContent;
+
+  const skills = await getActiveSkills();
+  const matched = skills.find((skill) => skill.id === command);
+  if (!matched) return rawContent;
+
+  const task = String(taskRaw || "").trim();
+  if (!task) {
+    return `Explain what the skill "${matched.id}" does and when it should be used.\n\nSkill details: ${matched.name} — ${matched.description || "No description provided."}`;
+  }
+
+  return `Use the skill "${matched.id}" if it is available and relevant. Prefer its tools when they fit the task.\n\nSkill details: ${matched.name} — ${matched.description || "No description provided."}\n\nUser task:\n${task}`;
 }
 
 export function useChat(options: ChatOptions = {}) {
@@ -505,12 +603,22 @@ export function useChat(options: ChatOptions = {}) {
       setIsLoading(true);
       setError(null);
 
+      const slashProcessedContent = await preprocessSlashCommand(content);
+      const normalizedContent =
+        slashProcessedContent.trim() ||
+        (attachments && attachments.length > 0
+          ? "Please analyze the attached files and use them as context for your answer."
+          : "");
+      const attachmentSummary = summarizeAttachments(attachments);
+      const displayContent =
+        content.trim() || attachmentSummary || normalizedContent;
+
       // Add user message
       const userMessageId = `user-${Date.now()}`;
       const userMessage: ChatMessage = {
         id: userMessageId,
         role: "user",
-        content,
+        content: displayContent,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, userMessage]);
@@ -558,7 +666,7 @@ export function useChat(options: ChatOptions = {}) {
           steering?: SendMessageOptions["steering"];
           attachments?: InlineGatewayAttachment[];
         } = {
-          message: content,
+          message: normalizedContent,
           conversationId,
           providerId: sendOptions?.providerId ?? options.providerId,
           streamId:

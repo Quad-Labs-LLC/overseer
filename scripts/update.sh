@@ -282,7 +282,7 @@ start_services() {
         sudo tee /etc/systemd/system/overseer.service > /dev/null << SVCEOF
 [Unit]
 Description=Overseer AI Agent - Web Admin Dashboard
-Documentation=https://github.com/ErzenXz/overseer
+Documentation=https://github.com/Quad-Labs-LLC/overseer
 After=network.target
 Wants=network-online.target
 

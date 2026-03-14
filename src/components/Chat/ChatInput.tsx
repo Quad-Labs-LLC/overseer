@@ -15,6 +15,18 @@ interface ListedDirResponse {
  entries?: SandboxFileEntry[];
 }
 
+interface ActiveSkillEntry {
+ id: string;
+ name: string;
+ description: string;
+ tools: string[];
+ triggers: string[];
+}
+
+interface ListedSkillsResponse {
+ skills?: ActiveSkillEntry[];
+}
+
 // Web Speech API types
 interface SpeechRecognitionEvent extends Event {
  resultIndex: number;
@@ -79,6 +91,9 @@ export function ChatInput({
  const [allFiles, setAllFiles] = useState<string[]>([]);
  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+ const [skills, setSkills] = useState<ActiveSkillEntry[]>([]);
+ const [isLoadingSkills, setIsLoadingSkills] = useState(false);
+ const [slashQuery, setSlashQuery] = useState<string | null>(null);
  const textareaRef = useRef<HTMLTextAreaElement>(null);
  const fileInputRef = useRef<HTMLInputElement>(null);
  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
@@ -158,6 +173,19 @@ export function ChatInput({
   }
  };
 
+ const loadSkills = async () => {
+  if (isLoadingSkills || skills.length > 0) return;
+  setIsLoadingSkills(true);
+  try {
+   const res = await fetch("/api/skills", { cache: "no-store" });
+   if (!res.ok) return;
+   const data = (await res.json()) as ListedSkillsResponse;
+   setSkills(Array.isArray(data.skills) ? data.skills : []);
+  } finally {
+   setIsLoadingSkills(false);
+  }
+ };
+
  useEffect(() => {
   const match = message.match(/(?:^|\s)@([^\s]*)$/);
   if (!match) {
@@ -171,11 +199,48 @@ export function ChatInput({
   // eslint-disable-next-line react-hooks/exhaustive-deps
  }, [message]);
 
+ useEffect(() => {
+  const match = message.match(/^\/([^\s]*)$/);
+  if (!match) {
+   setSlashQuery(null);
+   return;
+  }
+
+  const query = match[1] ?? "";
+  setSlashQuery(query);
+  void loadSkills();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+ }, [message]);
+
  const filteredFiles =
   mentionQuery === null
    ? []
    : allFiles
      .filter((p) => p.toLowerCase().includes(mentionQuery.toLowerCase()))
+     .slice(0, 10);
+
+ const slashCommands = slashQuery === null
+  ? []
+  : [
+     {
+      label: "/skills",
+      insert: "/skills ",
+      description: "List active skills available in this workspace",
+     },
+     {
+      label: "/skill",
+      insert: "/skill ",
+      description: "Target a specific skill explicitly",
+     },
+     ...skills.map((skill) => ({
+      label: `/${skill.id}`,
+      insert: `/${skill.id} `,
+      description:
+       skill.description ||
+       (skill.tools.length > 0 ? `Tools: ${skill.tools.join(", ")}` : skill.name),
+     })),
+    ]
+     .filter((command) => command.label.toLowerCase().includes(`/${slashQuery.toLowerCase()}`))
      .slice(0, 10);
 
  const attachExistingFile = async (path: string) => {
@@ -210,6 +275,11 @@ export function ChatInput({
   } catch {
    // ignore non-fatal picker errors
   }
+ };
+
+ const handleSlashSelect = (value: string) => {
+  setMessage(value);
+  setSlashQuery(null);
  };
 
  const handleSubmit = (e?: React.FormEvent) => {
@@ -349,6 +419,34 @@ export function ChatInput({
        )}
       </div>
      )}
+
+     {slashQuery !== null && (
+      <div className="absolute left-0 right-0 bottom-full mb-2 rounded-xl border border-border bg-card shadow-2xl max-h-56 overflow-y-auto z-20">
+       <div className="px-3 py-2 text-xs text-muted-foreground border-b border-border">
+        Skills commands
+       </div>
+
+       {isLoadingSkills ? (
+        <div className="px-3 py-3 text-sm text-muted-foreground">Loading skills...</div>
+       ) : slashCommands.length === 0 ? (
+        <div className="px-3 py-3 text-sm text-muted-foreground">No matching commands</div>
+       ) : (
+        <div className="py-1">
+         {slashCommands.map((command) => (
+          <button
+           key={command.label}
+           type="button"
+           onClick={() => handleSlashSelect(command.insert)}
+           className="w-full text-left px-3 py-2 hover:bg-primary transition-colors"
+          >
+           <div className="text-sm text-foreground truncate">{command.label}</div>
+           <div className="text-[11px] text-muted-foreground truncate">{command.description}</div>
+          </button>
+         ))}
+        </div>
+       )}
+      </div>
+     )}
     </div>
 
     {/* Voice input button */}
@@ -402,7 +500,7 @@ export function ChatInput({
 
    {/* Input hints */}
    <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-    <span>Enter to send, Shift+Enter newline, @ to attach from Files</span>
+    <span>Enter to send, Shift+Enter newline, `/skills` or `/&lt;skill&gt;` for skills, `@` for Files</span>
     {isListening && (
      <span className="flex items-center gap-1 text-red-400">
       <span className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />

@@ -121,11 +121,15 @@ export default function CronPage() {
 
  const handleToggle = async (jobId: number, enabled: boolean) => {
   try {
-   await fetch(`/api/cron/${jobId}`, {
+   const res = await fetch(`/api/cron/${jobId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ enabled }),
    });
+   if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Failed to update cron job");
+   }
    fetchJobs();
   } catch (err) {
    setError(err instanceof Error ? err.message : String(err));
@@ -135,7 +139,11 @@ export default function CronPage() {
  const handleDelete = async (jobId: number) => {
   if (!confirm("Are you sure you want to delete this cron job?")) return;
   try {
-   await fetch(`/api/cron/${jobId}`, { method: "DELETE" });
+   const res = await fetch(`/api/cron/${jobId}`, { method: "DELETE" });
+   if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Failed to delete cron job");
+   }
    if (selectedJob?.id === jobId) setSelectedJob(null);
    fetchJobs();
   } catch (err) {
@@ -145,7 +153,11 @@ export default function CronPage() {
 
  const handleRunNow = async (jobId: number) => {
   try {
-   await fetch(`/api/cron/${jobId}/run`, { method: "POST" });
+   const res = await fetch(`/api/cron/${jobId}/run`, { method: "POST" });
+   if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Failed to trigger cron job");
+   }
    fetchJobs();
   } catch (err) {
    setError(err instanceof Error ? err.message : String(err));

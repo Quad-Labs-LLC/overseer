@@ -49,7 +49,7 @@ Instances of abusive behavior may be reported to the project team. All complaint
 
 **Before submitting a bug report:**
 - Check the [FAQ](https://docs.overseer.sh/guides/faq)
-- Search [existing issues](https://github.com/ErzenXz/overseer/issues)
+- Search [existing issues](https://github.com/Quad-Labs-LLC/overseer/issues)
 - Try the latest version
 
 **Submitting a good bug report:**
@@ -89,7 +89,7 @@ Any other context about the problem.
 
 **Before suggesting a feature:**
 - Check if it already exists
-- Search [existing feature requests](https://github.com/ErzenXz/overseer/issues?q=is%3Aissue+label%3Aenhancement)
+- Search [existing feature requests](https://github.com/Quad-Labs-LLC/overseer/issues?q=is%3Aissue+label%3Aenhancement)
 - Consider if it fits Overseer's scope
 
 **Submitting a good feature request:**
@@ -141,11 +141,11 @@ Share your custom skills with the community!
 2. Test thoroughly
 3. Add documentation
 4. Submit to [Skills Marketplace](https://github.com/ErzenXz/overseer-skills) (coming soon)
-5. Or share in [Discussions](https://github.com/ErzenXz/overseer/discussions)
+5. Or share in [Discussions](https://github.com/Quad-Labs-LLC/overseer/discussions)
 
 ### 💬 Helping Others
 
-- Answer questions in [Discussions](https://github.com/ErzenXz/overseer/discussions)
+- Answer questions in [Discussions](https://github.com/Quad-Labs-LLC/overseer/discussions)
 - Help troubleshoot issues
 - Share your use cases and tips
 - Write blog posts or tutorials
@@ -171,7 +171,7 @@ git clone https://github.com/YOUR_USERNAME/overseer.git
 cd overseer
 
 # 3. Add upstream remote
-git remote add upstream https://github.com/ErzenXz/overseer.git
+git remote add upstream https://github.com/Quad-Labs-LLC/overseer.git
 
 # 4. Install dependencies
 npm install
@@ -610,7 +610,7 @@ git push origin feature/my-feature
 
 ### Communication Channels
 
-- **GitHub Discussions**: https://github.com/ErzenXz/overseer/discussions
+- **GitHub Discussions**: https://github.com/Quad-Labs-LLC/overseer/discussions
 - **Discord**: https://discord.gg/overseer
 - **Twitter**: [@overseer](https://twitter.com/overseer)
 - **Email**: contribute@overseer.io
@@ -639,7 +639,7 @@ git push origin feature/my-feature
 
 **New to open source?** Welcome! Here's how to get started:
 
-1. **Pick a "good first issue"**: https://github.com/ErzenXz/overseer/issues?q=label%3A%22good+first+issue%22
+1. **Pick a "good first issue"**: https://github.com/Quad-Labs-LLC/overseer/issues?q=label%3A%22good+first+issue%22
 
 2. **Comment on the issue**: Let us know you're working on it
 

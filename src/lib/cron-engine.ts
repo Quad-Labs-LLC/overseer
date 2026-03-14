@@ -32,6 +32,7 @@ const JOB_TIMEOUT_DEFAULT = 300_000; // 5 minute default timeout
 let pollTimer: ReturnType<typeof setInterval> | null = null;
 let isRunning = false;
 let activeJobs = 0;
+const runningJobIds = new Set<number>();
 
 // =====================================================
 // Core Functions
@@ -105,6 +106,14 @@ async function checkDueJobs(): Promise<void> {
     logger.info(`Found ${dueJobs.length} due cron job(s)`);
 
     for (const job of dueJobs) {
+      if (runningJobIds.has(job.id)) {
+        logger.info("Cron job already running, skipping duplicate schedule tick", {
+          jobId: job.id,
+          jobName: job.name,
+        });
+        continue;
+      }
+
       if (activeJobs >= MAX_CONCURRENT_JOBS) {
         logger.warn("Max concurrent cron jobs reached, deferring remaining", {
           active: activeJobs,
@@ -132,6 +141,15 @@ async function checkDueJobs(): Promise<void> {
  * Execute a single cron job
  */
 async function executeJob(job: CronJob): Promise<void> {
+  if (runningJobIds.has(job.id)) {
+    logger.warn("Skipping cron execution because job is already running", {
+      jobId: job.id,
+      jobName: job.name,
+    });
+    return;
+  }
+
+  runningJobIds.add(job.id);
   activeJobs++;
   const startTime = Date.now();
   const ownerUserId = job.owner_user_id ?? 1;
@@ -280,6 +298,7 @@ async function executeJob(job: CronJob): Promise<void> {
     });
   } finally {
     activeJobs--;
+    runningJobIds.delete(job.id);
 
     // Calculate and set next run time
     try {
@@ -305,6 +324,13 @@ export async function triggerJob(jobId: number): Promise<{
   const job = cronJobsModel.findById(jobId);
   if (!job) {
     return { success: false, error: `Cron job ${jobId} not found` };
+  }
+
+  if (runningJobIds.has(job.id)) {
+    return {
+      success: false,
+      error: `Cron job ${job.id} is already running`,
+    };
   }
 
   logger.info("Manually triggering cron job", { jobId, jobName: job.name });
