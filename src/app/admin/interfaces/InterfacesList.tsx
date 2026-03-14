@@ -155,8 +155,18 @@ export function InterfacesList({ interfaces }: InterfacesListProps) {
           )}
          </p>
          {iface.type === "discord" && (
+          <div className="space-y-1">
+           <p className="text-xs text-muted-foreground">
+            Client ID: {hasClientId ? <span className="text-foreground font-medium">configured</span> : <span className="text-amber-500">missing</span>}
+           </p>
+           <p className="text-xs text-muted-foreground">
+            Use it by DM, <span className="font-mono text-foreground">/ask</span>, or mention the bot in a server.
+           </p>
+          </div>
+         )}
+         {iface.type === "telegram" && (
           <p className="text-xs text-muted-foreground">
-           Client ID: {hasClientId ? <span className="text-foreground font-medium">configured</span> : <span className="text-amber-500">missing</span>}
+           Use it by sending a direct message to the bot in Telegram.
           </p>
          )}
          {!isHealthyConfig && (
@@ -229,8 +239,19 @@ export function InterfacesList({ interfaces }: InterfacesListProps) {
         )}
        >
         <div className={cn("w-2 h-2 rounded-full", testResultForThis.success ? "bg-emerald-500" : "bg-destructive")} />
-        <span className="font-medium">{testResultForThis.success ? "Connection successful:" : "Connection failed:"}</span>
+        <span className="font-medium">{testResultForThis.success ? "Token check passed:" : "Connection failed:"}</span>
         <span className="opacity-90 font-mono text-xs">{testResultForThis.message}</span>
+       </div>
+      )}
+
+      {iface.type === "discord" && (
+       <div className="mt-4 rounded-lg border border-border/60 bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
+        <div className="font-semibold text-foreground mb-1">Discord checklist</div>
+        <div>1. Bot Token and Client ID saved</div>
+        <div>2. Bot invited with <span className="font-mono text-foreground">bot</span> and <span className="font-mono text-foreground">applications.commands</span></div>
+        <div>3. Message Content Intent enabled in Discord Developer Portal</div>
+        <div>4. <span className="font-mono text-foreground">overseer-discord</span> restarted on the server</div>
+        <div>5. Test with DM, <span className="font-mono text-foreground">/ask</span>, or a bot mention</div>
        </div>
       )}
      </div>

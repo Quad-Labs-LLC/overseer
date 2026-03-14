@@ -7,6 +7,19 @@ description: "Discord bot integration guide"
 
 Integrate Overseer with your Discord server for team-based AI assistance with role-based access control.
 
+## Important
+
+The **Test** button in Overseer only checks whether your Discord bot token is valid.
+
+It does **not** mean all of these are already done:
+
+- the bot was invited to your server
+- the Discord worker process is running
+- Message Content Intent is enabled
+- slash commands were registered
+
+If Test says OK but the bot says nothing in Discord, you still need to finish the setup below.
+
 ## Setup
 
 <Steps>
@@ -22,11 +35,15 @@ Integrate Overseer with your Discord server for team-based AI assistance with ro
     Use the OAuth2 URL Generator with `bot` and `applications.commands` scopes.
     Invite to your server.
   </Step>
+  <Step title="Enable Message Content Intent">
+    In Discord Developer Portal, open the Bot settings and turn on **Message Content Intent**.
+  </Step>
   <Step title="Configure">
-    Add this to your `.env` file:
+    In Overseer, save:
 
     ```bash
     DISCORD_BOT_TOKEN=your-discord-token
+    DISCORD_CLIENT_ID=your-client-id
     DISCORD_ALLOWED_GUILDS=server-id-1,server-id-2
     ```
   </Step>
@@ -35,12 +52,35 @@ Integrate Overseer with your Discord server for team-based AI assistance with ro
     pnpm discord:dev
     ```
   </Step>
+  <Step title="Try it the right way">
+    Test with one of these:
+
+    ```bash
+    /ask hello
+    ```
+
+    or DM the bot directly, or mention the bot in a server channel.
+  </Step>
 </Steps>
 
 ## Features
 
 - **Server Integration** — Works within your Discord server context
 - **Slash Commands** — Native Discord slash command support
+- **Mention Replies** — Mention the bot in a channel to talk to it
+- **DM Support** — Private direct messages also work
 - **Role-Based Access** — Control who can interact with the bot
 - **Thread Support** — Keep conversations organized
 - **Rich Embeds** — Beautiful formatted responses
+
+## Troubleshooting
+
+If the bot was invited but still does not answer:
+
+1. Make sure the Discord interface is **Active**
+2. Make sure **Client ID** is filled in
+3. Make sure **Allowed Guild IDs** includes your server, or leave it empty
+4. Restart the Discord worker
+5. Try `/ask hello`
+6. Try a DM
+7. Try mentioning the bot in a server message

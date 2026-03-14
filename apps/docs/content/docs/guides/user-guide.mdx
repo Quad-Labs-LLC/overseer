@@ -290,6 +290,14 @@ Bot: 🚀 Deploying application...
 
 ## Using Discord Bot
 
+The Discord bot does **not** need you to guess how to talk to it.
+
+Once it is set up, you can use any of these:
+
+- `/ask your message`
+- a direct message to the bot
+- mention the bot in a server message
+
 ### Initial Setup
 
 1. **Create Discord Application**:
@@ -308,6 +316,7 @@ Bot: 🚀 Deploying application...
 
 3. **Configure Overseer**:
    - Add token to Settings → Interfaces
+   - Add Client ID
    - Add server ID to allowed guilds
    - Save and restart bot service
 
@@ -315,11 +324,10 @@ Bot: 🚀 Deploying application...
 
 | Command | Description |
 |---------|-------------|
-| `/chat [message]` | Send message to agent |
-| `/status` | Show bot status |
-| `/model` | Show current model |
-| `/reset` | Clear conversation |
-| `/help` | Show help |
+| `/ask [message]` | Send a message to Overseer |
+| `/help` | Show Discord usage help |
+
+If your slash commands do not appear, restart the Discord worker after saving the interface, and make sure the bot was invited with `applications.commands`.
 
 ### Thread-Based Conversations
 

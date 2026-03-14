@@ -76,7 +76,7 @@ export default async function InterfacesPage() {
      </div>
     </div>
 
-    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+   <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
      <div className="px-6 py-4 border-b border-border/50 bg-muted/20">
       <h2 className="text-sm font-semibold tracking-tight text-foreground flex items-center gap-2">
        <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
@@ -91,17 +91,28 @@ export default async function InterfacesPage() {
        </li>
        <li className="flex gap-4">
         <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold ring-1 ring-primary/20">2</span>
-        <span className="pt-0.5">Copy Bot Token and Client ID into the interface form</span>
+        <span className="pt-0.5">Copy the <strong className="text-foreground">Bot Token</strong> and <strong className="text-foreground">Client ID</strong> into the interface form</span>
        </li>
        <li className="flex gap-4">
         <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold ring-1 ring-primary/20">3</span>
-        <span className="pt-0.5 leading-relaxed">Invite the bot to your server with required scopes and permissions</span>
+        <span className="pt-0.5 leading-relaxed">Invite the bot with <code className="px-1.5 py-0.5 bg-muted/50 border border-border rounded text-foreground font-mono text-[11px]">bot</code> and <code className="px-1.5 py-0.5 bg-muted/50 border border-border rounded text-foreground font-mono text-[11px]">applications.commands</code> scopes</span>
        </li>
        <li className="flex gap-4">
         <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold ring-1 ring-primary/20">4</span>
-        <span className="pt-0.5 leading-relaxed">Run <code className="px-1.5 py-0.5 bg-muted/50 border border-border rounded text-foreground font-mono text-[11px]">npm run discord</code> and test connectivity</span>
+        <span className="pt-0.5 leading-relaxed">Enable <strong className="text-foreground">Message Content Intent</strong> in Discord Developer Portal</span>
+       </li>
+       <li className="flex gap-4">
+        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold ring-1 ring-primary/20">5</span>
+        <span className="pt-0.5 leading-relaxed">Run <code className="px-1.5 py-0.5 bg-muted/50 border border-border rounded text-foreground font-mono text-[11px]">npm run discord</code> or restart <code className="px-1.5 py-0.5 bg-muted/50 border border-border rounded text-foreground font-mono text-[11px]">overseer-discord</code></span>
+       </li>
+       <li className="flex gap-4">
+        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold ring-1 ring-primary/20">6</span>
+        <span className="pt-0.5 leading-relaxed">In Discord, test with <code className="px-1.5 py-0.5 bg-muted/50 border border-border rounded text-foreground font-mono text-[11px]">/ask hello</code>, a DM, or by mentioning the bot</span>
        </li>
       </ol>
+      <div className="mx-6 mb-6 rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-200/90">
+       The <strong>Test</strong> button only checks whether the token is valid. It does not mean the bot has already been invited, started, or given the right Discord permissions.
+      </div>
      </div>
     </div>
    </div>
